@@ -27,3 +27,10 @@ TODO
 
 TODO
 
+***
+
+**错误提示**
+
+    E/SELinux (  200): avc:  denied  { add } for service=PowerService scontext=u:r:init:s0 tcontext=u:object_r:default_android_service:s0 tclass=service_manager
+
+    

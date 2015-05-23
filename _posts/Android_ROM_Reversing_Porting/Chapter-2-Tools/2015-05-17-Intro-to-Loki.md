@@ -72,8 +72,11 @@ exit 0
 {% endhighlight %}
 
 该脚本的主要过程是:
+
 1. 将手机上的aboot.img 通过dd命令,导出到临时目录;
+
 2. 利用loki_tool, 将新导出aboot.img作为输入参数,对待刷入的boot.img进行patch,生成一个可以绕过 Bootloader校验的boot.lok
+
 3. 将boot.lok刷入boot分区
 
 可以看到,第三方的 boot.img 并不是直接刷入,而是在手机上通过 loki 处理后,再刷入的。
