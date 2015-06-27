@@ -202,7 +202,7 @@ upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与
 
     $ repo status [<PROJECT_LIST>]
 
-status用于查看多个
+status用于查看多个git库的状态。实际上，是对`git status`命令的封装。
 
 
 ***
