@@ -1,9 +1,13 @@
 ---
 layout: page
-title: 最近更新
+title:
 tagline:
 ---
+
 {% include JB/setup %}
+
+最近更新
+===
 
 <ul class="posts">
   {% for post in site.posts %}
@@ -11,4 +15,13 @@ tagline:
   {% endfor %}
 </ul>
 
+<br/><br/>
 
+转载信息
+===
+
+博客内容均属原创，欢迎转载，请注明出处:
+
+ **原文内容**：duanqz.github.io
+ 
+ **作者邮箱**：duanqz@gmail.com
