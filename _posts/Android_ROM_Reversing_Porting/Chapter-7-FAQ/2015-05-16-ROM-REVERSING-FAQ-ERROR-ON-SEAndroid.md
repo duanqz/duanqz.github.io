@@ -9,7 +9,7 @@ tags: [SELinux权限限制]
 
 分析由于SEAndroid的限制导致的错误
 
-## SEAndroid访问权限限制
+# SEAndroid访问权限限制
 
 **错误提示**
 

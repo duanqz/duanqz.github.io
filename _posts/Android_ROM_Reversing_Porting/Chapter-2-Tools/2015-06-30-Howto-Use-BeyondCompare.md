@@ -7,7 +7,7 @@ tags : []
 ---
 {% include JB/setup %}
 
-## 概要
+# 概要
 
 `BeyondCompare`是由[Scooter Software](http://www.scootersoftware.com/)推出的一款文件和目录对比工具，是一个共享软件，需要购买版权才能使用。
 可以从官网[下载地址](http://www.scootersoftware.com/download.php)获取安装包。
@@ -16,7 +16,7 @@ tags : []
 
 `BeyondCompare`提供Windows， Linux和Mac三类版本，本文以Linux的4.0版本为例，介绍BeyondCompare在ROM适配过程中一些使用技巧。
 
-## 1. 忽略Smali文件对比时的行号差异
+# 1. 忽略Smali文件对比时的行号差异
 
 smali代码中通过 **.line** 关键字标识的行，会对应到Java代码的行号，譬如： “.line 147”，表示接下来的smali代码对应到Java代码的第147行。 **.line** 关键字并不影响smali语法的执行，在对比Smali文件时，可以忽略掉**.line** 关键字的差异，使得对比结果更加清晰。
 
@@ -51,7 +51,7 @@ $ bcompare file1.smali file2.smali
 <div align="center"><img src="/assets/images/BeyondCompare/8-withoutlines.png"/></div>
 
 
-## 2. 文件夹比较时快速查找文件
+# 2. 文件夹比较时快速查找文件
 
 在命令行输入如下命令，对比两个目录
 
@@ -62,7 +62,7 @@ $ bcompare fold1 fold2
 该命令会启动BeyondCompare的图形界面，显示出fold1和fold2两个目录下所有文件的差异。当需要定位到某一个文件查看时，可以利用过滤器![image](/assets/images/BeyondCompare/9-filters.png)，
 过滤器的内容是一个正则表达式，只需要输入要查找的文件名关键字，然后查询即可。
 
-## 3. 将BeyondCompare作为git的图形化对比工具
+# 3. 将BeyondCompare作为git的图形化对比工具
 
 准确说这应该是git的使用技巧,但涉及BeyondCompare这个工具,这里一并做下介绍。
 

@@ -14,7 +14,7 @@ tags: [Loki]
 
 当前版本(2015.04.20)已经编译好了可以在ARM上运行的loki_tool,位于bin目录下,可以直接将这个二进制 Push到手机上运行。
 
-## 使用介绍
+# 使用介绍
 
 {% highlight console %}
 Loki tool v2.1
@@ -61,7 +61,7 @@ $ loki_tool flash boot boot.lok
 {% endhighlight %}
 
 
-## CyanogenMode如何使用Loki
+# CyanogenMode如何使用Loki
 
 以LG G2(D802)为例，我们可以从CM的刷机包中,看到`Loki`的真实使用过程:
 
@@ -92,7 +92,7 @@ exit 0
 可以看到,第三方的 boot.img 并不是直接刷入,而是在手机上通过 loki 处理后,再刷入的。
 
 
-## 编译PC版本的Loki
+# 编译PC版本的Loki
 
 `Loki`并不仅仅只限于在手机上运行,该一下编译配置,就可以编译出在PC上运行的版本。从GitHub下载完 Loki 的源码后,打开根目录下得Makefile文件,将其中的
 **CC := arm-linux-androideabi-gcc**

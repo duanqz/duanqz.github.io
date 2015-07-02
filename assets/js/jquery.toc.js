@@ -13,11 +13,11 @@
  *   http://www.gnu.org/licenses/gpl.html
  */
 (function($) {
-    var toggleHTML = '<div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="toctogglelink" class="internal" href="#">hide</a>]</span></div>';
+    var toggleHTML = '<div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="toctogglelink" class="internal" href="#">---</a>]</span></div>';
     var tocContainerHTML = '<div id="toc-container"><table class="toc" id="toc"><tbody><tr><td>%1<ul>%2</ul></td></tr></tbody></table></div>';
 
     function createLevelHTML(anchorId, tocLevel, tocSection, tocNumber, tocText, tocInner) {
-        var link = '<a href="#%1"><span class="tocnumber">%2</span> <span class="toctext">%3</span></a>%4'
+        var link = '<a href="#%1"><span class="toctext">%3</span></a>%4'
             .replace('%1', anchorId)
             .replace('%2', tocNumber)
             .replace('%3', tocText)
@@ -34,8 +34,8 @@
             showAlways: false,
             saveShowStatus: true,
             contentsText: 'Contents',
-            hideText: 'hide',
-            showText: 'show'};
+            hideText: '---',
+            showText: '+++'};
 
         if (settings) {
             $.extend(config, settings);

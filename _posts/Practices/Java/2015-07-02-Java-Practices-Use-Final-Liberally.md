@@ -8,7 +8,7 @@ tags : [Java Practices]
 {% include JB/setup %}
 
 
-## final关键字的使用场景
+# final关键字的使用场景
 
 使用**final**关键字一般有以下显示的作用：
 
@@ -80,7 +80,7 @@ public final class Boat {
 
 ***
 
-## final关键字的使用细节
+# final关键字的使用细节
 
 <br/>
 <font size="4"><b>final局部变量与普通局部变量有什么区别</b></font>
