@@ -13,50 +13,54 @@ tags: [打包错误]
 
 **错误提示**
 
-    I: Using Apktool 2.0.0 
-    I: Checking whether sources has changed... 
-    I: Smaling smali folder into classes.dex... 
-    Exception in thread "main" org.jf.util.ExceptionWithContext: Unsigned short value out of range: 67380 
-        	at org.jf.dexlib2.writer.DexDataWriter.writeUshort(DexDataWriter.java:116) 
-        	at org.jf.dexlib2.writer.InstructionWriter.write(InstructionWriter.java:312) 
-        	at org.jf.dexlib2.writer.DexWriter.writeCodeItem(DexWriter.java:990) 
-        	at org.jf.dexlib2.writer.DexWriter.writeDebugAndCodeItems(DexWriter.java:769) 
-        	at org.jf.dexlib2.writer.DexWriter.writeTo(DexWriter.java:222) 
-        	at org.jf.dexlib2.writer.DexWriter.writeTo(DexWriter.java:200) 
-        	at brut.androlib.src.SmaliBuilder.build(SmaliBuilder.java:57) 
-        	at brut.androlib.src.SmaliBuilder.build(SmaliBuilder.java:41) 
-        	at brut.androlib.Androlib.buildSourcesSmali(Androlib.java:354) 
-        	at brut.androlib.Androlib.buildSources(Androlib.java:294) 
-        	at brut.androlib.Androlib.build(Androlib.java:280) 
-        	at brut.androlib.Androlib.build(Androlib.java:255) 
-        	at brut.apktool.Main.cmdBuild(Main.java:225) 
-        	at brut.apktool.Main.main(Main.java:84) 
-    
-    make[1]: *** [out/obj/system/framework/framework.jar] Error 161 
-    make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
-    make: *** [ota] Error 2 
+{% highlight console %}
+I: Using Apktool 2.0.0 
+I: Checking whether sources has changed... 
+I: Smaling smali folder into classes.dex... 
+Exception in thread "main" org.jf.util.ExceptionWithContext: Unsigned short value out of range: 67380 
+    	at org.jf.dexlib2.writer.DexDataWriter.writeUshort(DexDataWriter.java:116) 
+    	at org.jf.dexlib2.writer.InstructionWriter.write(InstructionWriter.java:312) 
+    	at org.jf.dexlib2.writer.DexWriter.writeCodeItem(DexWriter.java:990) 
+    	at org.jf.dexlib2.writer.DexWriter.writeDebugAndCodeItems(DexWriter.java:769) 
+    	at org.jf.dexlib2.writer.DexWriter.writeTo(DexWriter.java:222) 
+    	at org.jf.dexlib2.writer.DexWriter.writeTo(DexWriter.java:200) 
+    	at brut.androlib.src.SmaliBuilder.build(SmaliBuilder.java:57) 
+    	at brut.androlib.src.SmaliBuilder.build(SmaliBuilder.java:41) 
+    	at brut.androlib.Androlib.buildSourcesSmali(Androlib.java:354) 
+    	at brut.androlib.Androlib.buildSources(Androlib.java:294) 
+    	at brut.androlib.Androlib.build(Androlib.java:280) 
+    	at brut.androlib.Androlib.build(Androlib.java:255) 
+    	at brut.apktool.Main.cmdBuild(Main.java:225) 
+    	at brut.apktool.Main.main(Main.java:84) 
+
+make[1]: *** [out/obj/system/framework/framework.jar] Error 161 
+make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
+make: *** [ota] Error 2 
+{% endhighlight %}
 
 **出错原因**
 
 通常是Android 5.0以上的版本，回编译framework.jar时，单个包的函数数量超过`65535`的限制导致的。
 在Android 5.0以下的版本，回编译时，也会有函数数量超过限制的错误，报错信息如下：
 
-    I: Checking whether sources has changed...
-    I: Smaling...
-    Exception in thread "main" org.jf.dexlib.Util.ExceptionWithContext: method index is too large.
-        at org.jf.dexlib.Util.ExceptionWithContext.withContext(ExceptionWithContext.java:54)
-        at org.jf.dexlib.Item.addExceptionContext(Item.java:177)
-        at org.jf.dexlib.Item.writeTo(Item.java:120)
-        ... more
-        at brut.apktool.Main.cmdBuild(Main.java:185)
-        at brut.apktool.Main.main(Main.java:70)
-    Caused by: java.lang.RuntimeException: method index is too large. 
-        at org.jf.dexlib.Code.Format.Instruction35c.writeInstruction(Instruction35c.java:102)
-        at org.jf.dexlib.Code.Instruction.write(Instruction.java:57)
-        at org.jf.dexlib.CodeItem.writeItem(CodeItem.java:258)
-        at org.jf.dexlib.Item.writeTo(Item.java:117)
-        ... 12 more
-        code_item @0x1a6ef4 (Landroid/opengl/GLErrorWrapper;->glFramebufferRenderbufferOES(IIII)V)
+{% highlight console %}
+I: Checking whether sources has changed...
+I: Smaling...
+Exception in thread "main" org.jf.dexlib.Util.ExceptionWithContext: method index is too large.
+    at org.jf.dexlib.Util.ExceptionWithContext.withContext(ExceptionWithContext.java:54)
+    at org.jf.dexlib.Item.addExceptionContext(Item.java:177)
+    at org.jf.dexlib.Item.writeTo(Item.java:120)
+    ... more
+    at brut.apktool.Main.cmdBuild(Main.java:185)
+    at brut.apktool.Main.main(Main.java:70)
+Caused by: java.lang.RuntimeException: method index is too large. 
+    at org.jf.dexlib.Code.Format.Instruction35c.writeInstruction(Instruction35c.java:102)
+    at org.jf.dexlib.Code.Instruction.write(Instruction.java:57)
+    at org.jf.dexlib.CodeItem.writeItem(CodeItem.java:258)
+    at org.jf.dexlib.Item.writeTo(Item.java:117)
+    ... 12 more
+    code_item @0x1a6ef4 (Landroid/opengl/GLErrorWrapper;->glFramebufferRenderbufferOES(IIII)V)
+{% endhighlight %}
 
 APKTOOL 2.0针对Android 5.0做了一些优化，之前只会提示`method index is too large.`，现在会提示出已有的函数索引数量(本例中是`67380`)
 
@@ -93,19 +97,21 @@ APKTOOL 2.0针对Android 5.0做了一些优化，之前只会提示`method index
 
 **错误提示**
 
-    make_ext4fs -s -l 537919488 -a system /tmp/tmpddYzrZ /tmp/targetfiles-KWw86n/system
-    Creating filesystem with parameters:
-    Size: 537919488
-    Block size: 4096
-    Blocks per group: 32768
-    Inodes per group: 6576
-    Inode size: 256
-    Journal blocks: 2052
-    Label:
-    Blocks: 131072
-    Block groups: 4
-    Reserved block group size: 39
-    error: do_inode_allocate_extents: Failed to allocate 109 blocks
+{% highlight console %}
+$ make_ext4fs -s -l 537919488 -a system /tmp/tmpddYzrZ /tmp/targetfiles-KWw86n/system
+Creating filesystem with parameters:
+Size: 537919488
+Block size: 4096
+Blocks per group: 32768
+Inodes per group: 6576
+Inode size: 256
+Journal blocks: 2052
+Label:
+Blocks: 131072
+Block groups: 4
+Reserved block group size: 39
+error: do_inode_allocate_extents: Failed to allocate 109 blocks
+{% endhighlight %}
 
 **出错原因**
 
@@ -118,19 +124,21 @@ Android最终在编译system.img的时候，会使用`make_ext4fs`这个工具�
 
 在编译整个系统的情况下，我们无法单独中断到`make_ext4fs`这条命令来修改`-l`参数。Android是预先将这个参数写到`META/misc_info.txt`这个文件中的：
 
-    recovery_api_version=3
-    fstab_version=1
-    blocksize=0xffffffff
-    boot_size=0x800000
-    recovery_size=0x800000
-    system_size=0x20100000
-    userdata_size=0x40100000
-    extfs_sparse_flag=-s
-    tool_extensions=.
-    default_system_dev_certificate=build/security/testkey
-    use_set_metadata=1
-    multistage_support=1
-    update_rename_support=1
-    fs_type=ext4
+{% highlight text %}
+recovery_api_version=3
+fstab_version=1
+blocksize=0xffffffff
+boot_size=0x800000
+recovery_size=0x800000
+system_size=0x20100000
+userdata_size=0x40100000
+extfs_sparse_flag=-s
+tool_extensions=.
+default_system_dev_certificate=build/security/testkey
+use_set_metadata=1
+multistage_support=1
+update_rename_support=1
+fs_type=ext4
+{% endhighlight %}
 
 `system_size=0x20100000`这一行，就指定了预先分配给system.img的大小，十进制的值就是`537919488`，只需要将这个值改大到可以正常打包system.img的大小即可。

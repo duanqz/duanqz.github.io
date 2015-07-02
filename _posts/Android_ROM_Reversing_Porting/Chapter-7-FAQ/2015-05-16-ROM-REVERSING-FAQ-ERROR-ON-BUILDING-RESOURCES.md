@@ -15,15 +15,16 @@ tags: [资源编译]
 
 **错误提示**
 
-    duanqizhi@xo:/smali-5.0/devices/base$ make 
-    # use /smali-5.0/devices/base/recovery.fstab 
-    >>> project: g2_cm, path: /home/duanqizhi/source/smali-5.0/devices/g2_cm 
-    # use /smali-5.0/devices/base/recovery.fstab 
-    make[1]: Entering directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
-    >>> prebuilt-files done 
-    >>> Nothing to do: bootimage 
-    >>> Nothing to do: recoveryimage 
-    >>> start auto merge framework-res 
+{% highlight console %}
+duanqizhi@xo:/smali-5.0/devices/base$ make 
+# use /smali-5.0/devices/base/recovery.fstab 
+>>> project: g2_cm, path: /home/duanqizhi/source/smali-5.0/devices/g2_cm 
+# use /smali-5.0/devices/base/recovery.fstab 
+make[1]: Entering directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
+>>> prebuilt-files done 
+>>> Nothing to do: bootimage 
+>>> Nothing to do: recoveryimage 
+>>> start auto merge framework-res 
     aapt package -u -x -z \ 
 		-c hdpi,mdpi,normal,nodpi,en_US,zh_CN,en_US,zh_CN,en_US,xhdpi,xxhdpi --preferred-density xxhdpi \ 
 		--min-sdk-version 21 \ 
@@ -36,9 +37,10 @@ tags: [资源编译]
 		-S /smali-5.0/devices/base/framework-res/res \ 
 		-F out/obj/system/framework/framework-res.apk.tmp 1>/dev/null 
     invalid resource directory name:   /smali-5.0/devices/base/framework-res/res values-ￎ@-rES 
-    make[1]: *** [out/obj/system/framework/framework-res.apk.tmp] Error 1 
-    make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
-    make: *** [ota] Error 
+make[1]: *** [out/obj/system/framework/framework-res.apk.tmp] Error 1 
+make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
+make: *** [ota] Error 
+{% endhighlight %}
 
 **出错原因**
 
@@ -57,15 +59,16 @@ AAPT编译资源时，遇到非法的资源名称目录，本例中是`values-�
 
 **错误提示**
 
-    duanqizhi@xo:/smali-5.0/devices/base$ make 
-    # use /smali-5.0/devices/base/recovery.fstab 
-    >>> project: g2_cm, path: /home/duanqizhi/source/smali-5.0/devices/g2_cm 
-    # use /smali-5.0/devices/base/recovery.fstab 
-    make[1]: Entering directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
-    >>> prebuilt-files done 
-    >>> Nothing to do: bootimage 
-    >>> Nothing to do: recoveryimage 
-    >>> start auto merge framework-res 
+{% highlight console %}
+duanqizhi@xo:/smali-5.0/devices/base$ make 
+# use /smali-5.0/devices/base/recovery.fstab 
+>>> project: g2_cm, path: /home/duanqizhi/source/smali-5.0/devices/g2_cm 
+# use /smali-5.0/devices/base/recovery.fstab 
+make[1]: Entering directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
+>>> prebuilt-files done 
+>>> Nothing to do: bootimage 
+>>> Nothing to do: recoveryimage 
+>>> start auto merge framework-res 
     aapt package -u -x -z \ 
 		-c hdpi,mdpi,normal,nodpi,en_US,zh_CN,en_US,zh_CN,en_US,xhdpi,xxhdpi --preferred-density xxhdpi \ 
 		--min-sdk-version 21 \ 
@@ -105,9 +108,10 @@ AAPT编译资源时，遇到非法的资源名称目录，本例中是`values-�
     /smali-5.0/devices/base/framework-res/res/values/public.xml:5586: error: Public entry identifier 0x104079c entry index is larger than available symbols (index 1948, total symbols 1942). 
 
     /smali-5.0/devices/base/framework-res/res/values/public.xml:5586: error: Public symbol string/transient_navigation_confirmation_long declared here is not defined. 
-    make[1]: *** [out/obj/system/framework/framework-res.apk.tmp] Error 1 
-    make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
-    make: *** [ota] Error 2 
+make[1]: *** [out/obj/system/framework/framework-res.apk.tmp] Error 1 
+make[1]: Leaving directory `/home/duanqizhi/source/smali-5.0/devices/g2_cm' 
+make: *** [ota] Error 2 
+{% endhighlight %}
 
 **出错原因**
 
@@ -139,22 +143,24 @@ AAPT编译资源时，遇到非法的资源名称目录，本例中是`values-�
 不同类型的资源ID一定是连续的，以字符串string为例，起始的资源ID(最小值)是`0x01040000`，末尾的资源ID(最大值)是`0x0104079c`，后者减去前者是`0x79c`，十进制的值是`1948`
 说明一共有应该有`1949`个字符串类型的资源，索引范围是`0～1948`
 
-    other resources type
-    ...
-    <public type="string" name="cancel" id="0x01040000" />
-    <public type="string" name="copy" id="0x01040001" />
-    <public type="string" name="copyUrl" id="0x01040002" />
-    ...
-    ...
-    <public type="string" name="mediaSize_na_gvrnmt_letter" id="0x01040796" />
-    <public type="string" name="mediaSize_na_legal" id="0x01040797" />
-    <public type="string" name="mediaSize_na_junior_legal" id="0x01040798" />
-    <public type="string" name="mediaSize_na_ledger" id="0x01040799" />
-    <public type="string" name="mediaSize_na_tabloid" id="0x0104079a" />
-    <public type="string" name="transient_navigation_confirmation" id="0x0104079b" />
-    <public type="string" name="transient_navigation_confirmation_long" id="0x0104079c" />
-    ...
-    other resources type
+{% highlight xml %}
+other resources type
+...
+<public type="string" name="cancel" id="0x01040000" />
+<public type="string" name="copy" id="0x01040001" />
+<public type="string" name="copyUrl" id="0x01040002" />
+...
+...
+<public type="string" name="mediaSize_na_gvrnmt_letter" id="0x01040796" />
+<public type="string" name="mediaSize_na_legal" id="0x01040797" />
+<public type="string" name="mediaSize_na_junior_legal" id="0x01040798" />
+<public type="string" name="mediaSize_na_ledger" id="0x01040799" />
+<public type="string" name="mediaSize_na_tabloid" id="0x0104079a" />
+<public type="string" name="transient_navigation_confirmation" id="0x0104079b" />
+<public type="string" name="transient_navigation_confirmation_long" id="0x0104079c" />
+...
+other resources type
+{% endhighlight %}
 
 `public.xml`中，最后7个资源ID在被解析时，它们的索引值分别是`0x796(1942)`, `0x797(1943)`... `0x79c(1948)`，即相对起始资源ID`0x01040000`的偏移，
 但实际的资源总数是`1942`，范围只有`0～1941`，所以，从1942开始索引的资源(最后的7个资源)都会越界。
@@ -174,13 +180,15 @@ APKTOOL可能将一些字符认定为非法的。
 
 当然，如果实在找不到这些丢失的字符串资源，我们可以将这些字符串资源补上，来解决编译问题，打开framework-res/res/values/string.xml文件，对于于本例丢失的7个资源而言，可以在文件末尾添加如下内容：
 
-    <string name="config_deviceKeyHandlerClass">APKTOOL_DUMMY_1</string> 
-    <string name="config_deviceKeyHandlerLib">APKTOOL_DUMMY_2</string> 
-    <string name="config_killSwitchClass">APKTOOL_DUMMY_3</string> 
-    <string name="config_killSwitchLib">APKTOOL_DUMMY_4</string> 
-    <string name="config_rat_2g">APKTOOL_DUMMY_5</string> 
-    <string name="config_rat_3g">APKTOOL_DUMMY_6</string> 
-    <string name="config_rat_4g">APKTOOL_DUMMY_7</string> 
+{% highlight xml %}
+<string name="config_deviceKeyHandlerClass">APKTOOL_DUMMY_1</string> 
+<string name="config_deviceKeyHandlerLib">APKTOOL_DUMMY_2</string> 
+<string name="config_killSwitchClass">APKTOOL_DUMMY_3</string> 
+<string name="config_killSwitchLib">APKTOOL_DUMMY_4</string> 
+<string name="config_rat_2g">APKTOOL_DUMMY_5</string> 
+<string name="config_rat_3g">APKTOOL_DUMMY_6</string> 
+<string name="config_rat_4g">APKTOOL_DUMMY_7</string> 
+{% endhighlight %}
 
 我们并不知道原始的资源内容是什么，这里都以APKTOOL_DUMMY来替代了，如果存在最终使用上问题，还需要根据实际情况来调整。
 
@@ -191,9 +199,10 @@ APKTOOL可能将一些字符认定为非法的。
 
 **错误提示**
 
-    duanqizhi@xo:/smali-5.0/devices/base$ make
-    # use /smali-5.0/devices/base/recovery.fstab 
-    >>> start auto merge framework-res 
+{% highlight console %}
+duanqizhi@xo:/smali-5.0/devices/base$ make
+# use /smali-5.0/devices/base/recovery.fstab 
+>>> start auto merge framework-res 
     aapt package -u -x -z \ 
 		-c hdpi,mdpi,normal,nodpi,en_US,zh_CN,en_US,zh_CN,en_US,xhdpi,xxhdpi --preferred-density xxhdpi \ 
 		--min-sdk-version 21 \ 
@@ -231,6 +240,7 @@ APKTOOL可能将一些字符认定为非法的。
     warning: string 'description_target_soundon' is missing 2 required localizations: en_US zh_CN 
     warning: string 'description_target_unlock' has no default translation. 
     warning: string 'description_target_unlock' is missing 2 required localizations: en_US zh_CN
+{% endhighlight %}
 
 **出错原因**
 
@@ -247,7 +257,9 @@ APKTOOL可能将一些字符认定为非法的。
 本例中，名称为app_no_restricted_accounts的字符串，它的内容没有中文定义，我们通过AAPT编译编译选项，将非中文的资源都去掉了，那么这个字符串就找不到了。
 AAPT编译资源时，并不会报错，public.xml仍然存在这个资源的映射关系。使用APKTOOL反编译时，由于找不的这个字符串资源的定义，就在public.xml中生成DUMMY的伪定义：
 
-    <public type="string" name="APKTOOL_DUMMY_011b" id="0x0x104011b" />
+{% highlight xml %}
+<public type="string" name="APKTOOL_DUMMY_011b" id="0x0x104011b" />
+{% endhighlight %}
 
 使用APKTOOL反编译后，看到很多APKTOOL_DUMMY的关键字，就是因为在public.xml中有定义，但实际又找不到资源导致的。
 

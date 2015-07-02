@@ -22,7 +22,9 @@ smali代码中通过 **.line** 关键字标识的行，会对应到Java代码的
 
 - 在命令行输入如下命令，对比两个文件
 
-    $ bcompare file1.smali file2.smali
+{% highlight console %}
+$ bcompare file1.smali file2.smali
+{% endhighlight %}
 
 该命令会启动BeyondCompare的图形界面，显示出file1.smali和file2.smali的文件差异，左侧的红色表示有差异的地方。红色越多，差异越大。
 
@@ -53,7 +55,9 @@ smali代码中通过 **.line** 关键字标识的行，会对应到Java代码的
 
 在命令行输入如下命令，对比两个目录
 
-    $ bcompare fold1 fold2
+{% highlight console %}
+$ bcompare fold1 fold2
+{% endhighlight %}
 
 该命令会启动BeyondCompare的图形界面，显示出fold1和fold2两个目录下所有文件的差异。当需要定位到某一个文件查看时，可以利用过滤器![image](/assets/images/BeyondCompare/9-filters.png)，
 过滤器的内容是一个正则表达式，只需要输入要查找的文件名关键字，然后查询即可。
@@ -64,9 +68,13 @@ smali代码中通过 **.line** 关键字标识的行，会对应到Java代码的
 
 - 在 Linux 下,执行以下命令配置git的默认可视化比较工具
 
-    $ git config --global diff.tool bc3
-    $ git config --global difftool.prompt false
+{% highlight console %}
+$ git config --global diff.tool bc3
+$ git config --global difftool.prompt false
+{% endhighlight %}
 
 - 使用BeyondCompare比较两个commit的差异, git difftool命令其他使用与git diff一致。
 
-    $ git difftool commit_old [commit_new] [file] &
+{% highlight console %}
+$ git difftool commit_old [commit_new] [file] &
+{% endhighlight %}

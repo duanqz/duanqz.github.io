@@ -30,9 +30,11 @@ tags : [UML Relationships]
 
 自然语言表达的`是(is a)`，描述了`继承关系Inheritance`， 用Java语言描述如下：
 
-    class Employee { ... }
+{% highlight java %}
+class Employee { ... }
     
-    class Manager extends Employee { ... }
+class Manager extends Employee { ... }
+{% endhighlight %}
 
 ## 2. 经理使用通行证，刷卡才能进门
 
@@ -40,18 +42,19 @@ tags : [UML Relationships]
 关联的两个对象并存在谁属于谁，两者可以同时存在，生命周期也互不影响。没有通行证，经理只是进不了门，
 但并不会消亡，他还是雇员，还是可以管理员工;同样，通行证也不因为经理离职了而丧失它的刷卡入门的功能。
 
-    class Manager extends Employee {    
-        void login(Passport passport) {         <----+
-            passport.swipe(this)                     |
-        }                                            |
-    }                                                |
-                                                     |
-    class Passport {                                 |
-        void swipe(Manager manager) {           <----+
-            // Check Identity of the manager
-        }
+{% highlight java %}
+class Manager extends Employee {    
+    void login(Passport passport) {         <----+
+        passport.swipe(this)                     |
+    }                                            |
+}                                                |
+                                                 |
+class Passport {                                 |
+    void swipe(Manager manager) {           <----+
+        // Check Identity of the manager
     }
-
+}
+{% endhighlight %}
 
 经理需要使用通行证，构成了Manager对Passport的依赖; 
 使用通行证刷卡验证时，构成了Passport对Manager的依赖;
@@ -64,15 +67,17 @@ tags : [UML Relationships]
 经理依赖于这群员工;同时，员工又是相对独立的，即便经理离职了，员工还是可以存在，员工不随着经理
 的消亡而消亡。
 
-    class Manager extends Employee {
-        List<Worker> workers = new ArrayList<Worker>();
+{% highlight java %}
+class Manager extends Employee {
+    List<Worker> workers = new ArrayList<Worker>();
         
-        void add(Worker worker) {       <>------+
-            workers.add(worker)                 |
-        }                                       |
-    }                                           |
-                                                |
-    class Worker extends Employee { }    <------+
+    void add(Worker worker) {       <>------+
+        workers.add(worker)                 |
+    }                                       |
+}                                           |
+                                            |
+class Worker extends Employee { }    <------+
+{% endhighlight %}
 
 然而，这和`关联关系(Association)`有什么区别呢？如果经理下面只有一个员工，那不就是经理和员工之间
 的单向关联吗？因为两者的生命周期互不影响啊，而且即便经理没有员工，经理也可以刷卡进门;即便员工没有经理，也可以照样干活啊。
@@ -91,19 +96,21 @@ tags : [UML Relationships]
 
 从代码的角度，每次新建一个项目的时候，都需要与一个经理参与进来，先有的Manager对象，再有的Project对象。
 
-    class Manager extends Employee {       <------+
-        void setSalary() { ... }   ---+           |
-    }                                 |           |
-                                      |           |
-    class Project {                   |           |
-        Manager mManager;             |           |
-                                      |           |
-        Project(Manager manager) {    |    -------+
-            mManager = manager;       |
-        }                             |
-                                      |
-        boolean isSuccess() { }   <---+    
-    }
+{% highlight java %}
+class Manager extends Employee {       <------+
+    void setSalary() { ... }   ---+           |
+}                                 |           |
+                                  |           |
+class Project {                   |           |
+    Manager mManager;             |           |
+                                  |           |
+    Project(Manager manager) {    |    -------+
+        mManager = manager;       |
+    }                             |
+                                  |
+    boolean isSuccess() { }   <---+    
+}
+{% endhighlight %}
 
 ## 5. 项目影响经理
 
@@ -123,11 +130,11 @@ tags : [UML Relationships]
 
                  关联关系         聚合关系         组合关系
     主权对象         无             单一            单一
-              
+                  
     生命周期      互不影响         互不影响         相互影响
-              
+                  
     从属对象      完全独立       属于主权对象      属于主权对象
-
+    
 
 
 英文原文地址：

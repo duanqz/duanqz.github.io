@@ -16,39 +16,49 @@ tags: [Loki]
 
 ## 使用介绍
 
-    Loki tool v2.1
-    Usage
-    # 对 in.img 进行 Patch,生成可以绕过 Bootloader 的 out.lok
-    # 要求一个输入参数 aboot.img,简单理解成为 Bootloader 分区的镜像
-    # 在拥有手机的 ROOT 权限后,可以从手机中把 aboot.img 取出来
-    # 使用该命令对 boot.img 或 recovery.img 进行 Patch
-    ./loki_tool [patch] [boot|recovery] [aboot.img] [in.img] [out.lok]
-    
-    # 使用该命令将 Patch 后的 img 刷入指定的分区
-    ./loki_tool [flash] [boot|recovery] [in.lok]
-    
-    # 使用该命令可以判定 loki 是否支持绕过当前手机的 Bootloader 校验
-    # 对于 Android 4.4及以上版本的 aboot.img,使用该命令,会提示错误信息:
-    # [-] Could not find boot_linux_from_mmc
-    ./loki_tool [find] [aboot.img]
+{% highlight console %}
+Loki tool v2.1
+Usage
 
-    # 使用该命令可以对 Patch 过后的 image 还原。
-    ./loki_tool [unlok] [in.lok] [out.img]
+$ loki_tool [patch] [boot|recovery] [aboot.img] [in.img] [out.lok]
+  对 in.img 进行 Patch,生成可以绕过 Bootloader 的 out.lok
+  要求一个输入参数 aboot.img,简单理解成为 Bootloader 分区的镜像
+  在拥有手机的 ROOT 权限后,可以从手机中把 aboot.img 取出来
+  使用该命令对 boot.img 或 recovery.img 进行 Patch
+    
+$ loki_tool [flash] [boot|recovery] [in.lok]
+  使用该命令将 Patch 后的 img 刷入指定的分区
+    
+$ loki_tool [find] [aboot.img]
+  使用该命令可以判定 loki 是否支持绕过当前手机的 Bootloader 校验
+  对于 Android 4.4及以上版本的 aboot.img,使用该命令,会提示错误信息:
+  [-] Could not find boot_linux_from_mmc
+
+$ loki_tool [unlok] [in.lok] [out.img]
+  使用该命令可以对 Patch 过后的 image 还原。
+
+{% endhighlight %}
 
 针对一款具体的手机而言,我们需要获取ROOT权限,才能正常使用`Loki`的功能。以LG G2(D802)为例：
 
 首先,需要获取手机的Bootloader分区镜像aboot.img,才能够计算出Bootloader签名验证函数check_sig()和内核加载函数boot_linux_from_mmc()的偏移值。在拿到ROOT权限后,可以直接从手机的aboot分区,将aboot.img 镜像取出来:
 
-    dd if=/dev/block/platform/msm_sdcc.1/by-name/aboot of=aboot.img
+{% highlight console %}
+$ dd if=/dev/block/platform/msm_sdcc.1/by-name/aboot of=aboot.img
+{% endhighlight %}
 
 然后,需要对定制过的boot.img或recovery.img 进行Patch,得到可以绕过Bootloader 校验的 boot.lok 或 recovery.lok:
 
-    loki_tool patch boot aboot.img boot.img boot.lok
+{% highlight console %}
+$ loki_tool patch boot aboot.img boot.img boot.lok
+{% endhighlight %}
 
 最后,建议使用 loki_tool 将 boot.lok 或 recovery.lok 刷人手机的对应分区。当然,
 也可以使用 dd 命令来刷写分区,但 loki_tool 在刷入之前,还会对镜像文件做检查:
 
-    loki_tool flash boot boot.lok
+{% highlight console %}
+$ loki_tool flash boot boot.lok
+{% endhighlight %}
 
 
 ## CyanogenMode如何使用Loki

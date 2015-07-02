@@ -16,8 +16,10 @@ tags: [Repo]
 Android源码包含数百个git库，仅仅是下载这么多git库就是一项繁重的任务，所以在下载源码时，Android就引入了repo。
 Android官方推荐下载repo的方法是通过Linux curl命令，下载完后，为repo脚本添加可执行权限：
 
-    $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-    $ chmod a+x ~/bin/repo
+{% highlight console %}
+$ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+$ chmod a+x ~/bin/repo
+{% endhighlight %}
 
 由于国内Google访问受限，所以上述命令不一定能下载成功。其实，我们现在可以从很多第三方渠道找到repo脚本，只需要取下来，确保repo可以正确执行即可。
 
@@ -39,23 +41,26 @@ repo将自动化的管理信息都隐藏根目录的**.repo**子目录中。
 AOSP项目清单git库下，只有一个文件default.xml，是一个标准的XML，描述了当前repo管理的所有信息。
 [AOSP的default.xml](https://android.googlesource.com/platform/manifest)的文件内容如下：
 
-    <?xml version="1.0" encoding="UTF-8"?>
-    <manifest>
-      <remote  name="aosp"
-               fetch=".."
-               review="https://android-review.googlesource.com/" />
-      <default revision="master"
-               remote="aosp"
-               sync-j="4" />
-      <project path="build" name="platform/build" groups="pdk,tradefed" >
+{% highlight xml %}
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+    <remote  name="aosp"
+             fetch=".."
+             review="https://android-review.googlesource.com/" />
+    <default revision="master"
+             remote="aosp"
+             sync-j="4" />
+    <project path="build" name="platform/build" groups="pdk,tradefed" >
         <copyfile src="core/root.mk" dest="Makefile" />
-      </project>
-      <project path="abi/cpp" name="platform/abi/cpp" groups="pdk" />
-      <project path="art" name="platform/art" groups="pdk" />
-      ...
-      <project path="tools/studio/translation" name="platform/tools/studio/translation" groups="notdefault,tools" />
-      <project path="tools/swt" name="platform/tools/swt" groups="notdefault,tools" />
-    </manifest>
+    </project>
+    <project path="abi/cpp" name="platform/abi/cpp" groups="pdk" />
+    <project path="art" name="platform/art" groups="pdk" />
+    ...
+    <project path="tools/studio/translation" name="platform/tools/studio/translation" groups="notdefault,tools" />
+    <project path="tools/swt" name="platform/tools/swt" groups="notdefault,tools" />
+</manifest>
+
+{% endhighlight %}
 
 - **&lt;remote&gt;**：描述了远程仓库的基本信息。name描述的是一个远程仓库的名称，通常我们看到的命名是origin;fetch用作项目名称的前缘，在构造项目仓库远程地址时使用到;review描述的是用作code review的server地址
 
@@ -71,16 +76,19 @@ name用于定义项目名称，命名方式采用的是整个项目URL的相对�
 
 local_manifests的修改示例如下：
 
-    $ ls .repo/local_manifests
-    local_manifest.xml
-    another_local_manifest.xml
+{% highlight console %}
+$ ls .repo/local_manifests
+local_manifest.xml
+another_local_manifest.xml
 
-    $ cat .repo/local_manifests/local_manifest.xml
-    <?xml version="1.0" encoding="UTF-8"?>
-    <manifest>
-        <project path="manifest" name="tools/manifest" />
-        <project path="platform-manifest" name="platform/manifest" />
-    </manifest>
+$ cat .repo/local_manifests/local_manifest.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+    <project path="manifest" name="tools/manifest" />
+    <project path="platform-manifest" name="platform/manifest" />
+</manifest>
+
+{% endhighlight %}
 
 ### 2.2 repo脚本库(.repo/repo)
 
@@ -106,14 +114,18 @@ repo对git命令进行了封装，提供了一套repo的命令集(包括init, sy
 
 repo命令的使用格式如下所示：
 
-    $ repo <COMMAND> <OPTIONS>
+{% highlight console %}
+$ repo <COMMAND> <OPTIONS>
+{% endhighlight %}
 
 可选的<COMMAND>的有：help、init、sync、upload、diff、download、forall、prune、start、status，每一个命令都有实际的使用场景，
 下面我们先对这些命令做一个简要的介绍：
 
 ### 3.1 init
 
-    $ repo init -u <URL> [<OPTIONS>]
+{% highlight console %}
+$ repo init -u <URL> [<OPTIONS>]
+{% endhighlight %}
 
 - ***-u***：指定manifests这个远程git库的URL，manifests库是整个项目的清单。默认情况，这个git库只包含了default.xml一个文件，其内容可以参见[Android的样本](https://android.googlesource.com/platform/manifest)
 
@@ -131,17 +143,19 @@ repo命令的使用格式如下所示：
 
 这些本地的目录是如何生成的呢？执行repo命令时，可以通过`--trace`参数，来看实际发生了什么。
 
-    $ repo --trace init -u $URL -b $BRANCH -m $MANIFEST
-    --------------------
-    mkdir .repo; cd .repo
-    git clone --bare $URL manifests.git
-    git clone https://android.googlesource.com/tools/repo
-    mkdir -p manifests/.git; cd manifests/.git
-    for i in ../../manifests.git/*; do ln -s $ı .; done
-    cd ..
-    git checkout $BRANCH -- .
-    cd ..
-    ln -s manifests/$MANIFEST manifest.xml 
+{% highlight console %}
+$ repo --trace init -u $URL -b $BRANCH -m $MANIFEST
+  --------------------
+  mkdir .repo; cd .repo
+  git clone --bare $URL manifests.git
+  git clone https://android.googlesource.com/tools/repo
+  mkdir -p manifests/.git; cd manifests/.git
+  for i in ../../manifests.git/*; do ln -s $ı .; done
+  cd ..
+  git checkout $BRANCH -- .
+  cd ..
+  ln -s manifests/$MANIFEST manifest.xml 
+{% endhighlight %}
 
 首先，在当前目录下创建.repo子目录，后续所有的操作都在.repo子目录下完成;
 
@@ -163,7 +177,9 @@ repo命令的使用格式如下所示：
 
 ### 3.2 sync
 
-    $ repo sync [PROJECT_LIST]
+{% highlight console %}
+$ repo sync [PROJECT_LIST]
+{% endhighlight %}
 
 下载远程代码，并将本地代码更新到最新，这个过程称为“同步”。如果不使用任何参数，那么会对所有repo管理的进行同步操作;也可以PROJECT_LIST参数，指定若干要同步的PROJECT。
 根据本地git库代码不同，同步操作会有不同的行为：
@@ -191,7 +207,9 @@ repo命令的使用格式如下所示：
 
 ### 3.3 upload
 
-    $ repo upload [PROJECT_LIST]
+{% highlight console %}
+$ repo upload [PROJECT_LIST]
+{% endhighlight %}
 
 从字面意思理解，upload就是要上传，将本地的代码上传到远程服务器。upload命令首先会找出本地分支从上一次同步操作以来发生的改动，然后会将这些改动生成Patch文件，上传至*Gerrit*服务器。
 如果没有指定PROJECT_LIST，那么upload会找出所有git库的改动;如果某个git库有多个分支，upload会提供一个交互界面，提示选择其中若干个分支进行上传操作。
@@ -199,9 +217,11 @@ repo命令的使用格式如下所示：
 upload并不会直接将改动合并后远程的git库，而是需要先得到Reviewer批准。Reviewer查看改动内容、决定是否批准合入代码的操作，都是通过Gerrit完成。
 Gerrit服务器的地址是在manifests中指定的：打开.repo/manifest.xml，&lt;remote&gt;这个XML TAG中的review属性值就是Review服务器的URL:
 
-  <remote  name="aosp"
-           fetch=".."
-           review="https://android-review.googlesource.com/" />
+{% highlight xml %}
+<remote name="aosp"
+        fetch=".."
+        review="https://android-review.googlesource.com/" />
+{% endhighlight %}
 
 Gerrit的实现机制不是本文讨论的内容，但有几个与Gerrit相关的概念，是需要代码提交人员了解的：
 
@@ -221,7 +241,9 @@ Commit-ID已经发生了变化，但仍可以保持Change-ID不变，这样,在G
 
 ### 3.4 download
 
-    $ repo download <TARGET> <CHANGE>
+{% highlight console %}
+$ repo download <TARGET> <CHANGE>
+{% endhighlight %}
 
 upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与upload一样，download命令也是配合Gerrit使用的。
 
@@ -233,11 +255,15 @@ upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与
 
 ### 3.5 forall
 
-    $ repo forall [PROJECT_LIST] -c <COMMAND>
+{% highlight console %}
+$ repo forall [PROJECT_LIST] -c <COMMAND>
+{% endhighlight %}
 
 对指定的git库执行**-c**参数制定的命令序列。在管理多个git库时，这是一条非常实用的命令。PROJECT_LIST是以空格区分的，譬如：
 
-    $ repo forall frameworks/base packages/apps/Mms -c "git status"
+{% highlight console %}
+$ repo forall frameworks/base packages/apps/Mms -c "git status"
+{% endhighlight %}
 
 表示对*platform/frameworks/base*和*platform/packages/apps/Mms*同时执行`git status`命令。
 如果没有指定PROJECT_LIST，那么，会对repo管理的所有git库都同时执行命令。
@@ -250,16 +276,20 @@ upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与
 
 ### 3.6 prune
 
-    $ repo prune [<PROJECT_LIST>]
+{% highlight console %}
+$ repo prune [<PROJECT_LIST>]
+{% endhighlight %}
 
 删除指定PROJECT中，已经合并的分支。当在开发分支上代码已经合并到主干分支后，使用该命令就可以删除这个开发分支。
 
 随着时间的演进，开发分支会越来越多，在多人开发同一个git库，多开发分支的情况会愈发明显，假设当前git库有如下分支：
 
-    * master
-      dev_feature1_201501   # 已经合并到master
-      dev_feature2_201502   # 已经合并到master
-      dev_feature3_201503   # 正在开发中，还有改动记录没有合并到master
+{% highlight console %}
+* master
+  dev_feature1_201501   # 已经合并到master
+  dev_feature2_201502   # 已经合并到master
+  dev_feature3_201503   # 正在开发中，还有改动记录没有合并到master
+{% endhighlight %}
 
 那么，针对该git库使用prune命令，会删除dev_feature1_201501和dev_feature2_201502。
 
@@ -267,7 +297,9 @@ upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与
 
 ### 3.7 start
 
-    $ repo start <BRANCH_NAME> [<PROJECT_LIST>]
+{% highlight console %}
+$ repo start <BRANCH_NAME> [<PROJECT_LIST>]
+{% endhighlight %}
 
 在指定的PROJECT的上，切换到&lt;BRANCH_NAME&gt;指定的分支。可以使用**--all**参数对所有的PROJECT都执行分支切换操作。
 该命令实际上是对`git checkout`命令的封装，&lt;BRANCH_NAME&gt;是自定义的，它将追踪manifest中指定的分支名。
@@ -276,7 +308,9 @@ upload是把改动内容提交到Gerrit，download是从Gerrit下载改动。与
 
 ### 3.8 status
 
-    $ repo status [<PROJECT_LIST>]
+{% highlight console %}
+$ repo status [<PROJECT_LIST>]
+{% endhighlight %}
 
 status用于查看多个git库的状态。实际上，是对`git status`命令的封装。
 
@@ -302,80 +336,99 @@ Android推荐的开发流程是：
 
 CyanogenMod(CM)适配了上百款机型，不同机型所涉及到的git库很可能是有差异的。以CM对清单文件的定制为例，通过新增local_manifest.xml，内容如下：
 
-    <manifest>
-        <!-- add github as a remote source -->
-        <remote name="github" fetch="git://github.com" />
+{% highlight xml %}
+<manifest>
+    <!-- add github as a remote source -->
+    <remote name="github" fetch="git://github.com" />
      
-        <!-- remove aosp standard projects and replace with cyanogenmod versions -->
-        <remove-project name="platform/bootable/recovery" />
-        <remove-project name="platform/external/yaffs2" />
-        <remove-project name="platform/external/zlib" />
-        <project path="bootable/recovery" name="CyanogenMod/android_bootable_recovery" remote="github" revision="cm-10.1" />
-        <project path="external/yaffs2" name="CyanogenMod/android_external_yaffs2" remote="github" revision="cm-10.1" />
-        <project path="external/zlib" name="CyanogenMod/android_external_zlib" remote="github" revision="cm-10.1" /> 
+    <!-- remove aosp standard projects and replace with cyanogenmod versions -->
+    <remove-project name="platform/bootable/recovery" />
+    <remove-project name="platform/external/yaffs2" />
+    <remove-project name="platform/external/zlib" />
+    <project path="bootable/recovery" name="CyanogenMod/android_bootable_recovery" remote="github" revision="cm-10.1" />
+    <project path="external/yaffs2" name="CyanogenMod/android_external_yaffs2" remote="github" revision="cm-10.1" />
+    <project path="external/zlib" name="CyanogenMod/android_external_zlib" remote="github" revision="cm-10.1" /> 
      
-        <!-- add busybox from the cyanogenmod repository -->
-        <project path="external/busybox" name="CyanogenMod/android_external_busybox" remote="github" revision="cm-10.1" />
+    <!-- add busybox from the cyanogenmod repository -->
+    <project path="external/busybox" name="CyanogenMod/android_external_busybox" remote="github" revision="cm-10.1" />
 
-    </manifest>
+</manifest>
+{% endhighlight %}
 
 local_manifest.xml会与已有的default.xml融合成一个项目清单文件manifest.xml，实现了对一些git库的替换和新增。
 可以通过以下命令导出当前的清单文件，最终snapshot.xml就是融合后的版本：
 
-    $ repo manifest -o snapshot.xml -r
+{% highlight console %}
+$ repo manifest -o snapshot.xml -r
+{% endhighlight %}
 
 在编译之前，保存整个项目的清单，有助于问题的回溯。当项目的git库发生变更，需要回退到上一个版本进行验证的时候，只需要重新基于snapshot.xml初始化上一个版本即可：
 
-    $ cp snapshot.xml .repo/manifests/
-    $ repo init -m snapshot.xml           # -m 参数表示自定义manifest
-    $ repo sync -d                        # -d 参数表示从当前分支脱离，切换到manifest中定义的分支
+{% highlight console %}
+$ cp snapshot.xml .repo/manifests/
+$ repo init -m snapshot.xml           # -m 参数表示自定义manifest
+$ repo sync -d                        # -d 参数表示从当前分支脱离，切换到manifest中定义的分支
+{% endhighlight %}
 
 ### 4.2 解决无法下载Android源码
 
 在repo init的时候，会从远程下载manifests和repo这两个git库，默认情况下，这两个git库的地址都是写死在repo这个python脚本里面的。对于AOSP而言，这两个git库的地址显然是google提供的。
 但由于google访问受限的缘故，会导致init时，无法下载manifests和repo。这时候，可以使用**init**的**-u**和**--repo-url**参数，自定义这两个库的地址，辅以**--no-repo-verify**来绕过代码检查。
 
-    $ repo init --repo-url [PATH/TO/REPO] -u [PATH/TO/MANIFEST] -b [BRANCH] --no-repo-verify
-    $ repo sync
+{% highlight console %}
+$ repo init --repo-url [PATH/TO/REPO] -u [PATH/TO/MANIFEST] -b [BRANCH] --no-repo-verify
+$ repo sync
+{% endhighlight %}
 
 ### 4.3 更快更省的下载远程代码
 
 repo默认会同步git库的所有远程分支的代码，但实际开发过程中，用到的分支是有限的。使用**sync**的**-c**参数，可以只下载manifest中设定的分支，这会节省代码下载时间以及本地的磁盘空间：
 
-    $ repo sync -c
+{% highlight console %}
+$ repo sync -c
+{% endhighlight %}
 
 如果实际开发过程中，需要用到另外一个分支，而又不想被其他分支干扰，可以在已有的工程根目录下，使用如下命令：
 
-    $ repo manifest -o snapshot.xml -r
-    $ repo init -u [PATH/TO/MANIFEST] -b [ANOTHER_BRANCH]
-    $ repo sync -c -d
+{% highlight console %}
+$ repo manifest -o snapshot.xml -r
+$ repo init -u [PATH/TO/MANIFEST] -b [ANOTHER_BRANCH]
+$ repo sync -c -d
+{% endhighlight %}
 
 以上命令序列，相当更新了manifest，而且仅仅只下载ANOTHER_BRANCH的代码，这样本地只保存了两个分支的代码。利用保存的snapshot.xml，还能将所有git库方便的切换回原来的分支。
 
 如果本地已经有一份Android源码，假设路径为~/android-exsit，想要下载另一份新的Android源码，通过**--reference**参数，在数分钟以内，就能将代码下载完毕：
 
-    $ mkdir ~/android-new && cd ~/android-new
-    $ repo init --reference=~/android-exsit -u [PATH/TO/MANIFEST] -b [BRANCH]
-    $ repo sync -c
+{% highlight console %}
+$ mkdir ~/android-new && cd ~/android-new
+$ repo init --reference=~/android-exsit -u [PATH/TO/MANIFEST] -b [BRANCH]
+$ repo sync -c
+{% endhighlight %}
 
 ### 4.4 避免在匿名分支上工作
 
 在sync完代码后，所有git库默认都是在一个匿名分支上(no branch)，很容易会由于误操作导致丢失代码修改。可以使用如下命令将所有的git库切换到开发分支：
 
-    $ repo start BRANCH --all
-
+{% highlight console %}
+$ repo start BRANCH --all
+{% endhighlight %}
 
 ### 4.5 使用upload提交代码
 
 开发人员可能同时在多个git库，甚至多个分支上，同时进行修改，针对每个git库单独提交代码是繁琐的。可以使用如下命令，一并提交所有的修改：
 
-    $ repo upload
+{% highlight console %}
+$ repo upload
+{% endhighlight %}
  
 不用担心会漏提交或者误提交，upload会提供一个交互界面，开发人员只需要选择需要提交的git库和分支即可。
 
 如果需要省去Gerrit上填写reviewer的操作，可以使用**--reviewer**参数指定Reviewer的邮箱地址：
 
-    $ repo upload --reviewer="R.E.viewer@google.com"
+{% highlight console %}
+$ repo upload --reviewer="R.E.viewer@google.com"
+{% endhighlight %}
 
 ### 4.6 定期删除已经合并的开发分支
 
@@ -383,13 +436,17 @@ Git鼓励在修复Bug或者开发新的Feature时，都创建一个新的分支�
 
 随着时间的演进，开发分支会越来越多，而一些已经合并到主干的开发分支是没有存在价值的，可以通过prune命令定期删除无用的开发分支：
 
-    $ repo prune [PROJECT_LIST]
+{% highlight console %}
+$ repo prune [PROJECT_LIST]
+{% endhighlight %}
 
 ### 4.7 同时操作多个git库
 
 对于部分开发人员而言，同时操作多个git库是常态，如果针对每个git库的操作命令都是相同的，那么可以使用如下命令一次性完成所有操作:
 
-    $ repo forall -c "git branch | grep tmp | xargs git branch -D; git branch"
+{% highlight console %}
+$ repo forall -c "git branch | grep tmp | xargs git branch -D; git branch"
+{% endhighlight %}
 
 参数**-c**指定的命令序列可以很复杂，多条命令只需要用“;”间隔。
 
