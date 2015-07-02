@@ -20,7 +20,7 @@ tagline:
 转载声明
 ===
 
-<font size="4"><b>博客内容均属原创，欢迎转载，请注明出处:</b></font>
+<font size="4"><b>博客内容均属原创，欢迎转载，请注明出处:</b></font><br/>
 
  **原文内容**：duanqz.github.io
  
