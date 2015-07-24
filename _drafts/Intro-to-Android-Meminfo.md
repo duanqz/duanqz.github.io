@@ -8,10 +8,61 @@ tags  []
 
 # 查看内存信息的方式
 
+在Linux上要，查看内存信息，
+
+Linux在内核2.6.25以上的版本，为用户空间提供一组名为pagemap的接口，用户进程可以通过读取/proc中的文件来进行页表检查
+
 ## procrank
+
+部分Andorid手机没有安装procrank命令，需要自行安装。
 
 {% highlight console %}
 $ adb shell procrank
+  PID       Vss      Rss      Pss      Uss  cmdline
+  752  1759396K  161936K   97986K   89876K  system_server
+  907  1652064K  146672K   83775K   74088K  com.android.systemui
+ 1283  1665524K  125984K   63174K   52124K  com.android.launcher3
+ 9578  1654704K  106592K   47788K   42016K  com.android.browser
+ 1072  1583960K   80844K   24473K   21420K  com.android.settings
+ 3230  1588056K   74112K   20503K   18344K  com.android.email
+ 1978  1587312K   70820K   18512K   15540K  com.android.incallui
+ 2244  1588408K   71408K   18401K   16380K  com.android.mms
+ 1250  1558848K   65668K   18326K   16612K  com.android.phone
+ 4786  1563376K   63084K   14438K   12368K  com.android.systemui:screenshot
+  196  1503616K   67332K   12779K    8032K  zygote
+  918  1535740K   56152K   10591K    9172K  android.process.media
+  186   129640K   13096K   10016K    9268K  /system/bin/mediaserver
+ 1220  1529296K   52700K    7346K    6104K  com.android.nfc
+ 3138  1543048K   52020K    7338K    4940K  com.android.dialer
+ 2485  1538988K   51956K    6872K    4988K  com.android.calendar:birthday
+ 2162  1530764K   51012K    6809K    5688K  com.android.providers.calendar
+  170   108072K   11856K    6208K    5336K  /system/bin/surfaceflinger
+ 1538  1524320K   48508K    5338K    4264K  com.android.providers.usagestats
+ 2113  1520476K   46516K    4745K    3732K  com.meizu.mpay
+ 1950  1519196K   44588K    4323K    3316K  com.android.smspush
+  184    32876K    5596K    3783K    3544K  /system/bin/rild
+  165    15556K    3460K    2799K    2776K  /system/bin/logd
+  198    11176K    3040K    2408K    2384K  /system/bin/mm-qcamera-daemon
+10826     6140K    1916K    1585K    1580K  procrank
+ 1049     7436K    2808K    1494K    1344K  /system/bin/wpa_supplicant
+  181    21800K    1684K    1010K     964K  /system/bin/netd
+  197     8252K    1484K     895K     868K  /system/bin/sdcard
+  169     9756K    1960K     892K     820K  /system/bin/vold
+  190    20988K    1200K     752K     732K  /system/bin/qmuxd
+  188     6316K    1740K     667K     604K  /system/bin/keystore
+  191    10820K    1200K     660K     596K  /system/bin/netmgrd
+    1     2612K     792K     642K     532K  /init
+  127     2608K     600K     486K     376K  /sbin/ueventd
+24608    10804K     500K     472K     472K  /sbin/adbd
+  167     4460K    1208K     417K     320K  /system/bin/lmkd
+  178     3196K     744K     417K     412K  /system/bin/sh
+  166     3684K     324K     320K     320K  /sbin/healthd
+  183     3828K     864K     299K     284K  /system/bin/debuggerd
+  168     3236K     672K     288K     280K  /system/bin/servicemanager
+24659     3060K     636K     276K     268K  logcat
+  187     3192K     680K     276K     268K  /system/bin/installd
+                           ------   ------  ------
+                          924832K  802352K  TOTAL
 {% endhightlight %}
 
 - VSS
