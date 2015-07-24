@@ -1,9 +1,9 @@
 ---
 layout: post
-title: ROM逆向适配——常见错误2
+title: 常见错误(2)-Smali编译相关
 category: ROM逆向适配
 tagline: Smali语法相关
-tags: [Smali编译]
+tags: [日志分析]
 ---
 {% include JB/setup %}
 

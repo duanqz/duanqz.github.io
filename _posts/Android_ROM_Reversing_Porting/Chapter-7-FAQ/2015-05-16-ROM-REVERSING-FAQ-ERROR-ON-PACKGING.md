@@ -1,9 +1,9 @@
 ---
 layout: post
-title: ROM逆向适配——常见错误4
+title: 常见错误(4)-打包错误
 category: ROM逆向适配
 tagline: 常见打包错误
-tags: [打包错误]
+tags: [日志分析]
 ---
 {% include JB/setup %}
 

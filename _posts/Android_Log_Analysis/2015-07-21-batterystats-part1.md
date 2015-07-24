@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android日志分析
+category: Android系统原理
 title: 电量统计(1)-原理
 tagline: batterystats
-tags:  [dumpsys]
+tags:  [Android系统原理]
 ---
 {% include JB/setup %}
 

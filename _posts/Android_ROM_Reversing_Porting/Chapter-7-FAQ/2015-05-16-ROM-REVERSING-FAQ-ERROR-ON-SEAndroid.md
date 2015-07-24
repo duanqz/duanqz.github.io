@@ -1,9 +1,9 @@
 ---
 layout: post
-title: ROM逆向适配——常见错误3
+title: 常见错误(3)-SELinux相关
 category: ROM逆向适配
-tagline: SELinux/SEAndroid权限相关
-tags: [SELinux权限限制]
+tagline: SELinux相关
+tags: [日志分析]
 ---
 {% include JB/setup %}
 

@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Loki介绍
-category: 工具使用
+category: ROM逆向适配
 tagline: Loki
-tags: [Loki]
+tags: [工具使用]
 ---
 {% include JB/setup %}
 

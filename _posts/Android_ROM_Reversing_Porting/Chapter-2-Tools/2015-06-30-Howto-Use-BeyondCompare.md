@@ -1,9 +1,9 @@
 ---
 layout: post
-category : 工具使用
+category : ROM逆向适配
 title: BeyondCompare使用介绍
 tagline: BeyondCompare
-tags : []
+tags : [工具使用]
 ---
 {% include JB/setup %}
 

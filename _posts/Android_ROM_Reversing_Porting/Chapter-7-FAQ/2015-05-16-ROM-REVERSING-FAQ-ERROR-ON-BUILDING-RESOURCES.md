@@ -1,9 +1,9 @@
 ---
 layout: post
-title: ROM逆向适配——常见错误1
+title: 常见错误(1)-资源编译相关
 category: ROM逆向适配
 tagline: 资源编译相关
-tags: [资源编译]
+tags: [日志分析]
 ---
 {% include JB/setup %}
 

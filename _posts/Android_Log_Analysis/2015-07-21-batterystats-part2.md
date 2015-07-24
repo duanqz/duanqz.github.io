@@ -1,15 +1,15 @@
 ---
 layout: post
-category: Android日志分析
+category: Android系统原理
 title: 电量统计(2)-日志
 tagline: batterystats
-tags:  [dumpsys]
+tags:  [日志分析]
 ---
 {% include JB/setup %}
 
 # 概要
 
-电量统计的实现原理在[电量统计(1)-原理](2015-07-21-batterystats-part1.md)中已经介绍过。
+电量统计的实现原理在[电量统计(1)-原理]中已经介绍过。
 
 # 电量统计信息的分析
 
