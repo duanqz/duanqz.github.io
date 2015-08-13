@@ -332,7 +332,8 @@ private void processAppUsage(SparseArray<UserHandle> asUsers) {
         //    wifi的使用又可以分为两个情况：扫描可用wifi(SCAN)和进行数据传输(RUNNING)，
         //    这两种情况下的单位时间电流量是不同的
 
-        // 5. 计算使用传感器的耗电量
+        // 5. 计算使用传感器的耗电量file:///home/duanqizhi/w/opensrc/duanqz.github.io/_posts/Android_Fundamentals/2015-07-21-batterystats-part2.md
+
         //    GPS使用的耗电量计算也被包含在这里
     }
 }
@@ -373,3 +374,12 @@ private void processMiscUsage() {
     }
 }
 {% endhighlight %}
+
+**至此，我们进一步分析以下两个问题:**
+
+- **如何计算一个应用程序的耗电量？** 收集硬件模块使用时间 -> 对每个应用程序进行归类计算
+
+- **电量统计需要完成哪些具体工作？** 电量使用信息收集，存储和计算
+
+本文分析了软件层面的电量统计原理，电量统计的结果，一般可以在“设置”这个程序的电池信息中可以看到。另一方面，Android提供的`dumpsys batterystats`功能，也能输出所有的电量统计信息，
+在[电量统计(2)-日志](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/21/batterystats-part2/)一文中，我们对Android的Log进行了详细的分析。
