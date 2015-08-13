@@ -332,8 +332,7 @@ private void processAppUsage(SparseArray<UserHandle> asUsers) {
         //    wifi的使用又可以分为两个情况：扫描可用wifi(SCAN)和进行数据传输(RUNNING)，
         //    这两种情况下的单位时间电流量是不同的
 
-        // 5. 计算使用传感器的耗电量file:///home/duanqizhi/w/opensrc/duanqz.github.io/_posts/Android_Fundamentals/2015-07-21-batterystats-part2.md
-
+        // 5. 计算使用传感器的耗电量
         //    GPS使用的耗电量计算也被包含在这里
     }
 }
