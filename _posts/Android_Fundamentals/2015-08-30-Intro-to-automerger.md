@@ -1,9 +1,9 @@
 ---
 layout: post
-category: 分支管理
+category: Android系统原理
 title: AOSP代码管理
 tagline: 
-tag: []
+tag: [多分支管理]
 ---
 {% include JB/setup %}
 
