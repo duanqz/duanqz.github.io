@@ -14,7 +14,7 @@ tags: [工具使用]
 `repo`是Android为了方便管理多个git库而开发的Python脚本。repo的出现，并非为了取代git，而是为了让Android开发者更为有效的利用git。
 
 Android源码包含数百个git库，仅仅是下载这么多git库就是一项繁重的任务，所以在下载源码时，Android就引入了repo。
-Android官方推荐下载repo的方法是通过Linux curl命令，下载完后，为repo脚本添加可执行权限：
+Android官方推荐下载repo的方法是通过**Linux curl**命令，下载完后，为repo脚本添加可执行权限：
 
 {% highlight console %}
 $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
@@ -27,13 +27,13 @@ $ chmod a+x ~/bin/repo
 
 # 2. 工作原理
 
-repo需要关注当前git库的数量、名称、路径，才能对这些git库进行操作。通过集中维护所有git库的清单，repo可以方便的从清单中获取git库的信息。
-这份清单会随着版本演进升级而产生变化，同时也一些本地的修改定制需求，所以，repo是通过一个git库来管理项目的清单文件的，这个git库名字叫`manifests`。
+repo需要关注当前git库的数量、名称、路径等，有了这些基本信息，才能对这些git库进行操作。通过集中维护所有git库的清单，repo可以方便的从清单中获取git库的信息。
+这份清单会随着版本演进升级而产生变化，同时也有一些本地的修改定制需求，所以，repo是通过一个git库来管理项目的清单文件的，这个git库名字叫`manifests`。
 
 当打开repo这个可执行的python脚本后，发现代码量并不大(不超过1000行)，难道仅这一个脚本就完成了AOSP数百个git库的管理吗？并非如此。
 repo是一系列脚本的集合，这些脚本也是通过git库来维护的，这个git库名字叫`repo`。
 
-在客户端使用repo初始化一个项目时，就会从远程把manifests和repo这两个git库拷贝到本地，但这对于Android开发人员来说，又是近乎无形的(一般通过文件管理器，是无法看到这两个git库的)。
+在客户端使用repo初始化一个项目时，就会从远程把`manifests`和`repo`这两个git库拷贝到本地，但这对于Android开发人员来说，又是近乎无形的(一般通过文件管理器，是无法看到这两个git库的)。
 repo将自动化的管理信息都隐藏根目录的**.repo**子目录中。
 
 ## 2.1 项目清单库(.repo/manifests)
@@ -422,7 +422,7 @@ $ repo start BRANCH --all
 $ repo upload
 {% endhighlight %}
  
-不用担心会漏提交或者误提交，upload会提供一个交互界面，开发人员只需要选择需要提交的git库和分支即可。
+不用担心会漏提交或者误提交，upload会提供一个交互界面，开发人员选择需要提交的git库和分支即可。
 
 如果需要省去Gerrit上填写reviewer的操作，可以使用**--reviewer**参数指定Reviewer的邮箱地址：
 
@@ -432,7 +432,7 @@ $ repo upload --reviewer="R.E.viewer@google.com"
 
 ## 4.6 定期删除已经合并的开发分支
 
-Git鼓励在修复Bug或者开发新的Feature时，都创建一个新的分支。创建Git分支的代价是很小的，而且速度很快，因此，不用担心创建Git分支是一件不讨好的事情，而应该尽可能多地使用分支。
+Git鼓励在修复Bug或者开发新的Feature时，都创建一个新的分支。创建Git分支的代价是很小的，而且速度很快，因此，不用担心创建Git分支的成本，而是尽可能多地使用分支。
 
 随着时间的演进，开发分支会越来越多，而一些已经合并到主干的开发分支是没有存在价值的，可以通过prune命令定期删除无用的开发分支：
 
