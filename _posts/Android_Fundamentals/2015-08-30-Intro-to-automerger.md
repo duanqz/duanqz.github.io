@@ -144,7 +144,7 @@ $ git rebase upstream
 
 在downstream上使用rebase，表示要改变当前的基节点的位置，通过**rebase**到upstream，就意味着将基节点切换到upstream的最新提交 *F*。
 本来downstream和upstream公共的父节点是 *B* ， 使用完**rebase**后，则会将 *C* 和 *D* 两个提交记录挑出来，重新提交到 *F* 之后，
-这同样会生成两个新的提交记录 *E'* 和 *F'* ， **Commit ID** 与之前 *E* 和 *F* 的是不同的。
+这同样会生成两个新的提交记录 *C'* 和 *C'* ， **Commit ID** 与之前 *C* 和 *D* 的是不同的。
 
 再进一步考虑，基于提交 *D* 拉出下游分支downstream2,新增提交 *H* ：
 
@@ -170,18 +170,21 @@ $ git rebase upstream
 $ git merge upstream
 {% endhighlight %}
 
+<div align="center"><img src="/assets/images/aospcodeline/6-aospcodeline-merge.png" alt="merge"/></div><br/>
+
 upstream和downstream两个分支**merge**，会出现一个新的提交 *M1* ， 它的父提交有两个，分别是 *D* 和 *F*。
 如果产生冲突，则会一次性提示所有代码改动产生的冲突，这与**rebase**不一样，有一个很形象的比喻来形容**merge**和**rebase**进行代码合并的区别：
 
 > 将一堆玩具整理到一个箱子中，**rebase**是一件一件挪，如果箱子满了(产生冲突),则需要整理一下箱子，腾出空间，再接着挪；
 > 而**merge**是一股脑将玩具扔到箱子中，箱子满了，再一起整理。
 
-<div align="center"><img src="/assets/images/aospcodeline/6-aospcodeline-merge.png" alt="merge"/></div><br/>
-
 <font color="red">注意：</font>一次**merge**操作不一定会生成新的合并提交 *M1*， 默认情况下，`git merge`是采用**fast-forward**模式的，只是改变指针位置。
 如果不出现冲突，则分支图中不会出现分叉的情况，还是保持所有的提交一条直线。这种情况下并不会产生新的提交记录， *E* 和 *F* 还是保留了原来的**Commit ID**。
 
-再进一步考虑，基于downstream的提交记录 *D* 又拉了新的分支downstream2 ，并增加了新的提交 *H* , 仍然采用**merge**将upstream合并到downstream2，
+再进一步考虑，基于downstream的提交记录 *D* 又拉了新的分支downstream2 ，并增加了新的提交 *H* , 仍然采用**merge**将upstream合并到downstream2:
+
+<div align="center"><img src="/assets/images/aospcodeline/9-aospcodeline-merge-evolve.png" alt="merge-evolve"/></div><br/>
+
 这时产生了一个新的合并提交 *M2* , 它的父提交是 *F* 和 *H* 。downstream和downstreanm2的公共父提交 *F*。
 
 这里有一个细节，upstream合并到downstream2，相当于**(B, F, H)**的三路合并，在此之前，将upstream合并到downstream，相当于**(B, F, D)**的三路合并。
@@ -189,8 +192,6 @@ upstream和downstream两个分支**merge**，会出现一个新的提交 *M1* �
 具体可以参见`git-rerere - Reuse recorded resolution of conflicted merges`机制。
 
 随着upstream的不断演进，会不断地**merge**到downstream和downstream2, 所有的下游分支的公共父提交始终都跟踪到upstream的最新提交记录。
-
-<div align="center"><img src="/assets/images/aospcodeline/9-aospcodeline-merge-evolve.png" alt="merge-evolve"/></div><br/>
 
 相比采用**cherry-pick**和**rebase**实现代码自动流，**merge**的方式更适应多分支的场景：
 
