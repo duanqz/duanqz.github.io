@@ -9,11 +9,13 @@ tags:  [日志分析]
 
 # 概要
 
-电量统计的实现原理在[电量统计(1)-原理](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/21/batterystats-part1/)中已经介绍过。
+在[电量统计(1)-原理](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/21/batterystats-part1/)一文
+中，我们分析了电量统计服务的运行机制、耗电量的计算方法。本文我们分析电量统计的输出日志，包括日志信息的格式、表示的意义等，这些日志信息能够帮助开发人员解决一些功耗和性能问题。
 
 # 电量统计信息的分析
 
-Android提供的dumpsys命令用于查看系统服务的信息，`batterystats`这个服务用于查看电量统计信息。
+Android提供的**dumpsys**命令用于查看系统服务的信息(实现原理可以查阅[dumpsys介绍](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/19/Intro-to-dumpsys/))，
+将**batterystats**作为参数，就能输出完整的电量统计信息。
 
 {% highlight console %}
 $ adb shell dumpsys batterystats

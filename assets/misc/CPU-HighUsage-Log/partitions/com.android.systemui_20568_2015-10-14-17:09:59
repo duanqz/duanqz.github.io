@@ -1,0 +1,946 @@
+----- pid 20568 at 2015-10-14 17:09:59 -----
+Cmd line: com.android.systemui
+
+KERNEL SPACE BACKTRACE, sysTid=20568
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc0002033cc>] work_resched+0x4/0x8 from [<0>] 
+
+
+"ndroid.systemui" sysTid=20568
+  #00 pc 00000000000a77dc  /system/lib64/libaoc.so
+  #01 pc 000000000016a574  /system/lib64/libaoc.so
+  #02 pc 00000000002d8548  /system/lib64/libaoc.so
+  #03 pc 0000000000037594  /system/lib64/libaoc.so
+  #04 pc 000000000014d100  /system/lib64/libaoc.so
+  #05 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #06 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #07 pc 000000000004f884  /system/lib64/libaoc.so
+  #08 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #09 pc 00000000002af228  /system/lib64/libaoc.so
+  #10 pc 000000000016a710  /system/lib64/libaoc.so
+  #11 pc 00000000002d8548  /system/lib64/libaoc.so
+  #12 pc 0000000000037594  /system/lib64/libaoc.so
+  #13 pc 0000000000156c98  /system/lib64/libaoc.so
+  #14 pc 000000000016a398  /system/lib64/libaoc.so
+  #15 pc 0000000000049008  /system/lib64/libaoc.so
+  #16 pc 000000000014d09c  /system/lib64/libaoc.so
+  #17 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #18 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #19 pc 000000000004fb18  /system/lib64/libaoc.so
+  #20 pc 00000000001dca88  /system/lib64/libaoc.so
+  #21 pc 000000000023351c  /system/lib64/libaoc.so
+  #22 pc 0000000000218f70  /system/lib64/libaoc.so
+  #23 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #24 pc 000000000004f884  /system/lib64/libaoc.so
+  #25 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #26 pc 00000000002af228  /system/lib64/libaoc.so
+  #27 pc 000000000016a398  /system/lib64/libaoc.so
+  #28 pc 00000000002d641c  /system/lib64/libaoc.so
+  #29 pc 0000000000046f60  /system/lib64/libaoc.so
+  #30 pc 000000000014d09c  /system/lib64/libaoc.so
+  #31 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #32 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #33 pc 000000000004f884  /system/lib64/libaoc.so
+  #34 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #35 pc 00000000002af228  /system/lib64/libaoc.so
+  #36 pc 000000000016a710  /system/lib64/libaoc.so
+  #37 pc 00000000002d8548  /system/lib64/libaoc.so
+  #38 pc 0000000000037594  /system/lib64/libaoc.so
+  #39 pc 000000000014d100  /system/lib64/libaoc.so
+  #40 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #41 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #42 pc 000000000004f884  /system/lib64/libaoc.so
+  #43 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #44 pc 00000000002af228  /system/lib64/libaoc.so
+  #45 pc 000000000016a710  /system/lib64/libaoc.so
+  #46 pc 00000000002d8548  /system/lib64/libaoc.so
+  #47 pc 0000000000037594  /system/lib64/libaoc.so
+  #48 pc 000000000014d100  /system/lib64/libaoc.so
+  #49 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #50 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #51 pc 000000000004fb18  /system/lib64/libaoc.so
+  #52 pc 00000000001dca88  /system/lib64/libaoc.so
+  #53 pc 00000000002313e8  /system/lib64/libaoc.so
+  #54 pc 00000000001855b0  /system/lib64/libaoc.so
+  #55 pc 000000000006feac  /system/lib64/libaoc.so
+  #56 pc 0000000000096660  /system/lib64/libandroid_runtime.so
+  #57 pc 0000000000097fd4  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::start(char const*, android::Vector<android::String8> const&)+724)
+  #58 pc 0000000000002190  /system/bin/app_process64
+  #59 pc 0000000000019a78  /system/lib64/libc.so (__libc_init+100)
+  #60 pc 0000000000002448  /system/bin/app_process64
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20572
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20572
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20573
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20573
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20574
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20574
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20575
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20575
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20576
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20576
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20577
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20577
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20578
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ndroid.systemu" sysTid=20578
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 000000000025cd34  /system/lib64/libaoc.so
+  #03 pc 000000000025d714  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20581
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c07020>] schedule_timeout+0x198/0x230 from [<0>] 
+	[<ffffffc000c070d4>] schedule_timeout_interruptible+0x1c/0x28 from [<0>] 
+	[<ffffffc000233c7c>] do_sigtimedwait+0x168/0x20c from [<0>] 
+	[<ffffffc000233dc0>] SyS_rt_sigtimedwait+0xa0/0x11c from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Signal Catcher" sysTid=20581
+  #00 pc 000000000005f214  /system/lib64/libc.so (__rt_sigtimedwait+8)
+  #01 pc 0000000000021d40  /system/lib64/libc.so (sigwait+44)
+  #02 pc 000000000023f89c  /system/lib64/libaoc.so
+  #03 pc 00000000002422dc  /system/lib64/libaoc.so
+  #04 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #05 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20583
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c07020>] schedule_timeout+0x198/0x230 from [<0>] 
+	[<ffffffc000b3d6fc>] unix_stream_recvmsg+0x4f0/0x7ac from [<0>] 
+	[<ffffffc000a4d060>] sock_recvmsg+0xfc/0x118 from [<0>] 
+	[<ffffffc000a4d578>] ___sys_recvmsg+0xd8/0x258 from [<0>] 
+	[<ffffffc000a51014>] __sys_recvmsg+0x48/0x94 from [<0>] 
+	[<ffffffc000a5106c>] SyS_recvmsg+0xc/0x20 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"JDWP" sysTid=20583
+  #00 pc 000000000005feb8  /system/lib64/libc.so (recvmsg+4)
+  #01 pc 00000000002d239c  /system/lib64/libaoc.so
+  #02 pc 00000000002d2d78  /system/lib64/libaoc.so
+  #03 pc 000000000017cc8c  /system/lib64/libaoc.so
+  #04 pc 000000000017e508  /system/lib64/libaoc.so
+  #05 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #06 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20585
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ReferenceQueueD" sysTid=20585
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #10 pc 0000000000046a88  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a398  /system/lib64/libaoc.so
+  #18 pc 00000000002d7068  /system/lib64/libaoc.so
+  #19 pc 0000000000046440  /system/lib64/libaoc.so
+  #20 pc 000000000014d09c  /system/lib64/libaoc.so
+  #21 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #22 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #23 pc 000000000004f884  /system/lib64/libaoc.so
+  #24 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #25 pc 0000000000230f28  /system/lib64/libaoc.so
+  #26 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #27 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #28 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20586
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"FinalizerDaemon" sysTid=20586
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #10 pc 0000000000046a88  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a398  /system/lib64/libaoc.so
+  #18 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #19 pc 0000000000046a88  /system/lib64/libaoc.so
+  #20 pc 000000000014d09c  /system/lib64/libaoc.so
+  #21 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #22 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #23 pc 000000000004f884  /system/lib64/libaoc.so
+  #24 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #25 pc 00000000002af228  /system/lib64/libaoc.so
+  #26 pc 000000000016a398  /system/lib64/libaoc.so
+  #27 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #28 pc 0000000000046a88  /system/lib64/libaoc.so
+  #29 pc 000000000014d09c  /system/lib64/libaoc.so
+  #30 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #31 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #32 pc 000000000004f884  /system/lib64/libaoc.so
+  #33 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #34 pc 00000000002af228  /system/lib64/libaoc.so
+  #35 pc 000000000016a398  /system/lib64/libaoc.so
+  #36 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #37 pc 0000000000046a88  /system/lib64/libaoc.so
+  #38 pc 000000000014d09c  /system/lib64/libaoc.so
+  #39 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #40 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #41 pc 000000000004f884  /system/lib64/libaoc.so
+  #42 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #43 pc 00000000002af228  /system/lib64/libaoc.so
+  #44 pc 000000000016a398  /system/lib64/libaoc.so
+  #45 pc 00000000002d7068  /system/lib64/libaoc.so
+  #46 pc 0000000000046440  /system/lib64/libaoc.so
+  #47 pc 000000000014d09c  /system/lib64/libaoc.so
+  #48 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #49 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #50 pc 000000000004f884  /system/lib64/libaoc.so
+  #51 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #52 pc 0000000000230f28  /system/lib64/libaoc.so
+  #53 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #54 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #55 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20587
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"FinalizerWatchd" sysTid=20587
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #10 pc 0000000000046a88  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a398  /system/lib64/libaoc.so
+  #18 pc 00000000002d641c  /system/lib64/libaoc.so
+  #19 pc 0000000000046f60  /system/lib64/libaoc.so
+  #20 pc 000000000014d09c  /system/lib64/libaoc.so
+  #21 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #22 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #23 pc 000000000004f884  /system/lib64/libaoc.so
+  #24 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #25 pc 00000000002af228  /system/lib64/libaoc.so
+  #26 pc 000000000016a398  /system/lib64/libaoc.so
+  #27 pc 00000000002d7068  /system/lib64/libaoc.so
+  #28 pc 0000000000046440  /system/lib64/libaoc.so
+  #29 pc 000000000014d09c  /system/lib64/libaoc.so
+  #30 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #31 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #32 pc 000000000004f884  /system/lib64/libaoc.so
+  #33 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #34 pc 0000000000230f28  /system/lib64/libaoc.so
+  #35 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #36 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #37 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20588
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"HeapTrimmerDaem" sysTid=20588
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #10 pc 0000000000046a88  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a398  /system/lib64/libaoc.so
+  #18 pc 00000000002d7068  /system/lib64/libaoc.so
+  #19 pc 0000000000046440  /system/lib64/libaoc.so
+  #20 pc 000000000014d09c  /system/lib64/libaoc.so
+  #21 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #22 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #23 pc 000000000004f884  /system/lib64/libaoc.so
+  #24 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #25 pc 0000000000230f28  /system/lib64/libaoc.so
+  #26 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #27 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #28 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20589
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"GCDaemon" sysTid=20589
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000002d55e4  /system/lib64/libaoc.so
+  #10 pc 0000000000046a88  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a398  /system/lib64/libaoc.so
+  #18 pc 00000000002d7068  /system/lib64/libaoc.so
+  #19 pc 0000000000046440  /system/lib64/libaoc.so
+  #20 pc 000000000014d09c  /system/lib64/libaoc.so
+  #21 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #22 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #23 pc 000000000004f884  /system/lib64/libaoc.so
+  #24 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #25 pc 0000000000230f28  /system/lib64/libaoc.so
+  #26 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #27 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #28 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20590
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc0009a5580>] binder_thread_read+0x94c/0x1328 from [<0>] 
+	[<ffffffc0009a9388>] binder_ioctl_write_read+0x1d4/0x40c from [<0>] 
+	[<ffffffc0009a988c>] binder_ioctl+0x2cc/0x72c from [<0>] 
+	[<ffffffc000327ccc>] do_vfs_ioctl+0x424/0x5b0 from [<0>] 
+	[<ffffffc000327efc>] SyS_ioctl+0xa4/0xc0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Binder_1" sysTid=20590
+  #00 pc 000000000005f960  /system/lib64/libc.so (__ioctl+4)
+  #01 pc 00000000000867e8  /system/lib64/libc.so (ioctl+100)
+  #02 pc 0000000000029e3c  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver(bool)+184)
+  #03 pc 000000000002a6e0  /system/lib64/libbinder.so (android::IPCThreadState::getAndExecuteCommand()+24)
+  #04 pc 000000000002a798  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool(bool)+76)
+  #05 pc 0000000000031d84  /system/lib64/libbinder.so
+  #06 pc 0000000000017984  /system/lib64/libutils.so (android::Thread::_threadLoop(void*)+188)
+  #07 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #08 pc 00000000000171e8  /system/lib64/libutils.so
+  #09 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #10 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20591
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc0009a5580>] binder_thread_read+0x94c/0x1328 from [<0>] 
+	[<ffffffc0009a9388>] binder_ioctl_write_read+0x1d4/0x40c from [<0>] 
+	[<ffffffc0009a988c>] binder_ioctl+0x2cc/0x72c from [<0>] 
+	[<ffffffc000327ccc>] do_vfs_ioctl+0x424/0x5b0 from [<0>] 
+	[<ffffffc000327efc>] SyS_ioctl+0xa4/0xc0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Binder_2" sysTid=20591
+  #00 pc 000000000005f960  /system/lib64/libc.so (__ioctl+4)
+  #01 pc 00000000000867e8  /system/lib64/libc.so (ioctl+100)
+  #02 pc 0000000000029e3c  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver(bool)+184)
+  #03 pc 000000000002a6e0  /system/lib64/libbinder.so (android::IPCThreadState::getAndExecuteCommand()+24)
+  #04 pc 000000000002a798  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool(bool)+76)
+  #05 pc 0000000000031d84  /system/lib64/libbinder.so
+  #06 pc 0000000000017984  /system/lib64/libutils.so (android::Thread::_threadLoop(void*)+188)
+  #07 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #08 pc 00000000000171e8  /system/lib64/libutils.so
+  #09 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #10 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20594
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"SoundPool" sysTid=20594
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000001f0b4  /system/lib64/libc.so (__pthread_cond_timedwait_relative(pthread_cond_t*, pthread_mutex_t*, timespec const*)+96)
+  #02 pc 00000000000ba57c  /system/lib64/libmedia.so (android::SoundPool::run()+52)
+  #03 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #04 pc 00000000000171e8  /system/lib64/libutils.so
+  #05 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #06 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20595
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"SoundPoolThread" sysTid=20595
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000001f0b4  /system/lib64/libc.so (__pthread_cond_timedwait_relative(pthread_cond_t*, pthread_mutex_t*, timespec const*)+96)
+  #02 pc 00000000000baafc  /system/lib64/libmedia.so (android::SoundPoolThread::read()+48)
+  #03 pc 00000000000bae74  /system/lib64/libmedia.so (android::SoundPoolThread::run()+88)
+  #04 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #05 pc 00000000000171e8  /system/lib64/libutils.so
+  #06 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #07 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20599
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Recents-TaskRes" sysTid=20599
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000005b5d8  /system/lib64/libaoc.so
+  #02 pc 00000000001f3ca0  /system/lib64/libaoc.so
+  #03 pc 00000000001f45a8  /system/lib64/libaoc.so
+  #04 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #05 pc 000000000004f884  /system/lib64/libaoc.so
+  #06 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #07 pc 00000000002af228  /system/lib64/libaoc.so
+  #08 pc 000000000016a398  /system/lib64/libaoc.so
+  #09 pc 00000000000471f0  /system/lib64/libaoc.so
+  #10 pc 0000000000156ba8  /system/lib64/libaoc.so
+  #11 pc 000000000016a398  /system/lib64/libaoc.so
+  #12 pc 00000000002d7068  /system/lib64/libaoc.so
+  #13 pc 0000000000046440  /system/lib64/libaoc.so
+  #14 pc 0000000000156ba8  /system/lib64/libaoc.so
+  #15 pc 000000000016a398  /system/lib64/libaoc.so
+  #16 pc 0000000000049008  /system/lib64/libaoc.so
+  #17 pc 000000000014d09c  /system/lib64/libaoc.so
+  #18 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #19 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #20 pc 000000000004f884  /system/lib64/libaoc.so
+  #21 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #22 pc 00000000002af228  /system/lib64/libaoc.so
+  #23 pc 000000000016a710  /system/lib64/libaoc.so
+  #24 pc 00000000002d8548  /system/lib64/libaoc.so
+  #25 pc 0000000000037594  /system/lib64/libaoc.so
+  #26 pc 0000000000156c98  /system/lib64/libaoc.so
+  #27 pc 000000000016a710  /system/lib64/libaoc.so
+  #28 pc 00000000002da40c  /system/lib64/libaoc.so
+  #29 pc 0000000000039038  /system/lib64/libaoc.so
+  #30 pc 000000000014d100  /system/lib64/libaoc.so
+  #31 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #32 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #33 pc 000000000004f884  /system/lib64/libaoc.so
+  #34 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #35 pc 0000000000230f28  /system/lib64/libaoc.so
+  #36 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #37 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #38 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20615
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc00028826c>] futex_wait_queue_me+0xcc/0x16c from [<0>] 
+	[<ffffffc000288f00>] futex_wait+0x12c/0x21c from [<0>] 
+	[<ffffffc00028aa2c>] do_futex+0x168/0xa00 from [<0>] 
+	[<ffffffc00028b358>] SyS_futex+0x94/0x1b0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"MDP-0" sysTid=20615
+  #00 pc 0000000000019d78  /system/lib64/libc.so (syscall+28)
+  #01 pc 000000000001f0b4  /system/lib64/libc.so (__pthread_cond_timedwait_relative(pthread_cond_t*, pthread_mutex_t*, timespec const*)+96)
+  #02 pc 00000000000464f8  /system/lib64/libdpframework.so
+  #03 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #04 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20819
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c08f40>] schedule_hrtimeout_range_clock+0x108/0x128 from [<0>] 
+	[<ffffffc000c08f6c>] schedule_hrtimeout_range+0xc/0x18 from [<0>] 
+	[<ffffffc00035bdec>] SyS_epoll_wait+0x40c/0x4c0 from [<0>] 
+	[<ffffffc00035bff8>] SyS_epoll_pwait+0x158/0x168 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"RenderThread" sysTid=20819
+  #00 pc 000000000005fff4  /system/lib64/libc.so (__epoll_pwait+8)
+  #01 pc 000000000001bbd4  /system/lib64/libc.so (epoll_pwait+32)
+  #02 pc 000000000001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+  #03 pc 000000000001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+  #04 pc 0000000000085aac  /system/lib64/libhwui.so (android::uirenderer::renderthread::RenderThread::threadLoop()+100)
+  #05 pc 0000000000017984  /system/lib64/libutils.so (android::Thread::_threadLoop(void*)+188)
+  #06 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #07 pc 00000000000171e8  /system/lib64/libutils.so
+  #08 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #09 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20869
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c08f40>] schedule_hrtimeout_range_clock+0x108/0x128 from [<0>] 
+	[<ffffffc000c08f6c>] schedule_hrtimeout_range+0xc/0x18 from [<0>] 
+	[<ffffffc00035bdec>] SyS_epoll_wait+0x40c/0x4c0 from [<0>] 
+	[<ffffffc00035bff8>] SyS_epoll_pwait+0x158/0x168 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"SystemUI Storag" sysTid=20869
+  #00 pc 000000000005fff4  /system/lib64/libc.so (__epoll_pwait+8)
+  #01 pc 000000000001bbd4  /system/lib64/libc.so (epoll_pwait+32)
+  #02 pc 000000000001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+  #03 pc 000000000001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+  #04 pc 00000000000d71e8  /system/lib64/libandroid_runtime.so (android::NativeMessageQueue::pollOnce(_JNIEnv*, int)+48)
+  #05 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #06 pc 000000000004fb18  /system/lib64/libaoc.so
+  #07 pc 00000000001dca88  /system/lib64/libaoc.so
+  #08 pc 00000000002af228  /system/lib64/libaoc.so
+  #09 pc 000000000016a398  /system/lib64/libaoc.so
+  #10 pc 0000000000049008  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a710  /system/lib64/libaoc.so
+  #18 pc 00000000002d8548  /system/lib64/libaoc.so
+  #19 pc 0000000000037594  /system/lib64/libaoc.so
+  #20 pc 0000000000156c98  /system/lib64/libaoc.so
+  #21 pc 000000000016a710  /system/lib64/libaoc.so
+  #22 pc 00000000002da40c  /system/lib64/libaoc.so
+  #23 pc 0000000000039038  /system/lib64/libaoc.so
+  #24 pc 000000000014d100  /system/lib64/libaoc.so
+  #25 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #26 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #27 pc 000000000004f884  /system/lib64/libaoc.so
+  #28 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #29 pc 0000000000230f28  /system/lib64/libaoc.so
+  #30 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #31 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #32 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20870
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc0009a5580>] binder_thread_read+0x94c/0x1328 from [<0>] 
+	[<ffffffc0009a9388>] binder_ioctl_write_read+0x1d4/0x40c from [<0>] 
+	[<ffffffc0009a988c>] binder_ioctl+0x2cc/0x72c from [<0>] 
+	[<ffffffc000327ccc>] do_vfs_ioctl+0x424/0x5b0 from [<0>] 
+	[<ffffffc000327efc>] SyS_ioctl+0xa4/0xc0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Binder_3" sysTid=20870
+  #00 pc 000000000005f960  /system/lib64/libc.so (__ioctl+4)
+  #01 pc 00000000000867e8  /system/lib64/libc.so (ioctl+100)
+  #02 pc 0000000000029e3c  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver(bool)+184)
+  #03 pc 000000000002a6e0  /system/lib64/libbinder.so (android::IPCThreadState::getAndExecuteCommand()+24)
+  #04 pc 000000000002a798  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool(bool)+76)
+  #05 pc 0000000000031d84  /system/lib64/libbinder.so
+  #06 pc 0000000000017984  /system/lib64/libutils.so (android::Thread::_threadLoop(void*)+188)
+  #07 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #08 pc 00000000000171e8  /system/lib64/libutils.so
+  #09 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #10 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20871
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc0009a5580>] binder_thread_read+0x94c/0x1328 from [<0>] 
+	[<ffffffc0009a9388>] binder_ioctl_write_read+0x1d4/0x40c from [<0>] 
+	[<ffffffc0009a988c>] binder_ioctl+0x2cc/0x72c from [<0>] 
+	[<ffffffc000327ccc>] do_vfs_ioctl+0x424/0x5b0 from [<0>] 
+	[<ffffffc000327efc>] SyS_ioctl+0xa4/0xc0 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"Binder_4" sysTid=20871
+  #00 pc 000000000005f960  /system/lib64/libc.so (__ioctl+4)
+  #01 pc 00000000000867e8  /system/lib64/libc.so (ioctl+100)
+  #02 pc 0000000000029e3c  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver(bool)+184)
+  #03 pc 000000000002a6e0  /system/lib64/libbinder.so (android::IPCThreadState::getAndExecuteCommand()+24)
+  #04 pc 000000000002a798  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool(bool)+76)
+  #05 pc 0000000000031d84  /system/lib64/libbinder.so
+  #06 pc 0000000000017984  /system/lib64/libutils.so (android::Thread::_threadLoop(void*)+188)
+  #07 pc 0000000000096480  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell(void*)+96)
+  #08 pc 00000000000171e8  /system/lib64/libutils.so
+  #09 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #10 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20872
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c08f40>] schedule_hrtimeout_range_clock+0x108/0x128 from [<0>] 
+	[<ffffffc000c08f6c>] schedule_hrtimeout_range+0xc/0x18 from [<0>] 
+	[<ffffffc00035bdec>] SyS_epoll_wait+0x40c/0x4c0 from [<0>] 
+	[<ffffffc00035bff8>] SyS_epoll_pwait+0x158/0x168 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"PhoneStatusBar" sysTid=20872
+  #00 pc 000000000005fff4  /system/lib64/libc.so (__epoll_pwait+8)
+  #01 pc 000000000001bbd4  /system/lib64/libc.so (epoll_pwait+32)
+  #02 pc 000000000001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+  #03 pc 000000000001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+  #04 pc 00000000000d71e8  /system/lib64/libandroid_runtime.so (android::NativeMessageQueue::pollOnce(_JNIEnv*, int)+48)
+  #05 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #06 pc 000000000004fb18  /system/lib64/libaoc.so
+  #07 pc 00000000001dca88  /system/lib64/libaoc.so
+  #08 pc 00000000002af228  /system/lib64/libaoc.so
+  #09 pc 000000000016a398  /system/lib64/libaoc.so
+  #10 pc 0000000000049008  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a710  /system/lib64/libaoc.so
+  #18 pc 00000000002d8548  /system/lib64/libaoc.so
+  #19 pc 0000000000037594  /system/lib64/libaoc.so
+  #20 pc 0000000000156c98  /system/lib64/libaoc.so
+  #21 pc 000000000016a710  /system/lib64/libaoc.so
+  #22 pc 00000000002da40c  /system/lib64/libaoc.so
+  #23 pc 0000000000039038  /system/lib64/libaoc.so
+  #24 pc 000000000014d100  /system/lib64/libaoc.so
+  #25 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #26 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #27 pc 000000000004f884  /system/lib64/libaoc.so
+  #28 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #29 pc 0000000000230f28  /system/lib64/libaoc.so
+  #30 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #31 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #32 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20873
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c08f40>] schedule_hrtimeout_range_clock+0x108/0x128 from [<0>] 
+	[<ffffffc000c08f6c>] schedule_hrtimeout_range+0xc/0x18 from [<0>] 
+	[<ffffffc00035bdec>] SyS_epoll_wait+0x40c/0x4c0 from [<0>] 
+	[<ffffffc00035bff8>] SyS_epoll_pwait+0x158/0x168 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"WifiManager" sysTid=20873
+  #00 pc 000000000005fff4  /system/lib64/libc.so (__epoll_pwait+8)
+  #01 pc 000000000001bbd4  /system/lib64/libc.so (epoll_pwait+32)
+  #02 pc 000000000001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+  #03 pc 000000000001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+  #04 pc 00000000000d71e8  /system/lib64/libandroid_runtime.so (android::NativeMessageQueue::pollOnce(_JNIEnv*, int)+48)
+  #05 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #06 pc 000000000004fb18  /system/lib64/libaoc.so
+  #07 pc 00000000001dca88  /system/lib64/libaoc.so
+  #08 pc 00000000002af228  /system/lib64/libaoc.so
+  #09 pc 000000000016a398  /system/lib64/libaoc.so
+  #10 pc 0000000000049008  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #13 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #14 pc 000000000004f884  /system/lib64/libaoc.so
+  #15 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #16 pc 00000000002af228  /system/lib64/libaoc.so
+  #17 pc 000000000016a710  /system/lib64/libaoc.so
+  #18 pc 00000000002d8548  /system/lib64/libaoc.so
+  #19 pc 0000000000037594  /system/lib64/libaoc.so
+  #20 pc 0000000000156c98  /system/lib64/libaoc.so
+  #21 pc 000000000016a710  /system/lib64/libaoc.so
+  #22 pc 00000000002da40c  /system/lib64/libaoc.so
+  #23 pc 0000000000039038  /system/lib64/libaoc.so
+  #24 pc 000000000014d100  /system/lib64/libaoc.so
+  #25 pc 00000000002ca8fc  /system/lib64/libaoc.so
+  #26 pc 00000000000549a0  /system/lib64/libaoc.so (aoc_quick_to_interpreter_bridge+112)
+  #27 pc 000000000004f884  /system/lib64/libaoc.so
+  #28 pc 00000000001dcaec  /system/lib64/libaoc.so
+  #29 pc 0000000000230f28  /system/lib64/libaoc.so
+  #30 pc 0000000000252a4c  /system/lib64/libaoc.so
+  #31 pc 000000000001f27c  /system/lib64/libc.so (__pthread_start(void*)+52)
+  #32 pc 000000000001b684  /system/lib64/libc.so (__start_thread+16)
+
+------------------------
+
+KERNEL SPACE BACKTRACE, sysTid=20879
+	[<ffffffc000204c80>] __switch_to+0x74/0x8c from [<0>] 
+	[<ffffffc000c0994c>] __schedule+0x358/0x8a0 from [<0>] 
+	[<ffffffc000c09eb8>] schedule+0x24/0x68 from [<0>] 
+	[<ffffffc000c08f40>] schedule_hrtimeout_range_clock+0x108/0x128 from [<0>] 
+	[<ffffffc000c08f6c>] schedule_hrtimeout_range+0xc/0x18 from [<0>] 
+	[<ffffffc00035bdec>] SyS_epoll_wait+0x40c/0x4c0 from [<0>] 
+	[<ffffffc00035bff8>] SyS_epoll_pwait+0x158/0x168 from [<0>] 
+	[<ffffffc000203318>] cpu_switch_to+0x48/0x4c from [<0>] 
+
+
+"ConnectivityMan" sysTid=20879
+  #00 pc 000000000005fff4  /system/lib64/libc.so (__epoll_pwait+8)
+  #01 pc 000000000001bbd4  /system/lib64/libc.so (epoll_pwait+32)
+  #02 pc 000000000001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+  #03 pc 000000000001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+  #04 pc 00000000000d71e8  /system/lib64/libandroid_runtime.so (android::NativeMessageQueue::pollOnce(_JNIEnv*, int)+48)
+  #05 pc 0000000000054824  /system/lib64/libaoc.so (aoc_quick_generic_jni_trampoline+164)
+  #06 pc 000000000004fb18  /system/lib64/libaoc.so
+  #07 pc 00000000001dca88  /system/lib64/libaoc.so
+  #08 pc 00000000002af228  /system/lib64/libaoc.so
+  #09 pc 000000000016a398  /system/lib64/libaoc.so
+  #10 pc 0000000000049008  /system/lib64/libaoc.so
+  #11 pc 000000000014d09c  /system/lib64/libaoc.so
+  #12 pc 00000000002ca8fc  /system  #00 pc 0000007fcce0a7b0  <unknown>
+
+----- end 24344 -----
