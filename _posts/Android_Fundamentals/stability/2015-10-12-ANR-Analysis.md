@@ -9,7 +9,20 @@ tags:  [Android调试]
 
 # 1. 概览
 
+`ANR(Application Not Responding)`，应用程序无响应，简单一个定义，却涵盖了很多Android系统的设计思想。
 
+首先，ANR属于应用程序的范畴，这不同于SNR(System Not Respoding)，SNR反映的问题是系统进程(system_server)失去了响应能力，而ANR明确将问题圈定在应用程序。
+SNR由Watchdog机制保证，具体可以查阅[Watchdog机制以及问题分析](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/);
+ANR由消息处理机制保证，Android在系统层实现了一套精密的机制来发现ANR，核心原理是消息调度和超时处理。
+
+其次，ANR机制主体实现在系统层。所有与ANR相关的消息，都会经过系统进程(system_server)调度，然后派发到应用进程完成对消息的实际处理，同时，系统进程设计了不同的超时限制来跟踪消息的处理。
+一旦应用程序处理消息不当，超时限制就起作用了，它收集一些系统状态，譬如CPU/IO使用情况、进程函数调用栈，并且报告用户有进程无响应了(ANR对话框)。
+
+然后，ANR问题本质是一个性能问题。ANR机制实际上对应用程序主线程的限制，要求主线程在限定的时间内处理完一些最常见的操作(启动服务、处理广播、处理输入)，
+如果处理超时，则认为主线程已经失去了响应其他操作的能力。主线程中的耗时操作，譬如密集CPU运算、大量IO、复杂界面布局等，都会降低应用程序的响应能力。
+
+最后，部分ANR问题是很难分析的，有时候由于系统底层的一些影响，导致消息调度失败，出现问题的场景又难以复现。
+这类ANR问题往往需要花费大量的时间去了解系统的一些行为，已经超出了ANR机制本身的范畴。
 
 # 2. ANR机制
 
@@ -46,19 +59,16 @@ ANR机制可以分为两部分：
 
 ### 2.1.1 Service处理超时
 
-Service运行在应用程序的主线程，如果Service的执行时间超过20秒，则会引发ANR。
-当发生**Service ANR**时，一般可以先排查一下在Service的生命周期函数中(onCreate(), onStartCommand()等)有没有做耗时的操作，譬如复杂的运算、IO操作等。
-如果应用程序的代码逻辑查不出问题，就需要深入检查当前系统的状态：CPU的使用情况、系统服务的状态等，判断当时系统的运行状态是否对ANR进程有影响。
+Service运行在应用程序的主线程，如果Service的执行时间超过**20秒**，则会引发ANR。
+
+当发生Service ANR时，一般可以先排查一下在Service的生命周期函数中(onCreate(), onStartCommand()等)有没有做耗时的操作，譬如复杂的运算、IO操作等。
+如果应用程序的代码逻辑查不出问题，就需要深入检查当前系统的状态：CPU的使用情况、系统服务的状态等，判断当时发生ANR进程是否受到系统运行异常的影响。
 
 如何检测Service超时呢？Android是通过设置定时消息实现的。定时消息是由AMS的消息队列处理的(system_server的ActivityManager线程)。
 AMS有Sercie运行的上下文信息，所以在AMS中设置一套超时检测机制也是合情合理的。
 
-Service ANR机制相对最为简单，主体实现在[ActiveServices](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)中，
-有几个关键点：
-
-- 当Service的生命周期开始时，**bumpServiceExecutingLocked()**会被调用，紧接着会调用**scheduleServiceTimeoutLocked()**，
-  通过AMS.MainHandler抛出一个定时消息**SERVICE_TIMEOUT_MSG**，前台进程中执行Service，超时时间是**SERVICE_TIMEOUT(20秒)**;
-  后台进程中执行Service，超时时间是**SERVICE_BACKGROUND_TIMEOUT(200秒)**
+Service ANR机制相对最为简单，主体实现在[ActiveServices](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)中。
+当Service的生命周期开始时，**bumpServiceExecutingLocked()**会被调用，紧接着会调用**scheduleServiceTimeoutLocked()**：
 
 {% highlight java %}
 void scheduleServiceTimeoutLocked(ProcessRecord proc) {
@@ -72,13 +82,17 @@ void scheduleServiceTimeoutLocked(ProcessRecord proc) {
 }
 {% endhighlight %}
 
+上述方法通过AMS.MainHandler抛出一个定时消息**SERVICE_TIMEOUT_MSG**：
 
-- 当Service的生命周期结束时，**serviceDoneExecutingLocked()**会被调用，之前抛出的**SERVICE_TIMEOUT_MSG**消息会被清除
+- 前台进程中执行Service，超时时间是**SERVICE_TIMEOUT(20秒)**
+- 后台进程中执行Service，超时时间是**SERVICE_BACKGROUND_TIMEOUT(200秒)**
 
-- 如果在超时时间内，**SERVICE_TIMEOUT_MSG**没有被清除，那么，AMS.MainHandler就会响应这个消息:
+当Service的生命周期结束时，会调用**serviceDoneExecutingLocked()**方法，之前抛出的**SERVICE_TIMEOUT_MSG**消息在这个方法中会被清除。
+如果在超时时间内，**SERVICE_TIMEOUT_MSG**没有被清除，那么，AMS.MainHandler就会响应这个消息:
 
 {% highlight java %}
 case SERVICE_TIMEOUT_MSG: {
+    // 判断是否在做dexopt操作， 该操作的比较耗时，允许再延长20秒
     if (mDidDexOpt) {
         mDidDexOpt = false;
         Message nmsg = mHandler.obtainMessage(SERVICE_TIMEOUT_MSG);
@@ -90,7 +104,7 @@ case SERVICE_TIMEOUT_MSG: {
 } break;
 {% endhighlight %}
 
-- 如果不是在做dexopt操作，**ActiveServices.serviceTimeout()**就会被调用，它会找到当前进程已经超时的Service，经过一些判定后，决定要报告ANR，最终调用**AMS.appNotResponding()**方法。
+如果不是在做dexopt操作，**ActiveServices.serviceTimeout()**就会被调用：
 
 {% highlight java %}
 void serviceTimeout(ProcessRecord proc) {
@@ -98,6 +112,7 @@ void serviceTimeout(ProcessRecord proc) {
     final long maxTime =  now -
               (proc.execServicesFg ? SERVICE_TIMEOUT : SERVICE_BACKGROUND_TIMEOUT);
     ...
+    // 寻找运行超时的Service
     for (int i=proc.executingServices.size()-1; i>=0; i--) {
         ServiceRecord sr = proc.executingServices.valueAt(i);
         if (sr.executingStart < maxTime) {
@@ -107,6 +122,7 @@ void serviceTimeout(ProcessRecord proc) {
        ...
     }
     ...
+    // 判断执行Service超时的进程是否在最近运行进程列表，如果不在，则忽略这个ANR
     if (timeout != null && mAm.mLruProcesses.contains(proc)) {
         anrMessage = "executing service " + timeout.shortName;
     }
@@ -117,11 +133,13 @@ void serviceTimeout(ProcessRecord proc) {
 }
 {% endhighlight %}
 
-当调用**AMS.appNotResponding()**这个方法时，ANR机制已经完成了监测报告任务，剩下的任务就是ANR结果的输出，都是由这个方法的实现，我们后文再详细展开。
+上述方法会找到当前进程已经超时的Service，经过一些判定后，决定要报告ANR，最终调用**AMS.appNotResponding()**方法。
+走到这一步，ANR机制已经完成了监测报告任务，剩下的任务就是ANR结果的输出，我们称之为ANR的报告机制。
+ANR的报告机制是通过**AMS.appNotResponding()**完成的，Broadcast和InputEvent类型的ANR最终也都会调用这个方法，我们后文再详细展开。
 
 **至此，我们分析了Service的ANR机制：**
 
-**通过定时消息跟踪Service的运行，定时消息被响应就意味着Service运行超时了，此时，就报告ANR。**
+**通过定时消息跟踪Service的运行，当定时消息被响应时，说明Service还没有运行完成，这就意味着Service ANR。**
 
 ### 2.1.2 Broadcast处理超时
 
@@ -135,43 +153,157 @@ void serviceTimeout(ProcessRecord proc) {
 
 > 1. Android如何将广播投递给各个应用程序？
 > 2. Android如何检测广播处理超时？
-> 3. 在什么场景下，系统会导致**onReceive()**方法超时？
+
+#### 广播消息的调度
 
 AMS维护了两个广播队列[BroadcastQueue](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java): 
-**foreground queue**和**background queue**，之所以有两个，就是因为要区分的不同超时时间：
-前台队列的超时时间是10秒，后台队列的超时时间是60秒。所有发送的广播都会进入到队列中等待调度，可以通过**Intent.FLAG_RECEIVER_FOREGROUND**参数将广播投递到前台队列。
 
-**BroadcastQueue.scheduleBroadcastsLocked()**完成对广播的调度，其实是往AMS线程(system_server进程中的ActivityManager线程)的消息队列发送**BROADCAST_INTENT_MSG**消息，
-经过一轮消息处理，真正执行广播调度的是**BroadcastQueue.processNextBroadcast()**，广播超时监测机制的调用关系如下：
+- **foreground queue**，前台队列的超时时间是10秒
+- **background queue**，后台队列的超时时间是60秒 
 
-    BroadcastQueue.processNextBroadcast()
-    └── BroadcastQueue.broadcastTimeoutLocked()
-    │   └── BroadcastQueue.AppNotResponding.run()
-    │       └── AMS.appNotResponding()
-    │
-    └── BroadcastQueue.setBroadcastTimeoutLocked()
-        └── BroadcastQueue.broadcastTimeoutLocked()
-            └── BroadcastQueue.AppNotResponding.run()
-                └── AMS.appNotResponding()
+之所以有两个，就是因为要区分的不同超时时间。所有发送的广播都会进入到队列中等待调度，在发送广播时，可以通过**Intent.FLAG_RECEIVER_FOREGROUND**参数将广播投递到前台队列。
+AMS线程会不断地从队列中取出广播消息派发到各个接收器(BroadcastReceiver)。当要派发广播时，AMS会调用**BroadcastQueue.scheduleBroadcastsLocked()**方法：
 
 {% highlight java %}
-final void  processNextBroadcast(boolean fromMsg) {
+public void scheduleBroadcastsLocked() {
     ...
-    r = mOrderedBroadcasts.get(0);
-    if ((numReceivers > 0) && (now > r.dispatchTime + (2*mTimeoutPeriod*numReceivers))) {
-        ...
-        broadcastTimeoutLocked(false); // forcibly finish this broadcast
+    if (mBroadcastsScheduled) {
+        return;
+    }
+    mHandler.sendMessage(mHandler.obtainMessage(BROADCAST_INTENT_MSG, this));
+    mBroadcastsScheduled = true;
+}
+{% endhighlight %}
+
+上述方法中，往AMS线程的消息队列发送**BROADCAST_INTENT_MSG**消息，由此也可以看到真正派发广播的是AMS线程(system_server进程中的ActivityManager线程)。
+由于上述方法可能被并发调用，所以通过**mBroadcastsScheduled**这个变量来标识**BROADCAST_INTENT_MSG**是不是已经被AMS线程接收了，当已经抛出的消息还未被接受时，不需要重新抛出。
+该消息被接收后的处理逻辑如下：
+
+{% highlight java %}
+public void handleMessage(Message msg) {
+    switch (msg.what) {
+        case BROADCAST_INTENT_MSG: {
+            ...
+            processNextBroadcast(true);
+        } break;
         ...
     }
-    ...
+}
+{% endhighlight %}
 
+直接调用**BroadcastQueue.processNextBroadcast()**方法，fromMsg参数为true表示这是一次来自**BROADCAST_INTENT_MSG**消息的派发请求。
+**BroadcastQueue.processNextBroadcast()**是派发广播消息最为核心的函数，代码量自然也不小，我们分成几个部分来分析：
+
+{% highlight java %}
+// processNextBroadcast部分1：处理非串行广播消息
+final void  processNextBroadcast(boolean fromMsg) {
+    ...
+    // 1. 设置mBroadcastsScheduled
+    if (fromMsg) {
+        mBroadcastsScheduled = false;
+    }
+    // 2. 处理“并行广播消息”
+    while (mParallelBroadcasts.size() > 0) {
+        ...
+        final int N = r.receivers.size();
+        for (int i=0; i<N; i++) {
+            Object target = r.receivers.get(i);
+            deliverToRegisteredReceiverLocked(r, (BroadcastFilter)target, false);
+        }
+        addBroadcastToHistoryLocked(r);
+    }
+    // 3. 处理阻塞的广播消息
+    if (mPendingBroadcast != null) {
+        ...
+        if (!isDead) { 
+            // isDead表示当前广播消息的进程的存活状态
+            // 如果还活着，则返回该函数，继续等待下次派发
+            return;
+        }
+        ...
+    }
+//未完待续
+{% endhighlight %}
+
+第一个部分是处理非"串行广播消息“，有以下几个步骤：
+
+1. 设置mBroadcastsScheduled。该变量在前文说过，是对BROADCAST_INTENT_MSG进行控制。
+   如果是响应BROADCAST_INTENT_MSG的派发调用，则将mBroadcastsScheduled设为false，
+   表示本次BROADCAST_INTENT_MSG已经处理完毕，可以继续抛出下一次**BROADCAST_INTENT_MSG**消息了
+
+2. 处理“并行广播消息”。广播接受器有“动态”和“静态”之分，通过**Context.registerReceiver()**注册的广播接收器为“动态”的，通过AndroidManifest.xml注册的广播接收器为“静态”的。
+   派发到这两种接收器上的广播消息也是有区分的：派发到“动态”接收器的消息为“并行广播消息”广播消息，派发到“静态”接收器的消息为“串行广播消息”。
+   我们先不去探究Android为什么这么设计，只关注这两种广播消息派发的区别。在BroadcastQueue维护着两个队列：
+
+   - **mParallelBroadcasts**，“并行广播消息”都会进入到此队列中排队。“并行广播消息”可以一次性派发完毕，即在一个循环中将广播派发到所有的“动态”接收器
+
+   - **mOrderedBroadcasts**，“串行广播消息”都会进入到此队列中排队。“串行广播消息”需要轮侯派发，当一个接收器处理完毕后，会再抛出BROADCAST_INTENT_MSG消息，
+     再次进入**BroadcastQueue.processNextBroadcast()**处理下一个
+
+3. 处理阻塞的广播消息。有时候会存在一个广播消息派发不出去的情况，这个广播消息会保存在mPendingBroadcast变量中。新一轮的派发启动时，会判断接收该消息的进程是否还活着，
+   如果接收进程还活着，那么就继续等待。否则，就放弃这个广播消息。
+
+接下来是最为复杂的一部分，处理“串行广播消息”，ANR监测机制只在这一类广播消息中才发挥作用，也就是说“并行广播消息”是不会发生ANR的。
+
+{% highlight java %}
+// processNextBroadcast部分2：从队列中取出“串行广播消息”
+    do {
+        r = mOrderedBroadcasts.get(0);
+        // 1. 广播消息的第一个ANR监测机制
+        if (mService.mProcessesReady && r.dispatchTime > 0) {
+            if ((numReceivers > 0) && 
+                (now > r.dispatchTime + (2*mTimeoutPeriod*numReceivers))) {
+                broadcastTimeoutLocked(false); // forcibly finish this broadcast
+                ...
+        }
+        // 2. 判断该广播消息是否处理完毕
+        if (r.receivers == null || r.nextReceiver >= numReceivers || 
+            r.resultAbort || forceReceive) {
+            ...
+            cancelBroadcastTimeoutLocked();
+            ...
+            mOrderedBroadcasts.remove(0);
+            continue;
+        }
+        
+    } while (r == null);
+//未完待续
+{% endhighlight %}
+
+这部分是一个while循环，每次都从mOrderedBroadcasts队列中取出第一条广播消息进行处理。第一个Broadcast ANR监测机制千呼万唤总算是出现了：
+
+1. 判定当前时间是否已经超过了`r.dispatchTime + 2×mTimeoutPeriod×numReceivers`:
+
+    - dispatchTime表示这一系列广播消息开始派发的时间。“串行广播消息”是逐个接收器派发的，一个接收器处理完毕后，才开始处理下一个消息派发。
+      开始派发到第一个接收器的时间就是dispatchTime。dispatchTime需要开始等广播消息派发以后才会设定，也就是说，第一次进入processNextBroadcast()时，
+      dispatchTime=0,并不会进入该条件判断
+
+    - mTimeoutPeriod由当前BroadcastQueue的类型决定(forground为10秒，background为60秒)。这个时间在初始化BroadcastQueue的时候就设置好了，
+      本意是限定每一个Receiver处理广播的时间，这里利用它做了一个超时计算
+
+    假设一个广播消息有2个接受器，mTimeoutPeriod是10秒，当2×10×2=40秒后，该广播消息还未处理完毕，就调用**broadcastTimeoutLocked()**方法，
+    这个方法会判断当前是不是发生了ANR，我们后文再分析。
+
+2. 如果广播消息是否已经处理完毕，则从mOrderedBroadcasts中移除，重新循环，处理下一条;否则，就会跳出循环。
+
+以上代码块完成的主要任务是从队列中取一条“串行广播消息”，接下来就准备派发了：
+
+{% highlight java %}
+// processNextBroadcast部分3：串行广播消息的第二个ANR监测机制
+    r.receiverTime = SystemClock.uptimeMillis();
+    ...
     if (! mPendingBroadcastTimeoutMessage) {
         long timeoutTime = r.receiverTime + mTimeoutPeriod;
         ...
         setBroadcastTimeoutLocked(timeoutTime);
     }
-}
+//未完待续
+{% endhighlight %}
 
+一旦开始“串行广播消息"派发，第二个ANR检测机制就出现了。**mPendingBroadcastTimeoutMessage**变量用于标识当前是否有阻塞的超时消息，
+如果没有则调用**BroadcastQueue.setBroadcastTimeoutLocked()**：
+
+{% highlight java %}
 final void setBroadcastTimeoutLocked(long timeoutTime) {
     if (! mPendingBroadcastTimeoutMessage) {
         Message msg = mHandler.obtainMessage(BROADCAST_TIMEOUT_MSG, this);
@@ -179,21 +311,169 @@ final void setBroadcastTimeoutLocked(long timeoutTime) {
         mPendingBroadcastTimeoutMessage = true;
     }
 }
-
 {% endhighlight %}
 
-- 第一个监测机制为判定当前时间是否已经超过了 r.dispatchTime + 2*mTimeoutPeriod*numReceivers
+通过设置一个定时消息**BROADCAST_TIMEOUT_MSG**来跟踪当前广播消息的执行情况，这种超时监测机制跟Service ANR很类似，也是抛到AMS线程的消息队列。
+如果所有的接收器都处理完毕了，则会调用**cancelBroadcastTimeoutLocked()**清除该消息;否则，该消息就会响应，并调用**broadcastTimeoutLocked()**，
+这个方法在第一种ANR监测机制的时候调用过，第二种ANR监测机制也会调用，我们留到后文分析。
 
-  - dispatchTime表示这一系列广播开始派发的时间
-  - mTimeoutPeriod由当前BroadcastQueue的类型决定(forground为10秒，background为60秒)
-  - numReceivers表示当前接收该广播的Receiver数量
+设置完定时消息后，就开始派发广播消息了，首先是“动态”接收器：
 
-- 第二个监测机制是设置定时消息：
-  
-  - receiverTime表示当前广播被Receiver接收的时间，
-  - 通过setBroadcastTimeoutLocked()设置一个定时消息，消息抛出的时间为 r.receiverTime + mTimeoutPeriod
-  - 与Service ANR类似，定时消息**BROADCAST_TIMEOUT_MSG**也是抛到AMS的消息队列
-  - **BROADCAST_TIMEOUT_MSG**的消息响应其实还是调用broadcastTimeoutLocked()方法
+{% highlight java %}
+// processNextBroadcast部分4： 向“动态”接收器派发广播消息
+    final Object nextReceiver = r.receivers.get(recIdx);
+    // 动态接收器的类型都是BroadcastFilter
+    if (nextReceiver instanceof BroadcastFilter) {
+        BroadcastFilter filter = (BroadcastFilter)nextReceiver;
+        deliverToRegisteredReceiverLocked(r, filter, r.ordered);
+        ...
+        return;
+    }
+//未完待续
+{% endhighlight %}
+
+“动态”接收器的载体进程一般是处于运行状态的，所以向这种类型的接收器派发消息相对简单，调用**BroadcastQueue.deliverToRegisteredReceiverLocked()**完成接下来的工作。
+但“静态”接收器是在AndroidManifest.xml中注册的，派发的时候，可能广播接收器的载体进程还没有启动，所以，这种场景会复杂很多。
+
+{% highlight java %}
+// processNextBroadcast部分5： 向“静态”接收器派发广播消息
+    // 静态接收器的类型都是 ResolveInfo
+    ResolveInfo info = (ResolveInfo)nextReceiver;
+    ...
+    // 1. 权限检查
+    ComponentName component = new ComponentName(
+                info.activityInfo.applicationInfo.packageName,
+                info.activityInfo.name);
+    int perm = mService.checkComponentPermission(info.activityInfo.permission,
+                r.callingPid, r.callingUid, info.activityInfo.applicationInfo.uid,
+                info.activityInfo.exported);
+    ...
+    // 2. 获取接收器所在的进程
+    ProcessRecord app = mService.getProcessRecordLocked(targetProcess,
+                info.activityInfo.applicationInfo.uid, false);
+    // 3. 进程已经启动
+    if (app != null && app.thread != null) {
+       ...
+       processCurBroadcastLocked(r, app);
+       return;
+    }
+    // 4. 进程还未启动
+    if ((r.curApp=mService.startProcessLocked(targetProcess,
+                info.activityInfo.applicationInfo, true,
+                r.intent.getFlags() | Intent.FLAG_FROM_BACKGROUND,
+                "broadcast", r.curComponent,
+                (r.intent.getFlags()&Intent.FLAG_RECEIVER_BOOT_UPGRADE) != 0, false, false))
+                        == null) {
+        ...
+        scheduleBroadcastsLocked();
+        return;
+    }
+    // 5. 进程启动失败
+    mPendingBroadcast = r;
+    mPendingBroadcastRecvIndex = recIdx;
+}
+// processNextBroadcast完
+{% endhighlight %}
+
+1. “静态”接收器是ResolveInfo，需要通过PackageManager获取包信息，进行权限检查。权限检查的内容非常庞大，此处不表。
+
+2. 经过一系列复杂的权限检查后，终于可以向目标接收器派发了。通过**AMS.getProcessRecordLocked()**获取广播接收器的进程信息
+
+3. 如果`app.thread ！= null`，则进程已经启动，就可以调用**BroadcastQueue.processCurBroadcastLocked()**进行接下来的派发处理了
+
+4. 如果进程还没有启动，则需要通过**AMS.startProcessLocked()**来启动进程，当前消息并未派发，调用**BroadcastQueue.scheduleBroadcastsLocked()**进入下一次的调度
+
+5. 如果进程启动失败了，则当前消息记录成mPendingBroadcast，即阻塞的广播消息，等待下一次调度时处理
+
+庞大的**processNextBroadcast()**终于完结了，它的功能就是对广播消息进行调度，该方法被设计得十分复杂而精巧，用于应对不同的广播消息和接收器的处理。
+
+#### 广播消息的跨进程传递
+
+调度是完成了，接下来，我们就来分析被调度广播消息如何到达应用程序。上文的分析中，最终有两个方法将广播消息派发出去：
+**BroadcastQueue.deliverToRegisteredReceiverLocked()**和**BroadcastQueue.processCurBroadcastLocked()**。
+
+我们先不展开这两个函数的逻辑，试想要将广播消息的从AMS线程所在的system_server进程传递到应用程序的进程，该怎么实现？
+自然需要用到跨进程调用，Android中最常规的手段就是Binder机制。没错，广播消息派发到应用进程就是这么玩的。
+
+对于应用程序已经启动(app.thread != null)的情况，会通过**IApplicationThread**发起跨进程调用，
+调用关系如下：
+
+    ActivityThread.ApplicationThread.scheduleReceiver()
+    └── ActivityThread.handleReceiver()
+        └── BroadcastReceiver.onReceive()
+    
+对于应用程序还未启动的情况，会调用**IIntentReceiver**发起跨进程调用，应用进程的实现在**LoadedApk.ReceiverDispatcher.IntentReceiver**中，
+调用关系如下：
+
+    LoadedApk.ReceiverDispatcher.IntentReceiver.performReceive()
+    └── LoadedApk.ReceiverDispatcher.performReceiver()
+        └── LoadedApk.ReceiverDispatcher.Args.run()
+            └── BroadcastReceiver.onReceive()
+
+最终，都会调用到**BroadcastReceiver.onReceive()**，在应用进程执行接收广播消息的具体动作。
+对于“串行广播消息”而言，执行完了以后，还需要通知system_server进程，才能继续将广播消息派发到下一个接收器，这又需要跨进程调用了。
+应用进程在处理完广播消息后，即在**BroadcastReceiver.onReceive()**执行完毕后，会调用**BroadcastReceiver.PendingResult.finish()**，
+接下来的调用关系如下：
+
+    BroadcastReceiver.PendingResult.finish()
+    └── BroadcastReceiver.PendingResult.sendFinished()
+        └── IActivityManager.finishReceiver()
+            └── ActivityManagerService.finishReceiver()
+                └── BroadcastQueue.processNextBroadcat()
+
+通过**IActivityManager**发起了一个从应用进程到system_server进程的调用，最终在AMS线程中，又走到了**BroadcastQueue.processNextBroadcat()**,
+开始下一轮的调度。
+
+#### broadcastTimeoutLocked()方法
+
+前文说过，两种ANR机制最终都会**BroadcastQueue.broadcastTimeoutLocked()**方法，这个方法主要是对**BROADCAST_TIMEOUT_MSG**进行处理，
+第一种ANR监测生效时，会将fromMsg设置为false;第二种ANR监测生效时，会将fromMsg参数为True时，表示当前正在响应**BROADCAST_TIMEOUT_MSG**消息。
+
+{% highlight java %}
+final void broadcastTimeoutLocked(boolean fromMsg) {
+    // 1. 设置mPendingBroadcastTimeoutMessage
+    if (fromMsg) {
+        mPendingBroadcastTimeoutMessage = false;
+    }
+    ...
+    // 2. 判断第二种ANR机制是否超时
+    BroadcastRecord r = mOrderedBroadcasts.get(0);
+    if (fromMsg) {
+        long timeoutTime = r.receiverTime + mTimeoutPeriod;
+        if (timeoutTime > now) {
+            setBroadcastTimeoutLocked(timeoutTime);
+            return;
+        }
+    }
+    ...
+    // 3. 已经超时，则结束对当前接收器，开始新一轮调度
+    finishReceiverLocked(r, r.resultCode, r.resultData,
+                r.resultExtras, r.resultAbort, false);
+    scheduleBroadcastsLocked();
+
+    // 4. 抛出绘制ANR对话框的消息
+    if (anrMessage != null) {
+        mHandler.post(new AppNotResponding(app, anrMessage));
+    }
+    
+}
+{% endhighlight %}
+
+1. **mPendingBroadcastTimeoutMessage**标识是否存在未处理的**BROADCAST_TIMEOUT_MSG**消息，
+   将其设置成false，允许继续抛出**BROADCAST_TIMEOUT_MSG**消息
+
+2. 每次将广播派发到接收器，都会将r.receiverTime更新，如果判断当前还未超时，则又抛出一个**BROADCAST_TIMEOUT_MSG**消息。
+   正常情况下，所有接收器处理完毕后，才会清除**BROADCAST_TIMEOUT_MSG**;否则，每进行一次广播消息的调度，都会抛出**BROADCAST_TIMEOUT_MSG**消息
+
+3. 判断已经超时了，说明当前的广播接收器还未处理完毕，则结束掉当前的接收器，开始新一轮广播调度
+
+4. 最终，发出绘制ANR对话框的消息
+
+**至此，我们回答了前文提出的两个问题:**
+
+**AMS维护着广播队列BroadcastQueue，AMS线程不断从队列中取出消息进行调度，完成广播消息的派发。**
+**在派发“串行广播消息”时，会抛出一个定时消息BROADCAST_TIMEOUT_MSG，在广播接收器处理完毕后，AMS会将定时消息清除。**
+**如果BROADCAST_TIMEOUT_MSG得到了响应，就会判断是否广播消息处理超时，最终通知ANR的发生。**
 
 ### 2.1.3 Input处理超时
 
@@ -203,7 +483,6 @@ final void setBroadcastTimeoutLocked(long timeoutTime) {
 
 > 1. 输入事件经历了一些什么工序才能被派发到应用的界面？
 > 2. 如何检测到输入时间处理超时？
-> 3. 在什么场景下，会导致**InputEvent**超时？
 
 输入事件最开始由硬件设备(譬如按键或触摸屏幕)发起，Android有一套输入子系统来发现各种输入事件，这些事件最终都会被[InputDispatcher](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)分发到各个需要接收事件的窗口。
 那么，窗口如何告之InputDispatcher自己需要处理输入事件呢？Android通过[InputChannel](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
@@ -301,7 +580,7 @@ int InputDispatcher::handleReceiveCallback(int fd, int events, void* data) {
             └── InputDispatcher::doNotifyANRLockedInterruptible()
                 └── NativeInputManager::notifyANR()
 
-- 首先，会调用**findFocusedWindowTargetsLocked()**或**findTouchedWindowTargetsLocked()**寻找接收输入事件的窗口，
+- 首先，会调用**findFocusedWindowTargetsLocked()**或**findTouchedWindowTargetsLocked()**寻找接收输入事件的窗口。
 
   在找到窗口以后，会调用[**checkWindowReadyForMoreInputLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#1633)
   检查窗口是否有能力再接收新的输入事件，会有一系列的场景阻碍事件的继续派发：
@@ -339,10 +618,25 @@ int InputDispatcher::handleReceiveCallback(int fd, int events, void* data) {
      finished processing certain input events that were delivered to it over
      %0.1fms ago.  Wait queue length: %d.  Wait queue head age: %0.1fms."
 
-- 然后，上述有任何一个场景发生了，则输入事件需要继续等待，紧接着就会调用**handleTargetsNotReadyLocked()**来判断是不是已经的等待超时了：
+- 然后，上述有任何一个场景发生了，则输入事件需要继续等待，紧接着就会调用**handleTargetsNotReadyLocked()**来判断是不是已经的等待超时了。
+  如果当前事件派发已经超时，则说明已经检测到了ANR，调用**onANRLocked()**方法，然后将nextWakeupTime设置为最小值，马上开始下一轮调度
 
-  - 如果当前事件派发已经超时，则说明已经检测到了ANR，调用**onANRLocked()**方法
-  - 如果当前没有超时，则继续调度。
+{% highlight c %}
+int32_t InputDispatcher::handleTargetsNotReadyLocked(nsecs_t currentTime,
+        const EventEntry* entry,
+        const sp<InputApplicationHandle>& applicationHandle,
+        const sp<InputWindowHandle>& windowHandle,
+        nsecs_t* nextWakeupTime, const char* reason) {
+    ...
+    if (currentTime >= mInputTargetWaitTimeoutTime) {
+        onANRLocked(currentTime, applicationHandle, windowHandle,
+            entry->eventTime, mInputTargetWaitStartTime, reason);
+        *nextWakeupTime = LONG_LONG_MIN;
+        return INPUT_EVENT_INJECTION_PENDING;
+    }
+    ...
+}
+{% endhighlight %}
 
 - 最后，在[**onANRLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#3430)方法中，
   会保存ANR的一些状态信息，调用**doNotifyANRLockedInterruptible()**，进一步会调用到JNI层的
@@ -474,7 +768,16 @@ public boolean inputDispatchingTimedOut(final ProcessRecord proc,
 
 ### 2.1.4 小结
 
-ANR监测机制小结
+ANR监测机制包含三种：
+
+- **Service ANR**，前台进程中Service生命周期不能超过**20秒**，后台进程中Service的生命周期不能超过**200秒**
+
+- **Broadcast ANR**，前台的“串行广播消息”必须在**10秒**内处理完毕，后台的“串行广播消息”必须在**60秒**处理完毕，
+  所谓处理完毕，是指广播消息从调度开始到收到应用进程通知的时间，不能超过**10秒**或**60秒**
+
+- **Input ANR**，输入事件必须在**5秒**内处理完毕
+
+ANR监测机制实际上是对应用程序主线程的要求，要求主线成必须在限定的时间内，完成对几种操作的响应;否则，就可以认为应用程序主线程失去响应能力。
 
 ## 2.2 ANR的报告机制
 
