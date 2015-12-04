@@ -14,7 +14,7 @@ tags:  [Middleware]
 *Settings*额外引入了以下资源：
 
     MeizuCommon/src
-    MeizuCommon/res                      
+    MeizuCommon/res
     MeizuWidget/MeizuToolTips/src
     MeizuWidget/MeizuToolTips/res
 

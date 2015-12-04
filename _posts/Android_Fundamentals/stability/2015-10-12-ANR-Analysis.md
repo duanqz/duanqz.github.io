@@ -22,7 +22,7 @@ ANR由消息处理机制保证，Android在系统层实现了一套精密的机�
 如果处理超时，则认为主线程已经失去了响应其他操作的能力。主线程中的耗时操作，譬如密集CPU运算、大量IO、复杂界面布局等，都会降低应用程序的响应能力。
 
 最后，部分ANR问题是很难分析的，有时候由于系统底层的一些影响，导致消息调度失败，出现问题的场景又难以复现。
-这类ANR问题往往需要花费大量的时间去了解系统的一些行为，已经超出了ANR机制本身的范畴。
+这类ANR问题往往需要花费大量的时间去了解系统的一些行为，超出了ANR机制本身的范畴。
 
 # 2. ANR机制
 
@@ -65,7 +65,7 @@ Service运行在应用程序的主线程，如果Service的执行时间超过**2
 如果应用程序的代码逻辑查不出问题，就需要深入检查当前系统的状态：CPU的使用情况、系统服务的状态等，判断当时发生ANR进程是否受到系统运行异常的影响。
 
 如何检测Service超时呢？Android是通过设置定时消息实现的。定时消息是由AMS的消息队列处理的(system_server的ActivityManager线程)。
-AMS有Sercie运行的上下文信息，所以在AMS中设置一套超时检测机制也是合情合理的。
+AMS有Service运行的上下文信息，所以在AMS中设置一套超时检测机制也是合情合理的。
 
 Service ANR机制相对最为简单，主体实现在[ActiveServices](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)中。
 当Service的生命周期开始时，**bumpServiceExecutingLocked()**会被调用，紧接着会调用**scheduleServiceTimeoutLocked()**：
@@ -156,10 +156,10 @@ ANR的报告机制是通过**AMS.appNotResponding()**完成的，Broadcast和Inp
 
 #### 广播消息的调度
 
-AMS维护了两个广播队列[BroadcastQueue](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java): 
+AMS维护了两个广播队列[BroadcastQueue](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java):
 
 - **foreground queue**，前台队列的超时时间是10秒
-- **background queue**，后台队列的超时时间是60秒 
+- **background queue**，后台队列的超时时间是60秒
 
 之所以有两个，就是因为要区分的不同超时时间。所有发送的广播都会进入到队列中等待调度，在发送广播时，可以通过**Intent.FLAG_RECEIVER_FOREGROUND**参数将广播投递到前台队列。
 AMS线程会不断地从队列中取出广播消息派发到各个接收器(BroadcastReceiver)。当要派发广播时，AMS会调用**BroadcastQueue.scheduleBroadcastsLocked()**方法：
@@ -215,7 +215,7 @@ final void  processNextBroadcast(boolean fromMsg) {
     // 3. 处理阻塞的广播消息
     if (mPendingBroadcast != null) {
         ...
-        if (!isDead) { 
+        if (!isDead) {
             // isDead表示当前广播消息的进程的存活状态
             // 如果还活着，则返回该函数，继续等待下次派发
             return;
@@ -232,7 +232,7 @@ final void  processNextBroadcast(boolean fromMsg) {
    表示本次BROADCAST_INTENT_MSG已经处理完毕，可以继续抛出下一次**BROADCAST_INTENT_MSG**消息了
 
 2. 处理“并行广播消息”。广播接受器有“动态”和“静态”之分，通过**Context.registerReceiver()**注册的广播接收器为“动态”的，通过AndroidManifest.xml注册的广播接收器为“静态”的。
-   派发到这两种接收器上的广播消息也是有区分的：派发到“动态”接收器的消息为“并行广播消息”广播消息，派发到“静态”接收器的消息为“串行广播消息”。
+   广播消息有“并行”和“串行”之分，“并行广播消息”都会派发到“动态”接收器，“串行广播消息”则会根据实际情况派发到两种接收器。
    我们先不去探究Android为什么这么设计，只关注这两种广播消息派发的区别。在BroadcastQueue维护着两个队列：
 
    - **mParallelBroadcasts**，“并行广播消息”都会进入到此队列中排队。“并行广播消息”可以一次性派发完毕，即在一个循环中将广播派发到所有的“动态”接收器
@@ -241,7 +241,7 @@ final void  processNextBroadcast(boolean fromMsg) {
      再次进入**BroadcastQueue.processNextBroadcast()**处理下一个
 
 3. 处理阻塞的广播消息。有时候会存在一个广播消息派发不出去的情况，这个广播消息会保存在mPendingBroadcast变量中。新一轮的派发启动时，会判断接收该消息的进程是否还活着，
-   如果接收进程还活着，那么就继续等待。否则，就放弃这个广播消息。
+   如果接收进程还活着，那么就继续等待。否则，就放弃这个广播消息
 
 接下来是最为复杂的一部分，处理“串行广播消息”，ANR监测机制只在这一类广播消息中才发挥作用，也就是说“并行广播消息”是不会发生ANR的。
 
@@ -251,13 +251,13 @@ final void  processNextBroadcast(boolean fromMsg) {
         r = mOrderedBroadcasts.get(0);
         // 1. 广播消息的第一个ANR监测机制
         if (mService.mProcessesReady && r.dispatchTime > 0) {
-            if ((numReceivers > 0) && 
+            if ((numReceivers > 0) &&
                 (now > r.dispatchTime + (2*mTimeoutPeriod*numReceivers))) {
                 broadcastTimeoutLocked(false); // forcibly finish this broadcast
                 ...
         }
         // 2. 判断该广播消息是否处理完毕
-        if (r.receivers == null || r.nextReceiver >= numReceivers || 
+        if (r.receivers == null || r.nextReceiver >= numReceivers ||
             r.resultAbort || forceReceive) {
             ...
             cancelBroadcastTimeoutLocked();
@@ -265,12 +265,12 @@ final void  processNextBroadcast(boolean fromMsg) {
             mOrderedBroadcasts.remove(0);
             continue;
         }
-        
+
     } while (r == null);
 //未完待续
 {% endhighlight %}
 
-这部分是一个while循环，每次都从mOrderedBroadcasts队列中取出第一条广播消息进行处理。第一个Broadcast ANR监测机制千呼万唤总算是出现了：
+这部分是一个do-while循环，每次都从mOrderedBroadcasts队列中取出第一条广播消息进行处理。第一个Broadcast ANR监测机制千呼万唤总算是出现了：
 
 1. 判定当前时间是否已经超过了`r.dispatchTime + 2×mTimeoutPeriod×numReceivers`:
 
@@ -300,7 +300,7 @@ final void  processNextBroadcast(boolean fromMsg) {
 //未完待续
 {% endhighlight %}
 
-一旦开始“串行广播消息"派发，第二个ANR检测机制就出现了。**mPendingBroadcastTimeoutMessage**变量用于标识当前是否有阻塞的超时消息，
+取出“串行广播消息"后，一旦要开始派发，第二个ANR检测机制就出现了。**mPendingBroadcastTimeoutMessage**变量用于标识当前是否有阻塞的超时消息，
 如果没有则调用**BroadcastQueue.setBroadcastTimeoutLocked()**：
 
 {% highlight java %}
@@ -401,7 +401,7 @@ final void setBroadcastTimeoutLocked(long timeoutTime) {
     ActivityThread.ApplicationThread.scheduleReceiver()
     └── ActivityThread.handleReceiver()
         └── BroadcastReceiver.onReceive()
-    
+
 对于应用程序还未启动的情况，会调用**IIntentReceiver**发起跨进程调用，应用进程的实现在**LoadedApk.ReceiverDispatcher.IntentReceiver**中，
 调用关系如下：
 
@@ -426,7 +426,7 @@ final void setBroadcastTimeoutLocked(long timeoutTime) {
 
 #### broadcastTimeoutLocked()方法
 
-前文说过，两种ANR机制最终都会**BroadcastQueue.broadcastTimeoutLocked()**方法，这个方法主要是对**BROADCAST_TIMEOUT_MSG**进行处理，
+前文说过，两种ANR机制最终都会调用**BroadcastQueue.broadcastTimeoutLocked()**方法，
 第一种ANR监测生效时，会将fromMsg设置为false;第二种ANR监测生效时，会将fromMsg参数为True时，表示当前正在响应**BROADCAST_TIMEOUT_MSG**消息。
 
 {% highlight java %}
@@ -455,7 +455,6 @@ final void broadcastTimeoutLocked(boolean fromMsg) {
     if (anrMessage != null) {
         mHandler.post(new AppNotResponding(app, anrMessage));
     }
-    
 }
 {% endhighlight %}
 
@@ -484,7 +483,8 @@ final void broadcastTimeoutLocked(boolean fromMsg) {
 > 1. 输入事件经历了一些什么工序才能被派发到应用的界面？
 > 2. 如何检测到输入时间处理超时？
 
-输入事件最开始由硬件设备(譬如按键或触摸屏幕)发起，Android有一套输入子系统来发现各种输入事件，这些事件最终都会被[InputDispatcher](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)分发到各个需要接收事件的窗口。
+输入事件最开始由硬件设备(譬如按键或触摸屏幕)发起，Android有一套输入子系统来发现各种输入事件，
+这些事件最终都会被[InputDispatcher](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)分发到各个需要接收事件的窗口。
 那么，窗口如何告之InputDispatcher自己需要处理输入事件呢？Android通过[InputChannel](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
 连接InputDispatcher和窗口，InputChannel其实是封装后的Linux管道(Pipe)。
 每一个窗口都会有一个独立的InputChannel，窗口需要将这个InputChannel注册到InputDispatcher中:
@@ -504,7 +504,7 @@ status_t InputDispatcher::registerInputChannel(const sp<InputChannel>& inputChan
 }
 {% endhighlight %}
 
-每注册一个InputChannel都被视为一个Connection，通过文件描述符来区别。InputDispatcher是一个消息处理循环，当有新的Connection时，就需要唤醒消息循环队列进行处理。
+对于InputDispatcher而言，每注册一个InputChannel都被视为一个Connection，通过文件描述符来区别。InputDispatcher是一个消息处理循环，当有新的Connection时，就需要唤醒消息循环队列进行处理。
 
 输入事件的类型有很多，按键、轨迹球、触屏等，Android对这些事件进行了分类，处理这些事件的窗口也被赋予了一个类型(**targetType**)：Foucused或Touched，
 如果当前输入事件是按键类型，则寻找Focused类型的窗口;如果当前输入事件类型是触摸类型，则寻找Touched类型的窗口。
@@ -520,7 +520,7 @@ InputDispatcher需要经过以下复杂的调用关系，才能把一个输入�
                             └── InputDispatcher::startDispatchCycleLocked()
                                 └── InputPublisher::publishKeyEvent()
 
-具体每个函数的实现逻辑此处不表。我们提出来几个关键点：
+具体每个函数的实现逻辑此处不表。我们提炼出几个关键点：
 
 - InputDispatcherThread是一个线程，它处理一次消息的派发
 - 输入事件作为一个消息，需要排队等待派发，每一个Connection都维护两个队列：
@@ -554,7 +554,7 @@ int InputDispatcher::handleReceiveCallback(int fd, int events, void* data) {
     └── InputDispatcher::onDispatchCycleFinishedLocked()
         └── InputDispatcher::doDispatchCycleFinishedLockedInterruptible()
             └── InputDispatcher::startDispatchCycleLocked()
-    
+
 调用到**doDispatchCycleFinishedLockedInterruptible()**方法时，会将已经成功派发的消息从waitQueue中移除，
 进一步调用会**startDispatchCycleLocked**开始派发新的事件。
 
@@ -584,42 +584,41 @@ int InputDispatcher::handleReceiveCallback(int fd, int events, void* data) {
 
   在找到窗口以后，会调用[**checkWindowReadyForMoreInputLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#1633)
   检查窗口是否有能力再接收新的输入事件，会有一系列的场景阻碍事件的继续派发：
-  
+
   - **场景1:** 窗口处于paused状态，不能处理输入事件
-  
-    "Waiting because the [targetType] window is paused." 
+
+    "Waiting because the [targetType] window is paused."
 
   - **场景2:** 窗口还未向InputDispatcher注册，无法将事件派发到窗口
-  
+
     "Waiting because the [targetType] window's input channel is not
      registered with the input dispatcher.  The window may be in the process
      of being removed."
 
   - **场景3:** 窗口和InputDispatcher的连接已经中断，即InputChannel不能正常工作
-  
+
     "Waiting because the [targetType] window's input connection is [status].
      The window may be in the process of being removed."
-  
+
   - **场景4:** InputChannel已经饱和，不能再处理新的事件
-  
+
     "Waiting because the [targetType] window's input channel is full.
      Outbound queue length: %d.  Wait queue length: %d."
 
   - **场景5:** 对于按键类型(KeyEvent)的输入事件，需要等待上一个事件处理完毕
-  
+
     "Waiting to send key event because the [targetType] window has not
      finished processing all of the input events that were previously
      delivered to it.  Outbound queue length: %d.  Wait queue length: %d."
 
   - **场景6:** 对于触摸类型(TouchEvent)的输入事件，可以立即派发到当前的窗口，因为TouchEvent都是发生在用户当前可见的窗口。但有一种情况，
     如果当前应用由于队列有太多的输入事件等待派发，导致发生了ANR，那TouchEvent事件就需要排队等待派发。
-    
+
     "Waiting to send non-key event because the %s window has not
      finished processing certain input events that were delivered to it over
      %0.1fms ago.  Wait queue length: %d.  Wait queue head age: %0.1fms."
 
-- 然后，上述有任何一个场景发生了，则输入事件需要继续等待，紧接着就会调用**handleTargetsNotReadyLocked()**来判断是不是已经的等待超时了。
-  如果当前事件派发已经超时，则说明已经检测到了ANR，调用**onANRLocked()**方法，然后将nextWakeupTime设置为最小值，马上开始下一轮调度
+- 然后，上述有任何一个场景发生了，则输入事件需要继续等待，紧接着就会调用**handleTargetsNotReadyLocked()**来判断是不是已经的等待超时了：
 
 {% highlight c %}
 int32_t InputDispatcher::handleTargetsNotReadyLocked(nsecs_t currentTime,
@@ -638,7 +637,8 @@ int32_t InputDispatcher::handleTargetsNotReadyLocked(nsecs_t currentTime,
 }
 {% endhighlight %}
 
-- 最后，在[**onANRLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#3430)方法中，
+- 最后，如果当前事件派发已经超时，则说明已经检测到了ANR，调用**onANRLocked()**方法，然后将nextWakeupTime设置为最小值，马上开始下一轮调度。
+  在[**onANRLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#3430)方法中，
   会保存ANR的一些状态信息，调用**doNotifyANRLockedInterruptible()**，进一步会调用到JNI层的
   [**NativeInputManager::notifyANR()**](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/jni/com_android_server_input_InputManagerService.cpp#598)方法，
   它的主要功能就是衔接Native层和Java层，直接调用Java层的**InputManagerService.notifyANR()**方法。
@@ -742,7 +742,7 @@ public boolean inputDispatchingTimedOut(final ProcessRecord proc,
         mDidDexOpt = false;
         return false;
     }
-    // 3. 发生ANR的进程是测试进程，需要中断，但不在UI界面显示ANR信息
+    // 3. 发生ANR的进程是测试进程，需要中断，但不在UI界面显示ANR信息判断
     if (proc.instrumentationClass != null) {
         ...
         finishInstrumentationLocked(proc, Activity.RESULT_CANCELED, info);
@@ -770,21 +770,28 @@ public boolean inputDispatchingTimedOut(final ProcessRecord proc,
 
 ANR监测机制包含三种：
 
-- **Service ANR**，前台进程中Service生命周期不能超过**20秒**，后台进程中Service的生命周期不能超过**200秒**
+- **Service ANR**，前台进程中Service生命周期不能超过**20秒**，后台进程中Service的生命周期不能超过**200秒**。
+  在启动Service时，抛出定时消息**SERVICE_TIMEOUT_MSG**或**SERVICE_BACKGOURND_TIMEOUT_MSG**，如果定时消息响应了，则说明发生了ANR
 
 - **Broadcast ANR**，前台的“串行广播消息”必须在**10秒**内处理完毕，后台的“串行广播消息”必须在**60秒**处理完毕，
-  所谓处理完毕，是指广播消息从调度开始到收到应用进程通知的时间，不能超过**10秒**或**60秒**
+  每派发串行广播消息到一个接收器时，都会抛出一个定时消息**BROADCAST_TIMEOUT_MSG**，如果定时消息响应，则判断是否广播消息处理超时，超时就说明发生了ANR
 
-- **Input ANR**，输入事件必须在**5秒**内处理完毕
+- **Input ANR**，输入事件必须在**5秒**内处理完毕。在派发一个输入事件时，会判断当前输入事件是否需要等待，如果需要等待，则判断是否等待已经超时，超时就说明发生了ANR
 
 ANR监测机制实际上是对应用程序主线程的要求，要求主线成必须在限定的时间内，完成对几种操作的响应;否则，就可以认为应用程序主线程失去响应能力。
+
+从ANR的三种监测机制中，我们看到不同超时机制的设计：
+
+Service和Broadcast都是由AMS调度，利用Handler和Looper，设计了一个TIMEOUT消息交由AMS线程来处理，整个超时机制的实现都是在Java层；
+InputEvent由InputDispatcher调度，待处理的输入事件都会进入队列中等待，设计了一个等待超时的判断，超时机制的实现在Native层。
+
 
 ## 2.2 ANR的报告机制
 
 无论哪种类型的ANR发生以后，最终都会调用 *AMS.appNotResponding()* 方法，所谓“殊途同归”。这个方法的职能就是向用户或开发者报告ANR发生了。
 最终的表现形式是：弹出一个对话框，告诉用户当前某个程序无响应;输入一大堆与ANR相关的日志，便于开发者解决问题。
 
-最终形式我们见过很多，但输出日志的原理是什么，未必所有人都了解。下面我们就来见识一下是如何输出ANR日志的。
+最终形式我们见过很多，但输出日志的原理是什么，未必所有人都了解，下面我们就来认识一下是如何输出ANR日志的。
 
 {% highlight java %}
 final void appNotResponding(ProcessRecord app, ActivityRecord activity,
@@ -794,7 +801,6 @@ final void appNotResponding(ProcessRecord app, ActivityRecord activity,
     // parent: 发生ANR的界面的上一级界面
     // aboveSystem:
     // annotation: 发生ANR的原因
-
     ...
     // 1. 更新CPU使用信息。ANR的第一次CPU信息采样
     updateCpuStatsNow();
@@ -862,7 +868,7 @@ final void appNotResponding(ProcessRecord app, ActivityRecord activity,
 
 ### 2.2.1 CPU的使用情况
 
-**AMS.updateCpuStatsNow()**方法的实现不在这里列出了，只需要知道更新CPU使用信息的间隔最小是5秒，即如果5秒内连续调用updateCpuStatsNow()方法，其实是没有更新CPU使用信息的。 
+**AMS.updateCpuStatsNow()**方法的实现不在这里列出了，只需要知道更新CPU使用信息的间隔最小是5秒，即如果5秒内连续调用updateCpuStatsNow()方法，其实是没有更新CPU使用信息的。
 
 CPU使用信息由[ProcessCpuTracker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/com/android/internal/os/ProcessCpuTracker.java)这个类维护，
 每次调用**ProcessCpuTracker.update()**方法，就会读取设备节点 */proc* 下的文件，来更新CPU使用信息，具体有以下几个维度：
@@ -942,3 +948,229 @@ private static void dumpStackTraces(String tracesPath, ArrayList<Integer> firstP
 
 - traces文件中包含很多进程的函数调用栈，这是由firstPids和lastPids数组控制的，在最终的traces文件中，firstPids中的进程是先打印的，
   而且当前发生ANR的进程又是排在firstPids的第一个，所以，当我们打开traces文件，第一个看到的就是当前发生ANR的应用进程
+
+# 3. 问题分析方法
+
+分析ANR问题，有三大利器：Logcat，traces和StrictMode。
+在[StrictMode机制]()一文中，我们介绍过StrictMode的实现机制以及用途，本文中不讨论利用StrictMode来解决ANR问题，但各位读者需要有这个意识。
+在[Watchdog机制以及问题分析](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/)一文中，我们介绍过logcat和traces这两种日志的用途。
+分析ANR问题同Watchdog问题一样，都需要经过日志获取、问题定位和场景还原三个步骤。
+
+## 3.1 日志获取
+
+我们在上文中分析过，ANR报告机制的重要职能就是输出日志，
+这些日志如何取到呢？请参见[日志获取](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/#tocAnchor-1-6-1)
+
+## 3.2 问题定位
+
+通过在`event log`中检索 **am_anr** 关键字，就可以找到发生ANR的进程，譬如以下日志：
+
+	10-16 00:48:27 820 907 I am_anr: [0,29533,com.android.systemui,1082670605,Broadcast of Intent { act=android.intent.action.TIME_TICK flg=0x50000114 (has extras) }]
+
+表示在 **10-16 00:48:27** 这个时刻，PID为 **29533** 进程发生了ANR，进程名是 **com.android.systemui**。
+
+接下来可以在`system log`检索 **ANR in** 关键字，找到发生ANR前后的CPU使用情况：
+
+	10-16 00:50:10 820 907 E ActivityManager: ANR in com.android.systemui, time=130090695
+    10-16 00:50:10 820 907 E ActivityManager: Reason: Broadcast of Intent { act=android.intent.action.TIME_TICK flg=0x50000114 (has extras) }
+    10-16 00:50:10 820 907 E ActivityManager: Load: 30.4 / 22.34 / 19.94
+    10-16 00:50:10 820 907 E ActivityManager: Android time :[2015-10-16 00:50:05.76] [130191,266]
+    10-16 00:50:10 820 907 E ActivityManager: CPU usage from 6753ms to -4ms ago:
+    10-16 00:50:10 820 907 E ActivityManager:   47% 320/netd: 3.1% user + 44% kernel / faults: 14886 minor 3 major
+    10-16 00:50:10 820 907 E ActivityManager:   15% 10007/com.sohu.sohuvideo: 2.8% user + 12% kernel / faults: 1144 minor
+    10-16 00:50:10 820 907 E ActivityManager:   13% 10654/hif_thread: 0% user + 13% kernel
+    10-16 00:50:10 820 907 E ActivityManager:   11% 175/mmcqd/0: 0% user + 11% kernel
+	10-16 00:50:10 820 907 E ActivityManager:   5.1% 12165/app_process: 1.6% user + 3.5% kernel / faults: 9703 minor 540 major
+	10-16 00:50:10 820 907 E ActivityManager:   3.3% 29533/com.android.systemui: 2.6% user + 0.7% kernel / faults: 8402 minor 343 major
+	10-16 00:50:10 820 907 E ActivityManager:   3.2% 820/system_server: 0.8% user + 2.3% kernel / faults: 5120 minor 523 major
+	10-16 00:50:10 820 907 E ActivityManager:   2.5% 11817/com.netease.pomelo.push.l.messageservice_V2: 0.7% user + 1.7% kernel / faults: 7728 minor 687 major
+    10-16 00:50:10 820 907 E ActivityManager:   1.6% 11887/com.android.email: 0.5% user + 1% kernel / faults: 6259 minor 587 major
+    10-16 00:50:10 820 907 E ActivityManager:   1.4% 11854/com.android.settings: 0.7% user + 0.7% kernel / faults: 5404 minor 471 major
+    10-16 00:50:10 820 907 E ActivityManager:   1.4% 11869/android.process.acore: 0.7% user + 0.7% kernel / faults: 6131 minor 561 major
+    10-16 00:50:10 820 907 E ActivityManager:   1.3% 11860/com.tencent.mobileqq: 0.1% user + 1.1% kernel / faults: 5542 minor 470 major
+    ...
+    10-16 00:50:10 820 907 E ActivityManager:  +0% 12832/cat: 0% user + 0% kernel
+    10-16 00:50:10 820 907 E ActivityManager:  +0% 13211/zygote64: 0% user + 0% kernel
+    10-16 00:50:10 820 907 E ActivityManager: 87% TOTAL: 3% user + 18% kernel + 64% iowait + 0.5% softirq
+
+这一段日志对于Android开发人员而言，实在太熟悉不过了，它包含的信息量巨大：
+
+- **发生ANR的时间**。event log中，ANR的时间是 **00：48：27**，因为**AMS.appNotResponding()**首先会打印event log，然后再打印system log，
+  所以，在system log中，找到ANR的时间是 **00:50:10**。可以从这个时间点之前的日志中，还原ANR出现时系统的运行状态
+
+- **打印ANR日志的进程**。ANR日志都是在system_server进程的AMS线程打印的，在event log和system log中，都能看到 **820** 和 **907**，
+  所以system_server的PID是 **802**，AMS线程的TID是 **907**。ANR的监测机制实现在AMS线程，分析一些受系统影响的ANR，需要知道system_server进程的运行状态
+
+- **发生ANR的进程**。**ANR in**关键字就表明了当前ANR的进程是com.android.system.ui，通过event log，知道进程的PID是 **29533**
+
+- **发生ANR的原因**。**Reason**关键字表明了当前发生ANR的原因是，处理TIME_TICK广播消息超时。
+  隐含的意思是TIME_TICK是一个串行广播消息，在 **29533** 的主线程中，执行**BroadcastReceiver.onReceive()**方法已经超过10秒
+
+- **CPU负载**。**Load**关键字表明了最近1分钟、5分钟、15分钟内的CPU负载分别是30.4、22.3、19.94。CPU最近1分钟的负载最具参考价值，因为ANR的超时限制基本都是1分钟以内，
+  这可以近似的理解为CPU最近1分钟平均有30.4个任务要处理，这个负载值是比较高的
+
+- **CPU使用统计时间段**。**CPU usage from XX to XX ago**关键字表明了这是在ANR发生之前一段时间内的CPU统计。
+  类似的还有**CPU usage from XX to XX after**关键字，表明是ANR发生之后一段时间内的CPU统计
+
+- **各进程的CPU使用率**。我们以com.android.systemui进程的CPU使用率为例，它包含以下信息：
+
+  - 总的CPU使用率: 3.3%，其中systemui进程在用户态的CPU使用率是2.6%，在内核态的使用率是0.7%
+
+  - 缺页次数fault：**8402 minor**表示高速缓存中的缺页次数，**343 major**表示内存的缺页次数。minor可以理解为进程在做内存访问，major可以理解为进程在做IO操作。
+    当前minor和major值都是比较高的，从侧面反映了发生ANR之前，systemui进程有有较多的内存访问操作，引发的IO次数也会较多
+
+  - **CPU使用率前面的 “+”**。部分进程的CPU使用率前面有 **“+”** 号，譬如cat和zygote64，表示在上一次CPU统计的时间片段内，还没有这些进程，而这一次CPU统计的时间片段内，运行了这些进程。
+    类似的还有 **“-”** 号，表示两次CPU统计时间片段时，这些进程消亡了
+
+- **CPU使用汇总**。**TOTAL**关键字表明了CPU使用的汇总，87%是总的CPU使用率，其中有一项**iowait**表明CPU在等待IO的时间，占到64%，说明发生ANR以前，有大量的IO操作。app_process、
+  system_server, com.android.systemui这几个进程的major值都比较大，说明这些进程的IO操作较为频繁，从而拉升了整个**iowait**的时间
+
+信息量是如此的庞大，以致于我们都要下结论了：CPU大量的时间都在等待IO，导致systemui进程分配不到CPU时间，从而主线程处理广播消息超时，发生了ANR。
+
+对于一个严谨的开发人员而言，这种结论下得有点早，因为还有太多的疑问：
+
+- systemui进程也分到了一些CPU时间(3.3%)，难道**BroadcastReceiver.onReceive()**方法就一直无法执行吗？
+
+- 为什么iowait的时间会这么多，而且多个进程的major值都很高？
+
+接下来还是需要从其他日志中还原ANR出现的场景。
+
+## 3.3 场景还原
+
+### 3.3.1 第一个假设和验证
+
+带着上文提出来的第一个疑问，我们先来做一个假设：如果systemui进程正在执行**BroadcatReceiver.onReceive()**方法，那么从traces.txt文件中，应该可以看到主线程的函数调用栈正在执行这个方法。
+
+接下来，我们首先从traces文件中，找到发生ANR时(**00:48:27**)，sysemtui进程的函数调用栈信息。
+
+	----- pid 29533 at 2015-10-16 00:48:06 -----
+    Cmd line: com.android.systemui
+
+    DALVIK THREADS (53):
+    "main" prio=5 tid=1 Native
+      | group="main" sCount=1 dsCount=0 obj=0x75bd5818 self=0x7f8549a000
+      | sysTid=29533 nice=0 cgrp=bg_non_interactive sched=0/0 handle=0x7f894bbe58
+      | state=S schedstat=( 288625433917 93454573244 903419 ) utm=20570 stm=8292 core=3 HZ=100
+      | stack=0x7fdffda000-0x7fdffdc000 stackSize=8MB
+      | held mutexes=
+      native: #00 pc 00060b0c  /system/lib64/libc.so (__epoll_pwait+8)
+      native: #01 pc 0001bb54  /system/lib64/libc.so (epoll_pwait+32)
+      native: #02 pc 0001b3d8  /system/lib64/libutils.so (android::Looper::pollInner(int)+144)
+      native: #03 pc 0001b75c  /system/lib64/libutils.so (android::Looper::pollOnce(int, int*, int*, void**)+76)
+      native: #04 pc 000d7194  /system/lib64/libandroid_runtime.so (android::NativeMessageQueue::pollOnce(_JNIEnv*, int)+48)
+      at android.os.MessageQueue.nativePollOnce(Native method)
+      at android.os.MessageQueue.next(MessageQueue.java:148)
+      at android.os.Looper.loop(Looper.java:151)
+      at android.app.ActivityThread.main(ActivityThread.java:5718)
+      at java.lang.reflect.Method.invoke!(Native method)
+      at java.lang.reflect.Method.invoke(Method.java:372)
+      at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:975)
+      at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:770)
+
+    ----- pid 29533 at 2015-10-16 00:48:29 -----
+    Cmd line: com.android.systemui
+
+    DALVIK THREADS (54):
+    "main" prio=5 tid=1 Blocked
+      | group="main" sCount=1 dsCount=0 obj=0x75bd5818 self=0x7f8549a000
+      | sysTid=29533 nice=0 cgrp=bg_non_interactive sched=0/0 handle=0x7f894bbe58
+      | state=S schedstat=( 289080040422 93461978317 904874 ) utm=20599 stm=8309 core=0 HZ=100
+      | stack=0x7fdffda000-0x7fdffdc000 stackSize=8MB
+      | held mutexes=
+      at com.mediatek.anrappmanager.MessageLogger.println(SourceFile:77)
+      - waiting to lock <0x26b337a3> (a com.mediatek.anrappmanager.MessageLogger) held by thread 49
+      at android.os.Looper.loop(Looper.java:195)
+      at android.app.ActivityThread.main(ActivityThread.java:5718)
+      at java.lang.reflect.Method.invoke!(Native method)
+      at java.lang.reflect.Method.invoke(Method.java:372)
+      at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:975)
+      at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:770)
+    ...
+    "Binder_5" prio=5 tid=49 Native
+      | group="main" sCount=1 dsCount=0 obj=0x136760a0 self=0x7f7e453000
+      | sysTid=6945 nice=0 cgrp=default sched=0/0 handle=0x7f6e3ce000
+      | state=S schedstat=( 5505571091 4567508913 30743 ) utm=264 stm=286 core=4 HZ=100
+      | stack=0x7f6b83f000-0x7f6b841000 stackSize=1008KB
+      | held mutexes=
+      native: #00 pc 00019d14  /system/lib64/libc.so (syscall+28)
+      native: #01 pc 0005b5d8  /system/lib64/libaoc.so (???)
+      native: #02 pc 002c6f18  /system/lib64/libaoc.so (???)
+      native: #03 pc 00032c40  /system/lib64/libaoc.so (???)
+      at libcore.io.Posix.getpid(Native method)
+      at libcore.io.ForwardingOs.getpid(ForwardingOs.java:83)
+      at android.system.Os.getpid(Os.java:176)
+      at android.os.Process.myPid(Process.java:754)
+      at com.mediatek.anrappmanager.MessageLogger.dump(SourceFile:219)
+      - locked <0x26b337a3> (a com.mediatek.anrappmanager.MessageLogger)
+      at com.mediatek.anrappmanager.ANRAppManager.dumpMessageHistory(SourceFile:65)
+      at android.app.ActivityThread$ApplicationThread.dumpMessageHistory(ActivityThread.java:1302)
+      at android.app.ApplicationThreadNative.onTransact(ApplicationThreadNative.java:682)
+      at android.os.Binder.execTransact(Binder.java:451)
+
+最终，我们找到systemui进程ANR时刻(**00:48:27**)附近的两个函数调用栈:
+
+1. 在ANR发生之前(**00:48:06**)，主线程的函数调用栈处于正常状态：消息队列中，循环中处理消息
+
+2. 在ANR发生之后2秒(**00:48:29**)，主线程处于Blocked状态，在等待一个被49号线程持有的锁。而49号线程是一个Binder线程，anrappmanager正在做dump操作。
+
+> 笔者分析的日志是MTK平台产生的，所以从函数调用栈中看到**com.mediatek.anrappmanager.MessageLogger**这样的类，它是MTK在AOSP上的扩展，用于打印ANR日志。
+
+**至此，systemui进程发生ANR的直接原因我们已经找到了，systemui进程正在打印traces，存在较长时间的IO操作，导致主线程阻塞，从而无法处理TIME_TICK广播消息，所以发生了ANR。**
+
+要避免这种场景下的ANR，我们就需要打破主线程中Blocked的逻辑。其实本例是由于MTK在AOSP的**android.os.Looper.loop()**扩展了打印消息队列的功能，该功能存在设计缺陷，会导致锁等待的情况。
+
+### 3.3.2 第二个假设和验证
+
+我们进一步挖掘在systemui还没有发生ANR时，就在打印traces的原因。带着上文提出的第二个疑问，我们来做另一个假设：
+iowait较高，而且多个进程的major都很高，可能是由于当前正在调用**AMS.dumpStackTraces()**方法，很多进程都需要将自己的函数调用栈写到traces文件，所以IO就会较高。
+如果当前正在调用**AMS.dumpStackTraces()**方法，那说明当时系统已经发生了异常，要么已经有ANR发生，要么有SNR发生
+
+从`event log`中，我们检索到了另一个ANR：
+
+    10-16 00:47:58 820 907 I am_anr  : [0,10464,com.android.settings,1086864965,Input dispatching timed out (Waiting to send key event because the focused window has not finished processing all of the input events that were previously delivered to it.  Outbound queue length: 0.  Wait queue length: 1.)]
+
+在 **00:47:58** 这个时刻，**com.android.settings**进程发生了ANR，而且ANR的时间在systemui之前(**00:48:27**)。这一下，我们就找到佐证了，正是因为settings进程先发生了ANR，调用**AMS.dumpStackTraces()**，
+从而很多进程都开始了打印traces的操作，所以系统的整个iowait比较高，大量进程的major值也比较高，systemui就在其列。在MTK逻辑的影响下，打印ANR日志会导致主线程阻塞，从而就连带引发了其他应用的ANR。
+
+在`system log`中，我们检索到了settings进程ANR的CPU使用信息：
+
+    10-16 00:48:12 820 907 E ActivityManager: ANR in com.android.settings (com.android.settings/.SubSettings), time=130063718
+    10-16 00:48:12 820 907 E ActivityManager: Reason: Input dispatching timed out (Waiting to send key event because the focused window has not finished processing all of the input events that were previously delivered to it.  Outbound queue length: 0.  Wait queue length: 1.)
+    10-16 00:48:12 820 907 E ActivityManager: Load: 21.37 / 19.25 / 18.84
+    10-16 00:48:12 820 907 E ActivityManager: Android time :[2015-10-16 00:48:12.24] [130077,742]
+    10-16 00:48:12 820 907 E ActivityManager: CPU usage from 0ms to 7676ms later:
+    10-16 00:48:12 820 907 E ActivityManager:   91% 820/system_server: 16% user + 75% kernel / faults: 13192 minor 167 major
+    10-16 00:48:12 820 907 E ActivityManager:   3.2% 175/mmcqd/0: 0% user + 3.2% kernel
+    10-16 00:48:12 820 907 E ActivityManager:   2.9% 29533/com.android.systemui: 2.3% user + 0.6% kernel / faults: 1352 minor 10 major
+    10-16 00:48:12 820 907 E ActivityManager:   2.2% 1736/com.android.phone: 0.9% user + 1.3% kernel / faults: 1225 minor 1 major
+    10-16 00:48:12 820 907 E ActivityManager:   2.2% 10464/com.android.settings: 0.7% user + 1.4% kernel / faults: 2801 minor 105 major
+    10-16 00:48:12 820 907 E ActivityManager:   0% 1785/com.meizu.experiencedatasync: 0% user + 0% kernel / faults: 3478 minor 2 major
+    10-16 00:48:12 820 907 E ActivityManager:   1.8% 11333/com.meizu.media.video: 1% user + 0.7% kernel / faults: 3843 minor 89 major
+    10-16 00:48:12 820 907 E ActivityManager:   1.5% 332/mobile_log_d: 0.5% user + 1% kernel / faults: 94 minor 1 major
+    10-16 00:48:12 820 907 E ActivityManager:   1% 11306/com.meizu.media.gallery: 0.7% user + 0.2% kernel / faults: 2204 minor 55 major
+    ...
+    10-16 00:48:12 820 907 E ActivityManager:  +0% 11397/sh: 0% user + 0% kernel
+    10-16 00:48:12 820 907 E ActivityManager:  +0% 11398/app_process: 0% user + 0% kernel
+    10-16 00:48:12 820 907 E ActivityManager: 29% TOTAL: 5.1% user + 15% kernel + 9.5% iowait + 0% softirq
+
+具体的涵义我们不再赘述了，只关注一下ANR的原因:
+
+> Input dispatching timed out (Waiting to send key event because the focused window has not finished processing all of the input events that were previously delivered to it.<br/>
+> **Outbound queue length: 0.  Wait queue length: 1.**)
+
+之前对Input ANR机制的分析派上用长了，我们轻松知道这种ANR的原因是什么。
+`Wait queue length： 1`表示之前的输入事件已经派发到Settings进程了，但Settings进程还没有处理完毕，新来的KeyEvent事件已经等待超过了5秒，所以ANR产生了。
+
+接下来，又需要找到Settings的traces，分析Settings主线程处理输入事件超时的原因，我们点到为止。
+
+# 4. 总结
+
+本文对Android ANR机制进行了深入的分析：
+
+- **ANR的监测机制**，从Service，Broadcast，InputEvent三种不同的ANR监测机制的源码实现开始，分析了Android如何发现各类ANR。在启动服务、派发广播消息和输入事件时，植入超时检测，用于发现ANR
+
+- **ANR的报告机制**，分析Android如何输出ANR日志。当ANR被发现后，两个很重要的日志输出是：CPU使用情况和进程的函数调用栈，这两类日志是我们解决ANR问题的利器
+
+- **ANR的解决方法**，通过一个案例，对ANR日志进行了深入解读，梳理了分析ANR问题的思路和途径
+
+最后，致各位读者，从日志出发解决ANR问题，理解ANR机制背后的实现原理，碰到再难的ANR问题也无需惊慌。
