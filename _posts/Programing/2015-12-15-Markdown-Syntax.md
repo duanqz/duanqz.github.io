@@ -7,11 +7,8 @@ tags : [markdown]
 ---
 {% include JB/setup %}
 
-Markdown是目前备受写作爱好者和撰稿者推崇的一种文本标记语言，说到编程语言，可能很多非编程人员都会感到苦恼，
-但编写Markdown非常简单，就像写普通的TXT文档一样。Markdown的语法标记也是一些常见的特殊字符，
-譬如 **\#, \*, \>** 等，使用起来都比较自然。
-
 本文作为一个Markdown语法的一个参考手册，列出Markdown支持的语法。
+Markdown的语法标记是一些常见的特殊字符，譬如 **\#, \*, \>** 等，使用起来都比较自然。
 
 <br/><font color='blue' size='5'><b>标题</b></font>
 
