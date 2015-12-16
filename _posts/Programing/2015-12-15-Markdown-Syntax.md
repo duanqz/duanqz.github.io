@@ -16,13 +16,12 @@ Markdown的语法标记是一些常见的特殊字符，譬如 **\#, \*, \>** �
     ## 二级标题
     ##### 五级标题
 
+![各级标题](/assets/images/markdown/1-markdown-titles.png)
 
 <br/><font color='blue' size='5'><b>强调</b></font>
 
-	*斜体*
-    _斜体_
-    **粗体**
-    __粗体__
+	*斜体* 或 _斜体_
+    **粗体** 或 __粗体__
 
 *斜体*
 
@@ -36,19 +35,20 @@ Markdown的语法标记是一些常见的特殊字符，譬如 **\#, \*, \>** �
 	    * 二级表项
 	    * 二级表项
 
-    - 一级表项
-    - 一级表项
-	    - 二级表项
-	    - 二级表项
-
     1. 一级表项1
-		- 二级表项1
-		- 二级表项2
+	    * 二级表项1
+	    * 二级表项2
     2. 一级表项2
 
+
+* 一级表项
+    * 二级表项
+    * 二级表项
+* 一级表项
+
 1. 一级表项1
-	- 二级表项1
-	- 二级表项2
+    * 二级表项1
+    * 二级表项2
 2. 一级表项2
 
 
@@ -72,9 +72,9 @@ Markdown的语法标记是一些常见的特殊字符，譬如 **\#, \*, \>** �
 	自动链接 <https://duanqz.github.io>
     文本链接 [Click to duanqz](https://duanqz.github.io)
 
-<https://duanqz.github.io>
+自动链接 <https://duanqz.github.io>
 
-[Click to duanqz](https://duanqz.github.io)
+文本链接 [Click to duanqz](https://duanqz.github.io)
 
 
 <br/><font color='blue' size='5'><b>图片</b></font>
@@ -82,8 +82,9 @@ Markdown的语法标记是一些常见的特殊字符，譬如 **\#, \*, \>** �
 	![文字描述](图片链接)
     ![锤锤](/assets/images/markdown/1-markdown-wangdachui.png)
 
+![文字描述](图片链接)
 
-![锤锤](/assets/images/markdown/1-markdown-wangdachui.png)
+![锤锤](/assets/images/markdown/2-markdown-wangdachui.png)
 
 
 <br/><font color='blue' size='5'><b>表格</b></font>
@@ -118,7 +119,7 @@ head1 | head2
 	- [ ] 任务三，未完成
 
 
-<div ><img src="/assets/images/markdown/2-markdown-tasklist.png" alt="任务列表"/></div>
+<div ><img src="/assets/images/markdown/3-markdown-tasklist.png" alt="任务列表"/></div>
 
 <br/><font color='blue' size='5'><b>代码块语法高亮</b></font>
 
