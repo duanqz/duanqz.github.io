@@ -333,14 +333,133 @@ void handleViolation(final ViolationInfo info) {
 # 3. StrictMode使用
 
 StrictMode机制只是用于发现一些违规操作，这些违规操作一般都是我们编码的疏漏，在运行时会被StrictMode暴露出来，但StrictMode并非真正意思上的“动态代码检查”。
-各位开发者有必要知道StrictMode的使用边界：
+各位读者有必要知道StrictMode的使用范围：
 
-- StrictMode是用在开发调试阶段，在正式发布时，应该关掉StrictMode机制
-	- AOSP的源码中，USER版是没有打开StrictMode
-	- Google Play建议上架的APK都关闭StrictMode
+- StrictMode只是用在开发调试阶段，在正式发布时，应该关掉StrictMode机制。
+	- AOSP的源码中，USER版并没有打开StrictMode
+	- 由于Android还会对StrictMode的检查策略进行调整，所以Google Play建议上架的APK都关闭StrictMode;
+	  从另一个角度，Google认为所有StrictMode的错误，在正式发布前，都应该解决。
 
-- StrictMode
+- StrictMode并不能发现Native层的违规操作，仅仅是用在Java层
 
-# 4. 总结
+StrictMode的使用场景可以分为三类，使用方式也都比较固定，可见StrictMode的对外接口还是封装得比较优美的。
+下面，我们逐个介绍一下StrictMode的使用场景。
+
+## 3.1 普通应用开启StrictMode
+
+对于应用程序而言，Android提供了一个最佳使用实践：尽可能早的在**android.app.Application**或**android.app.Activity**的生命周期使能StrictMode，
+onCreate()方法就是一个最佳的时机，越早开启就能在更多的代码执行路径上发现违规操作。
+
+{% highlight java %}
+public void onCreate() {
+    if (DEVELOPER_MODE) {
+       StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+               .detectDiskReads()
+               .detectDiskWrites()
+               .detectNetwork()   // or .detectAll() for all detectable problems
+               .penaltyLog()
+               .build());
+       StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+               .detectLeakedSqlLiteObjects()
+               .detectLeakedClosableObjects()
+               .penaltyLog()
+               .penaltyDeath()
+               .build());
+    }
+    super.onCreate();
+}
+{% endhighlight %}
+
+以上StrictMode的使能代码限定在**DEVELOPER_MODE**：
+
+- 设定了Disk Read, Disk Write, Network Access三项ThreadPolicy，惩罚是打印日志;
+- 设定了Cursor Leak, Closable Leak两项VMPolicy，惩罚是打印日志和杀掉进程。
+
+当出现一些ThreadPolicy相关违规操作时，Android也提供了很多标准的解决方案，譬如**Handler， AsyncTask， IntentService**，能够将耗时的操作从主线程中分离出来。
+
+## 3.2 系统应用开启StrictMode
+
+对于Android系统应用和系统进程(system_server)而言，其实默认就会开启StrictMode。
+StrictMode提供了**conditionallyEnableDebugLogging()**方法：
+
+{% highlight java %}
+public static boolean conditionallyEnableDebugLogging() {
+    boolean doFlashes = SystemProperties.getBoolean(VISUAL_PROPERTY, false)
+                && !amTheSystemServerProcess();
+    final boolean suppress = SystemProperties.getBoolean(DISABLE_PROPERTY, false);
+    if (!doFlashes && (IS_USER_BUILD || suppress)) {
+        setCloseGuardEnabled(false);
+        return false;
+    }
+
+   int threadPolicyMask = StrictMode.DETECT_DISK_WRITE |
+            StrictMode.DETECT_DISK_READ |
+            StrictMode.DETECT_NETWORK;
+    ...
+    if (!IS_USER_BUILD) {
+        threadPolicyMask |= StrictMode.PENALTY_DROPBOX;
+    }
+
+    StrictMode.setThreadPolicyMask(threadPolicyMask);
+    if (IS_USER_BUILD) {
+        setCloseGuardEnabled(false);
+    } else {
+        VmPolicy.Builder policyBuilder = new VmPolicy.Builder().detectAll().penaltyDropBox();
+        ...
+        setVmPolicy(policyBuilder.build());
+        setCloseGuardEnabled(vmClosableObjectLeaksEnabled());
+    }
+    return true;
+}
+{% endhighlight %}
+
+该方法的目的就是要设置ThreadPolicy和VMPolicy，不过会有一些条件判断，具体的逻辑不表。我们来看一下调用这个方法的地方：
+
+    SystemServer.run()
+    ServiceThread.run()
+    ActivityThread.handleBindApplication()
+    └── StrictMode.conditionallyEnableDebugLogging()
+
+这表示在system_server进程、一些全局的消息线程(IoThread, UiThread, FgThread, DisplayThread)、应用进程这些东西启动的时候开启StrictMode。
+在**ActivityThread.handleBindApplication()**中有这么一段限制：
+
+{% highlight java %}
+private void handleBindApplication(AppBindData data) {
+    ...
+    if ((data.appInfo.flags &
+         (ApplicationInfo.FLAG_SYSTEM |
+          ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0) {
+        StrictMode.conditionallyEnableDebugLogging();
+    }
+    ...
+}
+{% endhighlight %}
+
+表示只为系统应用(**FLAG_SYSTEM, FLAG_UPDATED_SYSTEM_APP**)开启了StrictMode，其他应用还是需要自行开启。
+
+## 3.3 临时关闭StrictMode
+
+对于某些操作而言，我们明确知道是StrictMode定义的违规操作，但实际上对性能并没有什么影响，那么，在执行这类操作的时候，可以临时关闭StrictMode。
+譬如针对一些主线程快速写磁盘的操作：
+
+{% highlight java %}
+StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
+                                 .permitDiskWrites()
+                                 .build());
+// 进行磁盘写操作...
+StrictMode.setThreadPolicy(old);
+{% endhighlight %}
+
+首先，将旧的ThreadPolicy缓存一把; 然后，设置新的ThreadPolicy，并允许写磁盘操作; 最后，在进行完正常的写磁盘操作后，还原旧的ThreadPolicy。
+这样就临时性的避开了StrictMode对写磁盘操作的检查。
+
+# 4. StrictMode案例
+
+分析完StrictMode的实现机制以及使用场景，部分读者或许还有一个疑惑，各种违规操作的代码长什么样？
+
+[StrictModeActivity]()中设计了一些测试样例
+
+# 5. 总结
 
 http://code.tutsplus.com/tutorials/android-best-practices-strictmode--mobile-7581
