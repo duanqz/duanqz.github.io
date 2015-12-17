@@ -17,6 +17,14 @@ tags:  [StrictMode]
 
 - **Penalty(惩罚)**：是指StrictMode发现违规操作后进行惩罚的方式，譬如绘制红框、打印日志、显示对话框、杀掉进程等。
 
+Android在很多关键的代码路径上都植入了StrictMode， 譬如磁盘读写、网络访问、系统进程启动等。StrictMode会根据设置的策略进行检查，如果某个进程在代码运行时出现了违规操作，那么就会受到"惩罚"。
+
+应用程序可以利用StrictMode尽可能的发现一些编码的疏漏，
+Android在[packages/experimental/StrictModeTest](https://android.googlesource.com/platform/packages/experimental/+/master/StrictModeTest/)这个APK中提供了常见违规操作的样例，
+谨作为大家的反面教材。
+
+本文深入分析StrictMode背后的实现原理以及使用场景。
+
 # 2. StrictMode机制
 
 StrictMode的实现涉及到以下源码：
@@ -453,13 +461,3 @@ StrictMode.setThreadPolicy(old);
 
 首先，将旧的ThreadPolicy缓存一把; 然后，设置新的ThreadPolicy，并允许写磁盘操作; 最后，在进行完正常的写磁盘操作后，还原旧的ThreadPolicy。
 这样就临时性的避开了StrictMode对写磁盘操作的检查。
-
-# 4. StrictMode案例
-
-分析完StrictMode的实现机制以及使用场景，部分读者或许还有一个疑惑，各种违规操作的代码长什么样？
-
-[StrictModeActivity]()中设计了一些测试样例
-
-# 5. 总结
-
-http://code.tutsplus.com/tutorials/android-best-practices-strictmode--mobile-7581
