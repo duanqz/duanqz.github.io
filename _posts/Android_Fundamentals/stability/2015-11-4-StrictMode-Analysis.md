@@ -20,7 +20,7 @@ tags:  [StrictMode]
 Android在很多关键的代码路径上都植入了StrictMode， 譬如磁盘读写、网络访问、系统进程启动等。StrictMode会根据设置的策略进行检查，如果某个进程在代码运行时出现了违规操作，那么就会受到"惩罚"。
 
 应用程序可以利用StrictMode尽可能的发现一些编码的疏漏，
-Android在[packages/experimental/StrictModeTest](https://android.googlesource.com/platform/packages/experimental/+/master/StrictModeTest/)这个APK中提供了常见违规操作的样例，
+Android在 [packages/experimental/StrictModeTest](https://android.googlesource.com/platform/packages/experimental/+/master/StrictModeTest/) 这个APK中提供了常见违规操作的样例，
 谨作为大家的反面教材。
 
 本文深入分析StrictMode背后的实现原理以及使用场景。
@@ -343,7 +343,7 @@ void handleViolation(final ViolationInfo info) {
 StrictMode机制只是用于发现一些违规操作，这些违规操作一般都是我们编码的疏漏，在运行时会被StrictMode暴露出来，但StrictMode并非真正意思上的“动态代码检查”。
 各位读者有必要知道StrictMode的使用范围：
 
-- StrictMode只是用在开发调试阶段，在正式发布时，应该关掉StrictMode机制。
+- StrictMode只是用在开发调试阶段，在正式发布时，应该关掉StrictMode
 	- AOSP的源码中，USER版并没有打开StrictMode
 	- 由于Android还会对StrictMode的检查策略进行调整，所以Google Play建议上架的APK都关闭StrictMode;
 	  从另一个角度，Google认为所有StrictMode的错误，在正式发布前，都应该解决。
