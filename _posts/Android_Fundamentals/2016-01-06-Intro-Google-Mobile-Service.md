@@ -69,3 +69,23 @@ Google通过OHA构建了Android生态圈，与Apple iOS和Windows Phone形成三
 通过Recovery将GMS包刷入手机这种方式属于后装，即已经有了Android刷机包后，再继续刷入GMS包。
 下面我们讲述一下如何在AOSP源码环境下，编译出包含GMS的Android刷机包。
 
+> **注意**：在没有经过Google授权的情况下预装GMS等同于盗版行为，应当坚决抵制。
+> 本例展示的GMS预装进作为学习用途，任何一个开发者都应该遵循"不作恶"的契约精神，这才是良性的发展之道。
+
+预装就是要将GMS包中的文件直接编译到Android的刷机包中，AOSP的编译系统能够轻松满足预装文件的需求。
+
+对于APK而言，只需要利用编译系统提供的**$(BUILD_PREBUILT)**脚本，以GMSCore.apk预装为例，
+新建一个Android.mk文件，添加如下内容：
+
+    include $(CLEAR_VARS)            # 清除所有临时变量
+    LOCAL_MODULE := GmsCore	         # 定义当前模块的名称
+    LOCAL_SRC_FILES := priv-app/$(LOCAL_MODULE)/$(LOCAL_MODULE).apk    #当前预装APK的路径
+    LOCAL_MODULE_CLASS := APPS       # 模块的类别
+    LOCAL_CERTIFICATE := platform    # APK签名
+    LOCAL_PRIVILEGED_MODULE := true  # 表示当前APK到编译到priv-app目录
+    include $(BUILD_PREBUILT)        # 预装编译
+
+对于其他APK而言，只需要在Android.mk中添加类似的代码块即可，如此以来，这些APK就能编译产出到AOSP的**out/target/product/$TARGET_DEVICE**目录。为了将APK打包进最终的刷机包，还需要在对应**$TARGET_DEVICE**的device.mk中添加：
+
+	PRODUCT_PACKAGES += GmsCore
+
