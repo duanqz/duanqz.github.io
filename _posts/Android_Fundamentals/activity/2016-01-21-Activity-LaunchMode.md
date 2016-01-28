@@ -48,11 +48,11 @@ Lollipop(Android 5.0)前后对这种启动模式的处理方式是不同的：
 
 我们来具体分析一下standard模式，假设有来自两个不同应用程序(APK)的Activity：
 
-<div align="center"><img src="/assets/images/activity/1-activity-launchmode-applications.png" alt="activities in different applications"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/1-activity-launchmode-applications.png" alt="activities in different applications"/></div>
 
 Activity A和Activity B属于application 1， Activity X和Activity Y属于application 2。
 
-<div align="center"><img src="/assets/images/activity/2-activity-launchmode-standard-pre-lollipop.png" alt="standard pre-lollipop"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/2-activity-launchmode-standard-pre-lollipop.png" alt="standard pre-lollipop"/></div>
 
   1. 首先，从Activity A启动了同一个应用中的Activity B，这时，会将Activity B压入任务栈Task 1的栈顶，Activity B变成了当前可见的实例;
   2. 然后，从Activity B启动了另外一个应用Application 2中的Activity Y，
@@ -84,7 +84,7 @@ Lollipop开始有了一些优化，虽然从用户体验来看Activity的启动�
 但从多任务窗口来查看当前的任务时，可以看到两个不同的任务，这更加符合用户的思维习惯。
 Lollipop以standard模式启动Activity如下图所示：
 
-<div align="center"><img src="/assets/images/activity/3-activity-launchmode-standard-lollipop.png" alt="standard pre-lollipop"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/3-activity-launchmode-standard-lollipop.png" alt="standard pre-lollipop"/></div>
 
   1. 首先，还是一样的，从Activity A启动同一应用中的Activity B;
   2. 然后，**区别来了**，从Activity B启动了另外一个应用Application 2中的Activity Y，
@@ -100,7 +100,7 @@ singleTop意指仅有一个栈顶的Activity实例，如果当前任务栈的顶
 
 以singleTop模式启动Activity的过程如下图所示：
 
-<div align="center"><img src="/assets/images/activity/4-activity-launchmode-singletop.png" alt="singleTop"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/4-activity-launchmode-singletop.png" alt="singleTop"/></div>
 
   1. 首先，启动了Application 1中的Activity A，位于任务栈Task 1的顶部，Activity A是当前可见的实例;
   2. 然后，从Activity B又启动了相同了Activity B，**区别于standard模式的地方来了**
@@ -112,7 +112,7 @@ singleTop和standard的区别在于，如果栈顶已经存在待启动Activity�
 
 什么是跨应用启动呢？假设当前有一个任务栈的顶部Activity设置了singleTop模式，如果有一个来自其他应用的Intent要启动这个Activity，就是跨应用启动。在这种情况下，Intent并不会去寻找已有任务栈的Activity，而是直接创建一个新的Activity实例：在lollipop之前，将Activity实例置于发起者的任务栈顶，在Lollipop之后，将Activity实例置于新任务栈的根部。singleTop和standard都是这么做的：
 
-<div align="center"><img src="/assets/images/activity/5-activity-launchmode-singletop-cross-application.png" alt="singleTop Cross-Application"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/5-activity-launchmode-singletop-cross-application.png" alt="singleTop Cross-Application"/></div>
 
 从Application 1中的Activity B以singleTop或standard模式启动Application 2中的Activity Y，行为都是一样的：新建Activity Y的实例，压入任务栈Task 2的栈顶。当Back键响应时，会销毁Activity Y的实例，将Task 1重新挪到前台，Activity Y之前的Activity B也会被重新置为可见状态。
 
@@ -132,7 +132,7 @@ singleTask意指一个Activity实例仅有一个宿主任务栈，这里有两�
 
 与singleTop相同的是，singleTask也会调用已有实例的**onNewIntent()**方法，不同的是：singleTop可能会存在多个Activity实例，而singleTask只会存在一个Activity实例，即无论来自何方的Intent，要以singleTask模式来启动Activity，最终都只会落到一个相同的任务栈中，而且这个任务栈中Activity实例有且仅有一个。
 
-<div align="center"><img src="/assets/images/activity/6-activity-launchmode-singletask.png" alt="singleTask"/></div>
+<div align="center"><img src="/assets/images/activity/launchmode/6-activity-launchmode-singletask.png" alt="singleTask"/></div>
 
 - 首先，从Activity A中以singleTask的方式启动Activity X。由于Activity X中已经存在于任务栈Task 2中，所以并不会新建一个Activity X的实例;
 - 然后，Task 2会被挪至前台，由于Activity X并非Task 2的栈顶，所以需要清楚在Activity X之上的所有Activity，这样一来，Ativity Y就会被清除，走完它的生命周期;
