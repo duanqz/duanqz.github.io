@@ -538,24 +538,7 @@ final int startActivityUncheckedLocked(ActivityRecord r, ActivityRecord sourceRe
 
 - 最终判定需要启动一个新的TaskRecord来承载ActivityRecord。如果ActivityRecord不是在后台启动，还需要将其设置为当前焦点。
 
-## IApplicationToken
 
-在创建一个ActivityRecord的时候，就创建了一个IApplicationToken的对象，即**ActivityRecord.appToken**：
-
-{% highlight java %}
-static class Token extends IApplicationToken.Stub {
-    final WeakReference<ActivityRecord> weakActivity;
-
-    Token(ActivityRecord activity) {
-        weakActivity = new WeakReference<ActivityRecord>(activity);
-    }
-    ...
-}
-{% endhighlight %}
-
-**Token**对象持有了当前ActivityRecord对象的弱引用，作为当前ActivityRecord的"对外"标识，
-这里所谓"对外"，是指
-譬如发生Activity切换时，需要经过应用进程到系统进程，再到应用进程的过程。
 
 ## ApplicationThread
 
