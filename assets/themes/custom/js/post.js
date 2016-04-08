@@ -7,8 +7,8 @@
  */
 $(document).ready(function() {
     generateContent();
-    share();
-    disqus();
+//    share();
+//    disqus();
 });
 
 /**
