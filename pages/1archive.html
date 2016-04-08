@@ -3,12 +3,12 @@ layout: page
 title: Archive
 permalink: /archive/
 icon: octicon-repo
-isNavItem: true
+isNavItem: false
 ---
-<link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/archive.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/archive.css"/>
 
 <section id="cd-timeline" class="cd-container">
-{% for post in site.posts  %}
+    {% for post in site.posts %}
     <div class="cd-timeline-block" id="{{ post.date | date: '%Y-%m-%d' }}">
         <div class="cd-timeline-img cd-picture">
             <img src="{{ '/icon-picture.svg' | prepend: site.imgrepo }}" alt="Picture">
@@ -19,5 +19,5 @@ isNavItem: true
             <span class="cd-date">{{ post.date | date: '%Y-%m-%d' }}</span>
         </div>
     </div>
-{% endfor %}
+    {% endfor %}
 </section>

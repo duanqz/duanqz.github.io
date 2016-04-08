@@ -1,47 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta name="author" content="{{ site.author.name }}" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8"/>
+    <meta name="author" content="{{ site.author.name }}"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="keywords" content="{{ page.title }}, {% for category in page.categories %}{{ category }},{% endfor %} {% for tag in page.tags %}{{ tag }},{% endfor %} {{ site.title }}" />
-    <meta name="description" content="{{ page.title }}, {% for category in page.categories %}{{ category }},{% endfor %} {% for tag in page.tags %}{{ tag }},{% endfor %} {% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="keywords"
+          content="{{ page.title }}, {% for category in page.categories %}{{ category }},{% endfor %} {% for tag in page.tags %}{{ tag }},{% endfor %} {{ site.title }}"/>
+    <meta name="description"
+          content="{{ page.title }}, {% for category in page.categories %}{{ category }},{% endfor %} {% for tag in page.tags %}{{ tag }},{% endfor %} {% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}"/>
     <meta name="theme-color" content="#2CA6CB"/>
-    <link rel="shortcut icon" type="image/x-icon" media="screen" href="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}" />
-    <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}" />
-    <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}"  />
+    <link rel="shortcut icon" type="image/x-icon" media="screen" href="/favicon.ico"/>
+    <link rel="canonical"
+          href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}"/>
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="/feed.xml"/>
 
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/octicons/octicons.css" />
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/style.css" />
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/highlight.css" />
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/post.css" />
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/octicons/octicons.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/highlight.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/post.css"/>
 
-    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/1.11.3/jquery.js" ></script>
-    <script type="text/javascript" src="{{ ASSET_PATH }}/js/bootstrap.min.js" ></script>
-    <script type="text/javascript" src="{{ ASSET_PATH }}/js/script.js" ></script>
-    <script type="text/javascript" src="{{ ASSET_PATH }}/js/post.js" ></script>
-    <script type="text/javascript" src="{{ ASSET_PATH }}/js/toc.js" ></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/script.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/post.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/toc.js"></script>
 
-	{% include JB/analytics %}
+    {% include JB/analytics %}
 </head>
 
 <body>
 <div class="main">
-    {% if page.url == "/index.html"  %}
+    {% if page.url == "/index.html" %}
     <a href="{{ site.baseurl | prepend: site.url }}">
         <div class="banner">
-            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/></h1>
+            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/>
+            </h1>
         </div>
     </a>
     {% endif %}
-    {% if page.isNavItem  %}
+    {% if page.isNavItem %}
     <a href="{{ site.baseurl | prepend: site.url }}">
         <div class="banner">
-            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/></h1>
+            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/>
+            </h1>
+
             <h3>{{page.title}}</h3>
         </div>
     </a>
@@ -50,30 +56,44 @@
         <nav class="navbar navbar-tiffany rectangle" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse"
+                            data-target=".navbar-collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{{ site.baseurl | prepend: site.url }}/">{{ site.title }}</a>
+                    <a class="navbar-brand" href="{{ site.baseurl | prepend: site.url }}/">{{site.title }}</a>
+
                     <p class="navbar-text">{{ site.description }}</p>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         {% if page.url == "/index.html" %}
-                        <li class="active">{% else %}
-                        <li>{% endif %}
-                        <a href="{{ site.baseurl | prepend: site.url }}/" class="word-keep"><span class="octicon octicon-book"></span></span>&nbsp;&nbsp;Blog</a>
+                        <li class="active">
+                        {% else %}
+                        <li>
+                        {% endif %}
+                            <a href="{{ site.baseurl | prepend: site.url }}/" class="word-keep">
+                                <span class="octicon octicon-book">&nbsp;&nbsp;Blog</span>
+                            </a>
                         </li>
                         {% for p in site.pages %}{% if p.isNavItem %}
                         {% if p.url == page.url %}
-                        <li class="active">{% else %}
-                        <li>{% endif %}
-                            <a href="{{ p.url | prepend: site.baseurl | prepend: site.url }}" class="word-keep"><span class="octicon {{ p.icon }}"></span>&nbsp;&nbsp;{{ p.title }}</a>
+                        <li class="active">
+                        {% else %}
+                        <li>
+                        {% endif %}
+                            <a href="{{ p.url | prepend: site.baseurl | prepend: site.url }}" class="word-keep">
+                                <span class="octicon {{ p.icon }}">&nbsp;&nbsp;{{p.title }}</span>
+                            </a>
                         </li>
                         {% endif %}
                         {% endfor %}
-                        <li><a href="#stq=" class="search-button"><span class="octicon octicon-search"></span></a></li>
+                        <li>
+                            <a href="#stq=" class="search-button">
+                                <span class="octicon octicon-search"></span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -92,16 +112,25 @@
     </div>
 </div>
 
-    <footer  class="footnote footnote-tiffany">
-        <div class="container">
-                <a class="foot-item" href="mailto:{{ site.author.email }}" target="_blank"><span class="octicon octicon-mail"></span></a>
-                <a class="foot-item" href="https://github.com/{{ site.author.github }}" target="_blank"><span class="octicon octicon-mark-github"></span></a>
-                <a class="foot-item" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}" target="_blank"><span class="octicon octicon-rss"></span></a>
-                <a class="foot-item" href="{{ '/link/' | prepend: site.baseurl | prepend: site.url }}"><span class="octicon octicon-link-external"></span></a>
-                &nbsp;
-                <a href="http://duanqz.github.io/"><span class="word-keep">&copy; duanqz</span></a>
-        </div>
-    </footer>
+<footer class="footnote footnote-tiffany">
+    <div class="container">
+        <a class="foot-item" href="mailto:{{ site.author.email }}" target="_blank">
+            <span class="octicon octicon-mail"></span>
+        </a>
+        <a class="foot-item" href="https://github.com/{{ site.author.github }}" target="_blank">
+            <span class="octicon octicon-mark-github"></span>
+        </a>
+        <a class="foot-item" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}"  target="_blank">
+            <span class="octicon octicon-rss"></span>
+        </a>
+        <a class="foot-item" href="{{ '/link/' | prepend: site.baseurl | prepend: site.url }}">
+            <span class="octicon octicon-link-external"></span>
+        </a>
+        <a href="http://duanqz.github.io/">
+            <span class="word-keep">&nbsp;&copy; duanqz</span>
+        </a>
+    </div>
+</footer>
 
 </body>
 </html>
