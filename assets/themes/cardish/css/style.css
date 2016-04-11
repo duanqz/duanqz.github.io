@@ -202,8 +202,15 @@ a:active {text-decoration: none}	/* 选定的链接 */
 
 .rectangle{
 	border-radius: 0px;
+	width: 100%;
+	z-index: 99;
+	position: fixed;
 }
 
+.roll-content {
+    position: relative;
+    top: 70px;
+}
 
 @media (min-width: 1200px){
     .col-lg-offset-1_5 {
