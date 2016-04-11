@@ -3,7 +3,7 @@ layout: post
 category: Android系统原理
 title: StrictMode机制以及使用场景
 tagline:
-tags:  [StrictMode]
+tags:  Android调试 稳定性
 ---
 {% include JB/setup %}
 

@@ -3,7 +3,7 @@ layout: post
 category: Android系统原理
 title: OOM机制以及问题分析
 tagline:
-tags:  [Android调试]
+tags:  Android调试 稳定性
 ---
 {% include JB/setup %}
 
