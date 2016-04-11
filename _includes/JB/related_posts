@@ -20,8 +20,8 @@
 
                     {% if postsAfterFilter.size > 0 %}
                     	{% for p in postsAfterFilter limit: 5 %}
-                    		<li><a href="{{ p.url }}">{{p.title }}</a></li>
-                    		{% endfor %}
+                    		<li><a href="{{ p.url }}" title="{{p.title }}">{{p.title }}</a></li>
+                    	{% endfor %}
                     {% endif %}
                 </ul>
             </div>
