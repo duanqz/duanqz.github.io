@@ -1,21 +1,47 @@
 ---
 layout: page
-title: Tags
-header: Posts By Tag
-group: navigation
+title: Tag
+permalink: /tags/
+icon: octicon-tag
+isNavItem: true
 ---
-{% include JB/setup %}
 
-<ul class="tag_box inline">
-  {% assign tags_list = site.tags %}  
-  {% include JB/tags_list %}
-</ul>
+<link rel="stylesheet" type="text/css" href="/assets/css/tagCloud.css"/>
+<link rel="stylesheet" type="text/css" href="/assets/css/tags.css"/>
+<script type="text/javascript" src="/assets/js/tagCloud.js"></script>
+<script type="text/javascript" src="/assets/js/tags.js"></script>
+
+<div>
+    <ul class="tag-box inline">
+        {% for tag in site.tags %}
+        <li>
+            <a href="#{{ tag | first }}">{{ tag | first }}<span>{{ tag | last | size }}</span></a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
 
-{% for tag in site.tags %} 
-  <h2 id="{{ tag[0] }}-ref">{{ tag[0] }}</h2>
-  <ul>
-    {% assign pages_list = tag[1] %}  
-    {% include JB/pages_list %}
-  </ul>
-{% endfor %}
+<div>
+    {% for tag in site.tags %}
+    <h2 id="{{ tag | first }}">{{ tag | first }}</h2>
+    <ul>
+        {% for posts in tag %}{% for post in posts %}{% if post.title != null %}
+        <li itemscope>
+            <span class="entry-date">
+                <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date |date_to_string }}</time>
+            </span>
+            &raquo; <a href="{{ post.url | prepend: site.baseurl | prepend: site.url }}">{{post.title }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</div>
+
+<div class="tagCloud">
+    {% for tag in site.tags %}
+    <a href="#{{ tag | first }}">{{ tag | first }}</a>
+    {% endfor %}
+</div>

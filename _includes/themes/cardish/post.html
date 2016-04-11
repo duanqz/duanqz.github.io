@@ -41,15 +41,16 @@
                             </p>
                         </li>
                         <li>
-                            <a class="foot-item" href="mailto:{{ site.author.email }}" target="_blank">
+                            <a class="post-meta" href="mailto:{{ site.author.email }}" title="{{ site.author.email }}" target="_blank">
                                 <span class="octicon octicon-mail"></span>
-                                {{ site.author.email }}
                             </a>
-                        </li>
-                        <li>
-                            <a class="foot-item" href="https://github.com/{{ site.author.github }}" target="_blank">
+                            &nbsp;
+                            <a class="post-meta" href="https://github.com/{{ site.author.github }}" title="https://github.com/{{ site.author.github }}" target="_blank">
                                 <span class="octicon octicon-mark-github"></span>
-                                {{ site.author.github }}
+                            </a>
+                            &nbsp;
+                            <a class="post-meta" href="/rss.xml"  title="订阅" target="_blank">
+                                <span class="octicon octicon-rss"></span>
                             </a>
                         </li>
 
