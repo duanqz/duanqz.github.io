@@ -37,7 +37,7 @@
                         <li>
                             <p class="post-meta">
                                 <span class="octicon octicon-clock"></span>
-                                {{ page.date | date: "%b%-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}
+                                {{ page.date | date: "%Y-%m-%d" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}
                             </p>
                         </li>
                         <li>
@@ -121,7 +121,7 @@
                 <div class="content-navigation-list">
                     <ul>
                         {% for p in site.posts limit: 5 %}
-                        <li>{{ page.date | date: "%b%-d,%Y" }}&nbsp;<a href="{{ p.url }}">{{p.title }}</a></li>
+                        <li>{{ page.date | date: "%Y-%m-%d" }}&nbsp;<a href="{{ p.url }}">{{p.title }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
