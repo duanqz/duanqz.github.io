@@ -27,6 +27,9 @@ author :
 #
 production_url : https://duanqz.github.io
 
+# Android source code url
+android_source : https://android.googlesource.com
+
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
 JB :

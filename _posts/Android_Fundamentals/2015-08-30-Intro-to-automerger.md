@@ -68,7 +68,7 @@ AOSP需要使用多个分支来维护不同的Android版本，设备厂商除了
 Android采用`git merge`的方式，自动将一个分支的改动合并到其他分支。从整个分支来看，就是代码从一个分支上**流**向了其他分支，**流**的起点称为上游分支(upstream)，**流**的终点称为下游分支(downstream)。
 然而，自动代码流虽然了避免了人工重复地提交，但也引入了新的问题：有一些改动仅适应于上游分支，自动流向下游分支会导致出错。因此，还需要对自动流进行控制。
 
-在**AOSP**的提交记录中(譬如：[lollipop-release分支](https://android.googlesource.com/platform/frameworks/base/+log/lollipop-release))，
+在**AOSP**的提交记录中(譬如：[lollipop-release分支]({{ site.android_source }}/platform/frameworks/base/+log/lollipop-release))，
 经常可以看到`DO NOT MERGE`关键字，为什么提交记录中会出现这种关键字？有什么用途呢？
 
 <div align="center"><img src="/assets/images/aospcodeline/2-aospcodeline-donotmerge.png" alt="DO NOT MERGE"/></div><br/>

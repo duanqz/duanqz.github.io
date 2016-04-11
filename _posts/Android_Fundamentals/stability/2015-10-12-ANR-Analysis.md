@@ -40,18 +40,18 @@ ANR机制可以分为两部分：
 
 - **Framework层**： ANR机制的核心
 
-  - [frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityManagerService.java)
-  - [frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java)
-  - [frameworks/base/services/core/java/com/android/server/am/ActiveServices.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)
-  - [frameworks/base/services/core/java/com/android/server/input/InputManagerService.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/input/InputManagerService.java)
-  - [frameworks/base/services/core/java/com/android/server/wm/InputMonitor.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/wm/InputMonitor.java)
-  - [frameworks/base/core/java/android/view/InputChannel](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
-  - [frameworks/base/services/core/java/com/android/internal/os/ProcessCpuTracker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/com/android/internal/os/ProcessCpuTracker.java)
+  - [frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityManagerService.java)
+  - [frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java)
+  - [frameworks/base/services/core/java/com/android/server/am/ActiveServices.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)
+  - [frameworks/base/services/core/java/com/android/server/input/InputManagerService.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/input/InputManagerService.java)
+  - [frameworks/base/services/core/java/com/android/server/wm/InputMonitor.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/wm/InputMonitor.java)
+  - [frameworks/base/core/java/android/view/InputChannel]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
+  - [frameworks/base/services/core/java/com/android/internal/os/ProcessCpuTracker]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/com/android/internal/os/ProcessCpuTracker.java)
 
 - **Native层**：输入事件派发机制。针对InputEvent类型的ANR
 
-  - [frameworks/base//services/core/jni/com_android_server_input_InputManagerService.cpp](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/jni/com_android_server_input_InputManagerService.cpp)
-  - [frameworks/native/services/inputflinger/InputDispatcher.cpp](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)
+  - [frameworks/base//services/core/jni/com_android_server_input_InputManagerService.cpp]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/jni/com_android_server_input_InputManagerService.cpp)
+  - [frameworks/native/services/inputflinger/InputDispatcher.cpp]({{ site.android_source }}/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)
 
 下面我们会深入源码，分析ANR的监测和报告过程。
 
@@ -67,7 +67,7 @@ Service运行在应用程序的主线程，如果Service的执行时间超过**2
 如何检测Service超时呢？Android是通过设置定时消息实现的。定时消息是由AMS的消息队列处理的(system_server的ActivityManager线程)。
 AMS有Service运行的上下文信息，所以在AMS中设置一套超时检测机制也是合情合理的。
 
-Service ANR机制相对最为简单，主体实现在[ActiveServices](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)中。
+Service ANR机制相对最为简单，主体实现在[ActiveServices]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActiveServices.java)中。
 当Service的生命周期开始时，**bumpServiceExecutingLocked()**会被调用，紧接着会调用**scheduleServiceTimeoutLocked()**：
 
 {% highlight java %}
@@ -156,7 +156,7 @@ ANR的报告机制是通过**AMS.appNotResponding()**完成的，Broadcast和Inp
 
 #### 广播消息的调度
 
-AMS维护了两个广播队列[BroadcastQueue](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java):
+AMS维护了两个广播队列[BroadcastQueue]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/BroadcastQueue.java):
 
 - **foreground queue**，前台队列的超时时间是10秒
 - **background queue**，后台队列的超时时间是60秒
@@ -484,8 +484,8 @@ final void broadcastTimeoutLocked(boolean fromMsg) {
 > 2. 如何检测到输入时间处理超时？
 
 输入事件最开始由硬件设备(譬如按键或触摸屏幕)发起，Android有一套输入子系统来发现各种输入事件，
-这些事件最终都会被[InputDispatcher](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)分发到各个需要接收事件的窗口。
-那么，窗口如何告之InputDispatcher自己需要处理输入事件呢？Android通过[InputChannel](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
+这些事件最终都会被[InputDispatcher]({{ site.android_source }}/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp)分发到各个需要接收事件的窗口。
+那么，窗口如何告之InputDispatcher自己需要处理输入事件呢？Android通过[InputChannel]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/android/view/InputChannel.java)
 连接InputDispatcher和窗口，InputChannel其实是封装后的Linux管道(Pipe)。
 每一个窗口都会有一个独立的InputChannel，窗口需要将这个InputChannel注册到InputDispatcher中:
 
@@ -582,7 +582,7 @@ int InputDispatcher::handleReceiveCallback(int fd, int events, void* data) {
 
 - 首先，会调用**findFocusedWindowTargetsLocked()**或**findTouchedWindowTargetsLocked()**寻找接收输入事件的窗口。
 
-  在找到窗口以后，会调用[**checkWindowReadyForMoreInputLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#1633)
+  在找到窗口以后，会调用[**checkWindowReadyForMoreInputLocked()**]({{ site.android_source }}/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#1633)
   检查窗口是否有能力再接收新的输入事件，会有一系列的场景阻碍事件的继续派发：
 
   - **场景1:** 窗口处于paused状态，不能处理输入事件
@@ -638,9 +638,9 @@ int32_t InputDispatcher::handleTargetsNotReadyLocked(nsecs_t currentTime,
 {% endhighlight %}
 
 - 最后，如果当前事件派发已经超时，则说明已经检测到了ANR，调用**onANRLocked()**方法，然后将nextWakeupTime设置为最小值，马上开始下一轮调度。
-  在[**onANRLocked()**](https://android.googlesource.com/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#3430)方法中，
+  在[**onANRLocked()**]({{ site.android_source }}/platform/frameworks/native/+/master/services/inputflinger/InputDispatcher.cpp#3430)方法中，
   会保存ANR的一些状态信息，调用**doNotifyANRLockedInterruptible()**，进一步会调用到JNI层的
-  [**NativeInputManager::notifyANR()**](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/jni/com_android_server_input_InputManagerService.cpp#598)方法，
+  [**NativeInputManager::notifyANR()**]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/jni/com_android_server_input_InputManagerService.cpp#598)方法，
   它的主要功能就是衔接Native层和Java层，直接调用Java层的**InputManagerService.notifyANR()**方法。
 
 {% highlight c %}
@@ -870,7 +870,7 @@ final void appNotResponding(ProcessRecord app, ActivityRecord activity,
 
 **AMS.updateCpuStatsNow()**方法的实现不在这里列出了，只需要知道更新CPU使用信息的间隔最小是5秒，即如果5秒内连续调用updateCpuStatsNow()方法，其实是没有更新CPU使用信息的。
 
-CPU使用信息由[ProcessCpuTracker](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/com/android/internal/os/ProcessCpuTracker.java)这个类维护，
+CPU使用信息由[ProcessCpuTracker]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/com/android/internal/os/ProcessCpuTracker.java)这个类维护，
 每次调用**ProcessCpuTracker.update()**方法，就会读取设备节点 */proc* 下的文件，来更新CPU使用信息，具体有以下几个维度：
 
 - **CPU的使用时间**: 读取 */proc/stat*

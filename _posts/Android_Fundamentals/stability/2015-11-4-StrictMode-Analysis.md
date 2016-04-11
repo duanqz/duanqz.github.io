@@ -20,7 +20,7 @@ tags:  [StrictMode]
 Android在很多关键的代码路径上都植入了StrictMode， 譬如磁盘读写、网络访问、系统进程启动等。StrictMode会根据设置的策略进行检查，如果某个进程在代码运行时出现了违规操作，那么就会受到"惩罚"。
 
 应用程序可以利用StrictMode尽可能的发现一些编码的疏漏，
-Android在 [packages/experimental/StrictModeTest](https://android.googlesource.com/platform/packages/experimental/+/master/StrictModeTest/) 这个APK中提供了常见违规操作的样例，
+Android在 [packages/experimental/StrictModeTest]({{ site.android_source }}/platform/packages/experimental/+/master/StrictModeTest/) 这个APK中提供了常见违规操作的样例，
 谨作为大家的反面教材。
 
 本文深入分析StrictMode背后的实现原理以及使用场景。
@@ -29,9 +29,9 @@ Android在 [packages/experimental/StrictModeTest](https://android.googlesource.c
 
 StrictMode的实现涉及到以下源码：
 
-- [libcore/dalvik/src/main/java/dalvik/system/BlockGuard.java](https://android.googlesource.com/platform/libcore/+/master/dalvik/src/main/java/dalvik/system/BlockGuard.java)
-- [libcore/dalvik/src/main/java/dalvik/system/CloseGuard.java](https://android.googlesource.com/platform/libcore/+/master/dalvik/src/main/java/dalvik/system/CloseGuard.java)
-- [frameworks/base/core/java/android/os/StrictMode.java](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/os/StrictMode.java)
+- [libcore/dalvik/src/main/java/dalvik/system/BlockGuard.java]({{ site.android_source }}/platform/libcore/+/master/dalvik/src/main/java/dalvik/system/BlockGuard.java)
+- [libcore/dalvik/src/main/java/dalvik/system/CloseGuard.java]({{ site.android_source }}/platform/libcore/+/master/dalvik/src/main/java/dalvik/system/CloseGuard.java)
+- [frameworks/base/core/java/android/os/StrictMode.java]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/android/os/StrictMode.java)
 
 总体而言，StrictMode机制所涉及到的代码量并不大，但Android中植入StrictMode的地方都是一些重要的关口，StrictMode所体现的面向接口编程的思想以及设计模式的应用，值得我们好好学习。
 下面，我们就深入源码，分析一下StrictMode机制的内部实现。

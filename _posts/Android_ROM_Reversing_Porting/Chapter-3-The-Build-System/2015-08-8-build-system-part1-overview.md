@@ -62,7 +62,7 @@ TODO：补充**Resurvise Make**缺陷的示例
 为了提升编译效率和灵活性，需要对模块的编译进行控制：单个模块可以单独进行编译，不需要的模块不会被重新编译，以便节省编译时间。
 
 在上述意图的驱使下，Android编译系统有以下主要的要求
-(更详细的要求，请查阅[build/core/build-system.html](https://android.googlesource.com/platform/build/+/master/core/build-system.html)
+(更详细的要求，请查阅[build/core/build-system.html]({{ site.android_source }}/platform/build/+/master/core/build-system.html)
 )：
 
 - **编译出多种目标**: 除了最终Android系统的产物(譬如：system.img, boot.img)，编译系统还要能够编译出很多实用的工具(譬如：aapt, adb)，这些工具不仅是编译环境需要的，也是开发者需要的。
@@ -84,7 +84,7 @@ TODO：补充**Resurvise Make**缺陷的示例
 include build/core/main.mk
 {% endhighlight %}
 
-所有的编译规则都定义在[build/core/main.mk](https://android.googlesource.com/platform/build/+/master/core/main.mk)文件中，最终所有的**Makefile**片段都将汇聚在这一个文件中。
+所有的编译规则都定义在[build/core/main.mk]({{ site.android_source }}/platform/build/+/master/core/main.mk)文件中，最终所有的**Makefile**片段都将汇聚在这一个文件中。
 
 Android编译系统如此强大，要变成**Makefile**的最终形态，当然是要经过很长一段路的，下图是整个编译系统的框架：
 
@@ -92,7 +92,7 @@ Android编译系统如此强大，要变成**Makefile**的最终形态，当然�
 
 我们会基于这个图来分析整个Android编译系统的设计原理：
 
-- 从Android源码来看，编译系统的核心功能位于**[build/core/](https://android.googlesource.com/platform/build/+/master/core)**目录，
+- 从Android源码来看，编译系统的核心功能位于**[build/core/]({{ site.android_source }}/platform/build/+/master/core)**目录，
   在device和vendor目录下，存放了与具体机型相关的配置，这些配置信息都是**.mk**文件的形式存放的(譬如**BoardConfig.mk**和**AndroidProducts.mk**)，
   另外，每一个模块的编译配置信息都是以独立的**Android.mk**文件的形式分散在各个模块的子目录中。
 
@@ -129,7 +129,7 @@ $ find . -name Android.mk | wc -l       # 笔者在Android 5.0.1下执行这个�
 
 - **运行envsetup.sh**
 
-  Android提供了一个环境初始化的脚本[build/envsetup.sh](https://android.googlesource.com/platform/build/+/master/envsetup.sh)，
+  Android提供了一个环境初始化的脚本[build/envsetup.sh]({{ site.android_source }}/platform/build/+/master/envsetup.sh)，
   通过*source*命令，便可以将该脚本添加到shell环境中。接着，便发现多了一个**lunch**命令，我们就是通过这个命令来配置Android初始化的参数。
   除了**lunch**，还会有很多其他命令，譬如: m, mm, mmm，我们会在[编译系统(2)-初始化过程]()这篇文章中来详细介绍*envsetup.sh*的工作过程。
 
@@ -140,7 +140,7 @@ $ lunch                     # 通过lunch来交互式的完成参数配置
 
 - **配置buildspec.mk**
 
-  该文件需要置于Android源码的根目录，Android提供一个配置模板[build/buildspec.mk.default](https://android.googlesource.com/platform/build/+/master/buildspec.mk.default)，
+  该文件需要置于Android源码的根目录，Android提供一个配置模板[build/buildspec.mk.default]({{ site.android_source }}/platform/build/+/master/buildspec.mk.default)，
   只需要将拷贝到根目录，重命名后，根据需要修改文件内容便可完成参数的配置。
   
   **注**：支持这种文件配置的方式来完成初始化，是考虑到有些固定的编译场景，不需要每次都重复运行**envsetup.sh**脚本来配置相同的参数。
@@ -186,7 +186,7 @@ $ lunch                     # 通过lunch来交互式的完成参数配置
 
 ### 3.1.3 芯片级(Architecture)的参数配置
 
-不同的产品(Product)配置会对应到不同的平台(Board)配置，而平台(Board)的配置也会影响到芯片(Architecture)的配置。**BoardConfig.mk**中定义的**TARGET_ARCH**和**TARGET_ARCH_VARIANT**两个参数决定了**TARGET_ARCH_SPECIFIC_MAKEFILE**这个芯片级(Architecture)的配置文件，它的值等于**[build/core/combo/arch](https://android.googlesource.com/platform/build/+/master/core/combo/arch)/$(TARGET_ARCH)/$(TARGET_ARCH_VARIANT).mk**。
+不同的产品(Product)配置会对应到不同的平台(Board)配置，而平台(Board)的配置也会影响到芯片(Architecture)的配置。**BoardConfig.mk**中定义的**TARGET_ARCH**和**TARGET_ARCH_VARIANT**两个参数决定了**TARGET_ARCH_SPECIFIC_MAKEFILE**这个芯片级(Architecture)的配置文件，它的值等于**[build/core/combo/arch]({{ site.android_source }}/platform/build/+/master/core/combo/arch)/$(TARGET_ARCH)/$(TARGET_ARCH_VARIANT).mk**。
 
 Android默认定义了arm, arm64, mips, mips64, x86, x86_64这几组与CPU芯片相关的编译参数。
 
@@ -205,7 +205,7 @@ Android编译系统的设计理念是将模块级别的配置独立出来，每�
 **BUILD_PACKAGE**             | package.mk             | 编译APK，如SystemUI.apk
 
 
-所有接口定义的源文件，都在[build/core](https://android.googlesource.com/platform/build/+/master/core/)目录下，在**Android.mk**中，只需要引用这些变量，就能触发一个模块的编译，不同的模块使用不用的编译方式。
+所有接口定义的源文件，都在[build/core]({{ site.android_source }}/platform/build/+/master/core/)目录下，在**Android.mk**中，只需要引用这些变量，就能触发一个模块的编译，不同的模块使用不用的编译方式。
 在将一个**Android.mk**文件*include*到**main.mk**中的时候，也会依次将上述变量定义的**.mk**文件*include*进来，从而生成最终的**Makefile**配置。
 
 ## 3.2 编译系统的运行过程
@@ -238,7 +238,7 @@ Android编译系统的设计理念是将模块级别的配置独立出来，每�
 
 - *Android.mk*，Android有全编译和模块编译之分：
 
-  - 全编译，会通过[build/tools/findleaves.py](https://android.googlesource.com/platform/build/+/master/tools/findleaves.py)这个脚本将所有模块的*Android.mk*加载到一个名为 **subdir_makefiles**这个变量中，然后逐个引入**$subdir_makefiles**中的**Makefile**片段;
+  - 全编译，会通过[build/tools/findleaves.py]({{ site.android_source }}/platform/build/+/master/tools/findleaves.py)这个脚本将所有模块的*Android.mk*加载到一个名为 **subdir_makefiles**这个变量中，然后逐个引入**$subdir_makefiles**中的**Makefile**片段;
   - 模块编译，是通过命令解析将待编译模块的*Android.mk*文件加载到**ONE_SHOT_MAKEFILE**这个变量中，编译时，仅仅是引入**ONE_SHOT_MAKEFILE**中的**Makefile**片段。
 
   *Android.mk*的编写模板基本都是一致的,它会引入很多编译系统已经初始化好的变量，譬如CLEAR_VARS， BUILD_JAVA_LIBRARY, 其实就是引入变量所对应的*.mk*文件，所以*Android.mk*的生成过程，也是一个**Makefile**片段的汇集过程。
@@ -247,7 +247,7 @@ Android编译系统的设计理念是将模块级别的配置独立出来，每�
 
 - *legacy_prebuilts.mk*，定义了**GRANDFATHERED_ALL_PREBUILT**变量，表示不需要经过编译的预装文件，譬如gps.conf(GPS配置文件), radio.img(射频分区镜像文件)，这些文件都是预编译好的，只需要拷贝到编译产出即可。Android定义了一个默认的**PREBUILT列表**，而且不希望第三方改动这个列表。当第三方有预编译文件，但又不在**PREBUILT列表**中时，就需要通过**PRODUCT_COPY_FILES**这个变量来指定了。
 
-- *Makefile*，不同于AOSP根目录下的**Makefile**，这个*Makefile*位于[build/core](https://android.googlesource.com/platform/build/+/master/core)目录下，Android官方对这个文件的解释是"定义一些杂乱的编译规则(miscellaneous rules)"，实际上，这个文件相当重要，诸如system.img, recovery.img, userdata.img, cache.img的目标定义都在这个文件中，更笼统点说，*out/target/product/PRODUCT_NAME/*目录下大部分的编译产出都是由该文件定义的。
+- *Makefile*，不同于AOSP根目录下的**Makefile**，这个*Makefile*位于[build/core]({{ site.android_source }}/platform/build/+/master/core)目录下，Android官方对这个文件的解释是"定义一些杂乱的编译规则(miscellaneous rules)"，实际上，这个文件相当重要，诸如system.img, recovery.img, userdata.img, cache.img的目标定义都在这个文件中，更笼统点说，*out/target/product/PRODUCT_NAME/*目录下大部分的编译产出都是由该文件定义的。
 
 ### 3.2.2 生成Makefile目标依赖
 

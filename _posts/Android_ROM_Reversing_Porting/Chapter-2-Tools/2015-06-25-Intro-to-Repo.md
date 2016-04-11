@@ -38,7 +38,7 @@ repo将自动化的管理信息都隐藏根目录的**.repo**子目录中。
 ## 2.1 项目清单库(.repo/manifests)
 
 AOSP项目清单git库下，只有一个文件default.xml，是一个标准的XML，描述了当前repo管理的所有信息。
-[AOSP的default.xml](https://android.googlesource.com/platform/manifest)的文件内容如下：
+[AOSP的default.xml]({{ site.android_source }}/platform/manifest)的文件内容如下：
 
 {% highlight xml %}
 <?xml version="1.0" encoding="UTF-8"?>
@@ -67,7 +67,7 @@ AOSP项目清单git库下，只有一个文件default.xml，是一个标准的XM
 
 - **&lt;project&gt;**：每一个repo管理的git库，就是对应到一个**&lt;project&gt;**标签，path描述的是项目相对于远程仓库URL的路径，同时将作为对应的git库在本地代码的路径;
 name用于定义项目名称，命名方式采用的是整个项目URL的相对地址。
-譬如，AOSP项目的URL为<https://android.googlesource.com/>，命名为**platform/build**的git库，访问的URL就是<https://android.googlesource.com/platform/build>
+譬如，AOSP项目的URL为<{{ site.android_source }}/>，命名为**platform/build**的git库，访问的URL就是<{{ site.android_source }}/platform/build>
 
 如果需要新增或替换一些git库，可以通过修改default.xml来实现，repo会根据配置信息，自动化管理。但直接对default.xml的定制，可能会导致下一次更新项目清单时，与远程default.xml发生冲突。
 因此，repo提供了一个种更为灵活的定制方式`local_manifests`:所有的定制是遵循default.xml规范的，文件名可以自定义，譬如local_manifest.xml, another_local_manifest.xml等，
@@ -126,7 +126,7 @@ $ repo <COMMAND> <OPTIONS>
 $ repo init -u <URL> [<OPTIONS>]
 {% endhighlight %}
 
-- ***-u***：指定manifests这个远程git库的URL，manifests库是整个项目的清单。默认情况，这个git库只包含了default.xml一个文件，其内容可以参见[Android的样本](https://android.googlesource.com/platform/manifest)
+- ***-u***：指定manifests这个远程git库的URL，manifests库是整个项目的清单。默认情况，这个git库只包含了default.xml一个文件，其内容可以参见[Android的样本]({{ site.android_source }}/platform/manifest)
 
 - ***-m， --manifest-name***：指定所需要的manifests库中的清单文件。默认情况下，会使用maniftests/default.xml
 
@@ -147,7 +147,7 @@ $ repo --trace init -u $URL -b $BRANCH -m $MANIFEST
   --------------------
   mkdir .repo; cd .repo
   git clone --bare $URL manifests.git
-  git clone https://android.googlesource.com/tools/repo
+  git clone {{ site.android_source }}/tools/repo
   mkdir -p manifests/.git; cd manifests/.git
   for i in ../../manifests.git/*; do ln -s $ı .; done
   cd ..
@@ -168,7 +168,7 @@ $ repo --trace init -u $URL -b $BRANCH -m $MANIFEST
 
 我们还介绍几个不常用的参数，在国内下载Android源码时，会用到：
 
-- ***--repo-url***：指定远程repo库的URL，默认情况是<https://android.googlesource.com/tools/repo>，但国内访问Google受限，会导致这个库无法下载，从而导致repo init失败，所以可以通过该参数指定一个访问不受限的repo地址
+- ***--repo-url***：指定远程repo库的URL，默认情况是<{{ site.android_source }}/tools/repo>，但国内访问Google受限，会导致这个库无法下载，从而导致repo init失败，所以可以通过该参数指定一个访问不受限的repo地址
 
 - ***--repo-branch***：同manifest这个git库一样，repo这个git库也是有版本差异的，可以通过该参数来指定下载repo这个远程git库的特定分支
 

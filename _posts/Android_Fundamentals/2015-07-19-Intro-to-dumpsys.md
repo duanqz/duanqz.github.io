@@ -53,7 +53,7 @@ System-Free: 306024K / 1523568K total = 20% free
 
 ## 2.1 dumpsys的代码逻辑
 
-`dumpsys`由[frameworks/native/cmds/dumpsys/dumpsys.cpp](https://android.googlesource.com/platform/frameworks/native/+/master/cmds/dumpsys/dumpsys.cpp)这个文件中编译得到。
+`dumpsys`由[frameworks/native/cmds/dumpsys/dumpsys.cpp]({{ site.android_source }}/platform/frameworks/native/+/master/cmds/dumpsys/dumpsys.cpp)这个文件中编译得到。
 我们截取该文件主要的代码片段来分析一下：
 
 {% highlight c %}

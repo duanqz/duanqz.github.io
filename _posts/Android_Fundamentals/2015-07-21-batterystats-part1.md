@@ -7,7 +7,7 @@ tags:  [batterystats]
 ---
 {% include JB/setup %}
 
-说明：本文的代码以**android-5.1.1_r8**为蓝本，代码的在线网址是<https://android.googlesource.com/>
+说明：本文的代码以**android-5.1.1_r8**为蓝本，代码的在线网址是<{{ site.android_source }}/>
 
 # 1. 概要
 
@@ -38,13 +38,13 @@ Android框架层通过一个名为`batterystats`的系统服务，实现了电�
 
 电量统计服务的代码逻辑涉及到以下android源码：
 
-- [frameworks/base/services/java/com/android/server/SystemServer.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/services/java/com/android/server/SystemServer.java#314)
-- [frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/services/core/java/com/android/server/am/ActivityManagerService.java#2162)
-- [frameworks/base/services/core/java/com/android/server/am/BatteryStatsService.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/services/core/java/com/android/server/am/BatteryStatsService.java)
-- [frameworks/base/core/java/android/os/BatteryStats.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/java/android/os/BatteryStats.java)
-- [frameworks/base/core/java/com/android/internal/os/BatteryStatsImpl.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/java/com/android/internal/os/BatteryStatsImpl.java)
-- [frameworks/base/core/java/com/android/internal/os/BatteryStatsHelper.java](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/java/com/android/internal/os/BatteryStatsHelper.java)
-- [frameworks/base/core/res/res/xml/power_profile.xml](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/res/res/xml/power_profile.xml)
+- [frameworks/base/services/java/com/android/server/SystemServer.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/services/java/com/android/server/SystemServer.java#314)
+- [frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/services/core/java/com/android/server/am/ActivityManagerService.java#2162)
+- [frameworks/base/services/core/java/com/android/server/am/BatteryStatsService.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/services/core/java/com/android/server/am/BatteryStatsService.java)
+- [frameworks/base/core/java/android/os/BatteryStats.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/java/android/os/BatteryStats.java)
+- [frameworks/base/core/java/com/android/internal/os/BatteryStatsImpl.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/java/com/android/internal/os/BatteryStatsImpl.java)
+- [frameworks/base/core/java/com/android/internal/os/BatteryStatsHelper.java]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/java/com/android/internal/os/BatteryStatsHelper.java)
+- [frameworks/base/core/res/res/xml/power_profile.xml]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/res/res/xml/power_profile.xml)
 
 为了描述的简便，后文仅以**短类名.方法名()**表示代码片段所在的位置。
 
@@ -112,7 +112,7 @@ public void publish(Context context) {
 - **mStats**是BatteryStatsImpl类的一个对象，从类名可以看出BatteryStatsImpl是BatteryStats的实现类，它描述了所有与电量消耗有关的信息，其实现逻辑，后文再作具体分析。
 
   这里新建了**PowerProfile**类，并调用了getNumSpeedSteps()方法， *NumSpeedSteps*描述的是CPU的运行频率，不同设备的CPU值可能不同。
-  除了CPU的运行频率，还有很多其他与耗电量相关参数，都是因设备而异的，**PowerProfile**类就是专门描述这些参数的，通过解析[frameworks/base/core/res/res/xml/power_profile.xml](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/res/res/xml/power_profile.xml)
+  除了CPU的运行频率，还有很多其他与耗电量相关参数，都是因设备而异的，**PowerProfile**类就是专门描述这些参数的，通过解析[frameworks/base/core/res/res/xml/power_profile.xml]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/res/res/xml/power_profile.xml)
 这个XML文件完成初始化。厂商需要根据硬件设备的实际情况，设置不同的参数，以下是Nexus 5(hammerhead)耗电参数配置的代码片段：
 
 {% highlight xml %}
@@ -161,7 +161,7 @@ wifi.on, wifi.active, wifi.scan分别表示wifi模块在打开、工作和扫描
 前面我们说过，手机电压通常是恒定的，耗电量是通过 “单位时间电流量(I) × 使用时间(t)” 来计算，而单位时间电流量是由厂商给定的，定义在power_profile.xml中，
 所以，只需要收集不同硬件模块的使用时间，就可以近似的计算出耗电量了
 
-收集信息被组织起来，在内存中的数据结构是由[**BatteryStats**](https://android.googlesource.com/platform/frameworks/base/+/android-5.1.1_r8/core/java/android/os/BatteryStats.java)类描述的。
+收集信息被组织起来，在内存中的数据结构是由[**BatteryStats**]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/java/android/os/BatteryStats.java)类描述的。
 为了能够从不同维度统计耗电量，这个数据结构设计得比较复杂，我们不在这里展开讨论，仅通过一个收集应用程序前台运行时间的例子，来说明信息收集过程。
 
 记录应用程序中所有Activity从显示状态(Resumed)到消失状态(Paused)的时间，就能够统计应用程序的前台运行时间。Activity状态的切换是由AMS掌控的，因此AMS需要将Activity的状态信息通知给`batterystats`服务。

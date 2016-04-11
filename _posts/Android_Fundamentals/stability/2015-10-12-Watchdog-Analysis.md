@@ -22,7 +22,7 @@ Android设计了一个软件层面Watchdog，用于保护一些重要的系统�
 
 # 2. Watchdog机制
 
-我们以[frameworks/base/services/core/java/com/android/server/Watchdog.java](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/Watchdog.java)为蓝本，分析Watchdog的实现逻辑。为了描述方便，ActivityManagerService， PackageManagerService， WindowManagerService会分别简称为AMS, PKMS, WMS。
+我们以[frameworks/base/services/core/java/com/android/server/Watchdog.java]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/Watchdog.java)为蓝本，分析Watchdog的实现逻辑。为了描述方便，ActivityManagerService， PackageManagerService， WindowManagerService会分别简称为AMS, PKMS, WMS。
 
 ## 2.1 Watchdog的初始化
 
@@ -494,7 +494,7 @@ ActivityManager线程实际上运行着AMS的消息队列，这个函数调用�
 
 - 线程状态为TimedWaiting, 这表示当前线程阻塞在一个超时的wait()方法
 - 正在处理广播消息超时发生的ANR(Application Not Responding)，需要将当前的函数调用栈打印出来
-- 最终在<0x264ff09d>等待，可以从[AMS的源码](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityManagerService.java#4830)
+- 最终在<0x264ff09d>等待，可以从[AMS的源码]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityManagerService.java#4830)
   中找到这一处锁的源码，因为dumpStackTraces()会写文件，所以AMS设计了一个200毫秒的超时锁。
 
 {% highlight java %}

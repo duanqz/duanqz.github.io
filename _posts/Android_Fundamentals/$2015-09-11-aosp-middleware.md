@@ -69,7 +69,7 @@ APK在编译时，会生成多个 **R.java**， 只是包名不同而已，内�
 **--extra-package**的使用是有特定场景的，如果不了解这些场景，则会造成APK滥用资源的包名。目前，APK使用SDK公共资源有以下几种方式：
 com.meizu.common.R, com.meizu.tooltips.R, com.meizu.colortheme_xxx.R，这些资源的包名在APK中基本是混用的，给后续维护和移植带来了困难。
 
-> **题外话**：AOSP也有很多**-extra-package**的使用案例，譬如[packages/apps/Dialer](https://android.googlesource.com/platform/packages/apps/Dialer/+/master)
+> **题外话**：AOSP也有很多**-extra-package**的使用案例，譬如[packages/apps/Dialer]({{ site.android_source }}/platform/packages/apps/Dialer/+/master)
 > 会静态打包IncallUI的代码和资源，所以通过**--extra-package**指定了 com.android.incallui 包名，但在Dialer的代码中，并不会通过 com.android.incallui.R 的方式来引用自身的资源(虽然完全可以这么做)。
 > 为什么要指定**--extra-package**参数呢？因为IncallUI的代码中有对 com.android.incallui.R 的引用，如果没有指定**--extra-package**，这些代码打包到Dialer中就会引发编译错误。
 
@@ -169,7 +169,7 @@ include $(BUILD_PACKAGE)
 {% endhighlight %}
 
 使用共享资源的应用，只需要引用**Shared Library**库文件即可，应用中并不需要静态打包**Shared Library**。Android源码中提供了**Shared Library**的使用示例：
-<https://android.googlesource.com/platform/frameworks/base/+/master/tests/SharedLibrary/>
+<{{ site.android_source }}/platform/frameworks/base/+/master/tests/SharedLibrary/>
 
 目前，只有Android.mk支持编译出一个**Shared Library**的APK包，但gradle并没有插件支持(当然，我们可以自行定制一个插件)，这与**AAR**正好相反，导致的结果就是：
 如果需要编译**AAR**，就需要用gradle; 如果需要编译**Shared Library**， 就需要用Android.mk。
@@ -195,10 +195,10 @@ include $(BUILD_PACKAGE)
 
 ### 2.3.1 系统资源的共享
 
-关于系统资源的共享，Android使出的方案是使用[frameworks/base/core/res/public.xml](https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/public.xml)来固定住系统资源的ID，
+关于系统资源的共享，Android使出的方案是使用[frameworks/base/core/res/public.xml]({{ site.android_source }}/platform/frameworks/base/+/master/core/res/res/values/public.xml)来固定住系统资源的ID，
 限定后续版本不能改变已有的资源ID。如果有新增的系统资源，则只能在现有的资源ID后累加。
 
-之所以叫**public**，就是公开给APK用的，与之对应的，还有**private**，Android又叫做**internal**。Android只保证在[frameworks/base/core/res/public.xml](https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/public.xml)定义的资源ID是固定不变的，并建议不要使用**internal**的资源，否则会存在兼容性问题，因为不同的Android版本，**internal**的资源ID是会发生变化的。
+之所以叫**public**，就是公开给APK用的，与之对应的，还有**private**，Android又叫做**internal**。Android只保证在[frameworks/base/core/res/public.xml]({{ site.android_source }}/platform/frameworks/base/+/master/core/res/res/values/public.xml)定义的资源ID是固定不变的，并建议不要使用**internal**的资源，否则会存在兼容性问题，因为不同的Android版本，**internal**的资源ID是会发生变化的。
 
 > **题外话**：我们在Android源码中，经常可以看到通过**@hide**注解修饰的类或方法，还有**com.android.internal**命名空间下的类和资源，对于基于Android SDK开发应用而言，这些东西是不可见的，
 > 因为Android在编译SDK时，会屏蔽**@hide**和**internal**的内容。之所以这么做，是有原因的：<br/>

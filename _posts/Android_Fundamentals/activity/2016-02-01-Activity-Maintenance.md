@@ -34,12 +34,12 @@ Activity的管理离不开基础的数据结构以及它们之间的相互关联
 
 Activity管理相关的数据结构包括：
 
-- [ActivityRecord](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityRecord.java)
-- [TaskRecord](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/TaskRecord.java)
-- [ActivityStack](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStack.java)
-- [ActivityDisplay](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStackSupervisor.java)
-- [ActivityStackSupervisor](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStackSupervisor.java)
-- [ProcessRecord](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ProcessRecord.java)
+- [ActivityRecord]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityRecord.java)
+- [TaskRecord]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/TaskRecord.java)
+- [ActivityStack]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStack.java)
+- [ActivityDisplay]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStackSupervisor.java)
+- [ActivityStackSupervisor]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityStackSupervisor.java)
+- [ProcessRecord]({{ site.android_source }}/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ProcessRecord.java)
 
 这些数据结构都是Java类，它们都属于系统进程的范畴，即对象的构建和销毁都在系统进程中完成，笔者将从类的属性和行为这两个角度来分析类的职能。
 Android有一些约定俗成的函数命名方式，与Activity管理相关很多函数都会带有**Locked**后缀，表示这些函数需要进行多线程同步操作(synchronized)，它们会读/写一些多线程共享的数据，读者在分析代码的时候可以适当关注。
