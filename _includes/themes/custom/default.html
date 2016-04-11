@@ -22,12 +22,14 @@
     <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/style.css"/>
     <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/highlight.css"/>
     <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/post.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_PATH }}/css/category.css"/>
 
     <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery.js"></script>
     <script type="text/javascript" src="{{ ASSET_PATH }}/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ ASSET_PATH }}/js/script.js"></script>
     <script type="text/javascript" src="{{ ASSET_PATH }}/js/post.js"></script>
     <script type="text/javascript" src="{{ ASSET_PATH }}/js/toc.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/category.js"></script>
 
     {% include JB/analytics %}
 </head>
@@ -37,15 +39,14 @@
     {% if page.url == "/index.html" %}
     <a href="{{ site.baseurl | prepend: site.url }}">
         <div class="banner">
-            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/>
-            </h1>
+            <h1>duanqz <img src="/favicon.ico" /></h1>
         </div>
     </a>
     {% endif %}
     {% if page.isNavItem %}
     <a href="{{ site.baseurl | prepend: site.url }}">
         <div class="banner">
-            <h1>duanqz <img src="{{ '/favicon.ico' | prepend: site.baseurl | prepend: site.url}}"/>
+            <h1>duanqz <img src="/favicon.ico"/>
             </h1>
 
             <h3>{{page.title}}</h3>
@@ -62,21 +63,28 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{{ site.baseurl | prepend: site.url }}/">{{site.title }}</a>
+                    <a class="navbar-brand" href="{{ site.baseurl | prepend: site.url }}/">{{ site.title }}</a>
 
                     <p class="navbar-text">{{ site.description }}</p>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        {% if page.url == "/index.html" %}
-                        <li class="active">
-                        {% else %}
+                        <!-- Categories -->
                         <li>
-                        {% endif %}
-                            <a href="{{ site.baseurl | prepend: site.url }}/" class="word-keep">
-                                <span class="octicon octicon-book">&nbsp;&nbsp;Blog</span>
+                            <a href="{{ site.url }}" class="categories-item" cate="All">
+                                <span class="octicon octicon-home"></span>
+                                All&nbsp;<span class="categories-badge">{{site.posts | size}}</span>
                             </a>
                         </li>
+                        {% for category in site.categories %}
+                        <li>
+                            <a href="javascript:void(0);" class="categories-item" cate="{{ category | first }}">
+                                <span class="octicon octicon-book"></span>
+                                {{ category | first }}<span class="categories-badge">{{ category | last | size }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+
                         {% for p in site.pages %}{% if p.isNavItem %}
                         {% if p.url == page.url %}
                         <li class="active">
@@ -84,7 +92,8 @@
                         <li>
                         {% endif %}
                             <a href="{{ p.url | prepend: site.baseurl | prepend: site.url }}" class="word-keep">
-                                <span class="octicon {{ p.icon }}">&nbsp;&nbsp;{{p.title }}</span>
+                                <span class="octicon {{ p.icon }}"></span>
+                                {{p.title }}
                             </a>
                         </li>
                         {% endif %}
@@ -120,10 +129,10 @@
         <a class="foot-item" href="https://github.com/{{ site.author.github }}" target="_blank">
             <span class="octicon octicon-mark-github"></span>
         </a>
-        <a class="foot-item" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}"  target="_blank">
+        <a class="foot-item" href="/feed.xml"  target="_blank">
             <span class="octicon octicon-rss"></span>
         </a>
-        <a class="foot-item" href="{{ '/link/' | prepend: site.baseurl | prepend: site.url }}">
+        <a class="foot-item" href="/link/">
             <span class="octicon octicon-link-external"></span>
         </a>
         <a href="http://duanqz.github.io/">

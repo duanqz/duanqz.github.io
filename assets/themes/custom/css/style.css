@@ -103,7 +103,7 @@ html{
     margin: 0px 0px 0px 0px;
 }
 body {
-    background-image: url({{ "/static/bg.jpg" | prepend: site.baseurl | prepend: site.url }});
+    /*background-image: url({{ "/static/bg.jpg" | prepend: site.baseurl | prepend: site.url }});*/
     height: 100%;
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 0px 0px;

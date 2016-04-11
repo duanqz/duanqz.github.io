@@ -14,7 +14,8 @@ isNavItem: true
 <div>
     <ul class="tag-box inline">
         {% for tag in site.tags %}
-        <li><a href="#{{ tag | first }}">{{ tag | first }}<span>{{ tag | last | size }}</span></a>
+        <li>
+            <a href="#{{ tag | first }}">{{ tag | first }}<span>{{ tag | last | size }}</span></a>
         </li>
         {% endfor %}
     </ul>

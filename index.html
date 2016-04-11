@@ -3,33 +3,9 @@ layout: default
 ---
 
 <link rel="stylesheet" type="text/css" href="/assets/css/article-list.css"/>
-<link rel="stylesheet" type="text/css" href="/assets/css/category.css"/>
-<script type="text/javascript" src="/assets/js/category.js"></script>
 
 <div class="row index">
     <div class="col-sm-10 col-sm-offset-1 col-lg-9 col-lg-offset-1_5">
-
-        <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                <span class="octicon octicon-list-unordered"></span>&nbsp;Categories
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li>
-                    <a href="javascript:void(0);" class="categories-item" cate="All">All&nbsp;<span class="categories-badge"> {{site.posts | size}}</span></a>
-                </li>
-                {% for category in site.categories %}
-                <li>
-                    <a href="javascript:void(0);" class="categories-item" cate="{{ category | first }}">
-                        {{ category | first }}&nbsp;<span class="categories-badge">{{ category | last | size }}</span>
-                    </a>
-                </li>
-
-                {% endfor %}
-            </ul>
-        </div>
-
-
         <div>
             <section class="category-slice" post-cate="All">
                 {% for post in site.posts %}
