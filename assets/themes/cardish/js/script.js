@@ -41,12 +41,22 @@ function backToTop() {
 }
 
 function search(){
-    (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
-        (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
-        e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.appendChild(s);
-    })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+//    (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+//        (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+//        e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.appendChild(s);
+//    })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+//
+//    _st('install','{{site.swiftype_searchId}}','2.0.0');
 
-    _st('install','{{site.swiftype_searchId}}','2.0.0');
+//    (function(){
+//        document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));
+//        var bdcs = document.createElement('script');
+//        bdcs.type = 'text/javascript';
+//        bdcs.async = true;
+//        bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=17140189356250418058' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);
+//        var s = document.getElementsByTagName('script')[0];
+//        s.parentNode.insertBefore(bdcs, s);}
+//        )();
 }
 
 
