@@ -11,13 +11,11 @@ layout: default
                 {% for post in site.posts %}
                 <article>
                     <header>
-                        <a href="/archive/#{{ post.date | date: '%Y-%m-%d' }}">
-                            <span class="octicon octicon-calendar"></span>&nbsp;<span>{{ post.date | date: "%Y-%m-%d" }}</span>
-                        </a>
+                        <span class="octicon octicon-calendar"></span>&nbsp;<span>{{ post.date | date: "%Y-%m-%d" }}</span>
                     </header>
                     <div class="module">
-                        <a class="title"
-                           href="{{ post.url }}">
+                        </span>
+                        <a class="title" href="{{ post.url }}">
                             {{ post.title }}
                         </a>
 
@@ -48,9 +46,7 @@ layout: default
                 {% if post.url %}
                 <article>
                     <header>
-                        <a href="/archive/#{{ post.date | date: '%Y-%m-%d' }}">
-                            <span class="octicon octicon-calendar"></span>&nbsp;{{ post.date | date: "%Y-%m-%d" }}
-                        </a>
+                        <span class="octicon octicon-calendar"></span>&nbsp;{{ post.date | date: "%Y-%m-%d" }}
                     </header>
                     <div class="module">
                         <a class="title" href="{{ post.url }}">{{ post.title }}</a>

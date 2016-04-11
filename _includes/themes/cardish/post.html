@@ -5,7 +5,7 @@
                 <p class="post-tag">
                     <span>
                         {% for cat in page.categories %}
-                        <a  href="{{ '/category' | prepend: site.baseurl | prepend: site.url }}/#{{ cat }}">
+                        <a  href="{{ HOME_PATH }}#{{ cat }}">
                             <span  class="octicon octicon-list-unordered">&nbsp;{{ cat }}</span>
                         </a>
                         {% endfor %}
@@ -75,7 +75,7 @@
                     <ul>
                         {% for tag in page.tags %}
                         <li>
-                            <a href="{{ '/tags' | prepend: site.baseurl | prepend: site.url }}#{{ tag }}">
+                            <a href="{{ site.JB.tags_path }}#{{ tag }}">
                                 <span  class="octicon octicon-tag"></span>&nbsp;{{ tag }}
                             </a>
                         </li>

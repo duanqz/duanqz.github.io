@@ -31,7 +31,7 @@ isNavItem: true
             <span class="entry-date">
                 <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date |date_to_string }}</time>
             </span>
-            &raquo; <a href="{{ post.url | prepend: site.baseurl | prepend: site.url }}">{{post.title }}</a>
+            &raquo; <a href="{{ post.url }}">{{post.title }}</a>
         </li>
         {% endif %}
         {% endfor %}
