@@ -952,14 +952,14 @@ private static void dumpStackTraces(String tracesPath, ArrayList<Integer> firstP
 # 3. 问题分析方法
 
 分析ANR问题，有三大利器：Logcat，traces和StrictMode。
-在[StrictMode机制]()一文中，我们介绍过StrictMode的实现机制以及用途，本文中不讨论利用StrictMode来解决ANR问题，但各位读者需要有这个意识。
+在[StrictMode机制](/2015-11-04-StrictMode-Analysis)一文中，我们介绍过StrictMode的实现机制以及用途，本文中不讨论利用StrictMode来解决ANR问题，但各位读者需要有这个意识。
 在[Watchdog机制以及问题分析](/2015-10-12-Watchdog-Analysis)一文中，我们介绍过logcat和traces这两种日志的用途。
 分析ANR问题同Watchdog问题一样，都需要经过日志获取、问题定位和场景还原三个步骤。
 
 ## 3.1 日志获取
 
 我们在上文中分析过，ANR报告机制的重要职能就是输出日志，
-这些日志如何取到呢？请参见[日志获取](/2015-10-12-Watchdog-Analysis/#tocAnchor-1-6-1)
+这些日志如何取到呢？请参见[日志获取](/2015-10-12-Watchdog-Analysis/#section-2)
 
 ## 3.2 问题定位
 
