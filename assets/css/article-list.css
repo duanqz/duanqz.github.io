@@ -1,6 +1,6 @@
 article{
     padding:6px 0px 8px 0px;
-    margin-top: 3em;
+    margin-top: .5em;
 }
 article header{
     text-decoration: none;
@@ -23,6 +23,8 @@ article .module {
     width: 100%;
     overflow: hidden;
     padding: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #b1b1b1;
     background: #f8f8fd;
 
@@ -32,10 +34,10 @@ article .module {
     box-shadow: 0 1px 2px rgba(0,0,0,0.4),0 0 30px rgba(10,10,0,0.1) inset;
 }
 article .title{
-    font-size: 1.6em;
+    font-size: 1.2em;
     font-weight: 500;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 
     margin-left: -25px;
     padding-left: 20px;
@@ -52,8 +54,8 @@ article .readmore{
     color: #999;
     text-shadow: 0 1px #fff;
     text-decoration: none;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin-top: 0px;
+    margin-bottom: 5px;
 }
 article .readmore:hover{
     background: #258fb8;
@@ -64,9 +66,9 @@ article .readmore:hover{
 
 article footer{
     font-size: .85em;
-    line-height: 1.6em;
+    line-height: 1em;
     border-top: 1px solid #ddd;
-    padding-top: 1.6em;
+    padding-top: 1em;
     margin: 0;
 }
 article footer a{

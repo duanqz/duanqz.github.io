@@ -80,7 +80,7 @@
       * 文章目录相关
       */
     .post .toc {
-        display: none!important;
+        display: block;
     }
 }
 
@@ -140,7 +140,7 @@
 }
 
 .toc i{
-    display: none;
+    display: block;
 }
 
 .boundary{
