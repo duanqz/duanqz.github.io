@@ -6,7 +6,7 @@
                     <span>
                         {% for cat in page.categories %}
                         <a  href="{{ HOME_PATH }}#{{ cat }}">
-                            <span  class="octicon octicon-list-unordered">&nbsp;{{ cat }}</span>
+                            <span class="octicon octicon-list-unordered">&nbsp;{{ cat }}</span>
                         </a>
                         {% endfor %}
                     </span>
@@ -19,6 +19,11 @@
             <article>
 			    {{content}}
             </article>
+            <hr class="boundary">
+            <p class="post-tag">
+                <span class="octicon octicon-list-unordered">&nbsp;更多阅读</span>
+            </p>
+            {% include JB/related_posts %}
         </div>
         <div class="pad-min"></div>
         <div id="post-comment" class="sheet post">
@@ -29,9 +34,6 @@
     <div class="content-navigation col-lg-3">
         <div class="shadow-bottom-center">
             <div class="content-navigation-tag">
-                <div class="content-navigation-header">
-                    <span class="octicon octicon-list-unordered"></span>&nbsp;文章信息
-                </div>
                 <div class="content-navigation-list">
                     <ul>
                         <li>
@@ -86,33 +88,7 @@
                 <div class="content-navigation-header">
                     <span class="octicon octicon-list-unordered"></span>&nbsp;相关文章
                 </div>
-                <div class="content-navigation-list">
-                    <ul>
-                        {% assign postsAfterFilter = '-' | split: "-" %}
-
-                        {% for p in site.posts %}
-                            {%if p.url != page.url %}
-                                {% assign commonTagCount = 0 %}
-
-                                {% for tag in p.tags %}
-                                    {% if page.tags contains tag %}
-                                        {% assign commonTagCount = commonTagCount | plus: 1 %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if commonTagCount > 0 %}
-                                    {% assign postsAfterFilter = postsAfterFilter | push: p %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if postsAfterFilter.size > 0 %}
-                            {% for p in postsAfterFilter limit: 5 %}
-                            <li><a href="{{ p.url }}">{{p.title }}</a></li>
-                            {% endfor %}
-                        {% endif %}
-                    </ul>
-                </div>
+                {% include JB/related_posts %}
             </div>
             <div class="content-navigation-related">
                 <div class="content-navigation-header">
