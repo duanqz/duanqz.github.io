@@ -44,7 +44,7 @@ System-Free: 306024K / 1523568K total = 20% free
 # 2. 工作原理
 
 `dumpsys`是Android上的一个二进制程序， 在命令行输出`adb shell dumpsys xx`命令，会通过**adb**将**dumpsys xx**发送到移动设备执行
-(**adb的工作原理可以参见[adb介绍](http://duanqz.github.io/rom%E9%80%86%E5%90%91%E9%80%82%E9%85%8D/2015/05/21/Intro-adb/)一文**)，
+(**adb的工作原理可以参见[adb介绍](/2015-05-21-Intro-adb)一文**)，
 收到**dumpsys xx**指令后，`dumpsys`这个二进制程序就开始工作了，`dumpsys`本身只提供一个输出框架，具体的输出内容还是交由实际的系统服务完成。
 
 下图是`dumpsys`的工作原理：

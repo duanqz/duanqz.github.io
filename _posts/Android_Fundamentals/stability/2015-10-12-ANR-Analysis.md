@@ -12,7 +12,7 @@ tags:  [Android调试]
 `ANR(Application Not Responding)`，应用程序无响应，简单一个定义，却涵盖了很多Android系统的设计思想。
 
 首先，ANR属于应用程序的范畴，这不同于SNR(System Not Respoding)，SNR反映的问题是系统进程(system_server)失去了响应能力，而ANR明确将问题圈定在应用程序。
-SNR由Watchdog机制保证，具体可以查阅[Watchdog机制以及问题分析](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/);
+SNR由Watchdog机制保证，具体可以查阅[Watchdog机制以及问题分析](/2015-10-12-Watchdog-Analysis);
 ANR由消息处理机制保证，Android在系统层实现了一套精密的机制来发现ANR，核心原理是消息调度和超时处理。
 
 其次，ANR机制主体实现在系统层。所有与ANR相关的消息，都会经过系统进程(system_server)调度，然后派发到应用进程完成对消息的实际处理，同时，系统进程设计了不同的超时限制来跟踪消息的处理。
@@ -953,13 +953,13 @@ private static void dumpStackTraces(String tracesPath, ArrayList<Integer> firstP
 
 分析ANR问题，有三大利器：Logcat，traces和StrictMode。
 在[StrictMode机制]()一文中，我们介绍过StrictMode的实现机制以及用途，本文中不讨论利用StrictMode来解决ANR问题，但各位读者需要有这个意识。
-在[Watchdog机制以及问题分析](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/)一文中，我们介绍过logcat和traces这两种日志的用途。
+在[Watchdog机制以及问题分析](/2015-10-12-Watchdog-Analysis)一文中，我们介绍过logcat和traces这两种日志的用途。
 分析ANR问题同Watchdog问题一样，都需要经过日志获取、问题定位和场景还原三个步骤。
 
 ## 3.1 日志获取
 
 我们在上文中分析过，ANR报告机制的重要职能就是输出日志，
-这些日志如何取到呢？请参见[日志获取](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/10/12/Watchdog-Analysis/#tocAnchor-1-6-1)
+这些日志如何取到呢？请参见[日志获取](/2015-10-12-Watchdog-Analysis/#tocAnchor-1-6-1)
 
 ## 3.2 问题定位
 

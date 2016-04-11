@@ -233,7 +233,7 @@ Andriod的日志门类繁多，而且，为了调试的需要，设备厂商和�
   - *radio* 通过android.util.Rlog工具类打印的日志，通信模块相关的日志一般都是使用此类日志，譬如RIL
 
 - **dumpsys** 通过`adb dumpsys`命令输出一些重要的系统服务信息，譬如内存、电源、磁盘等，
-  工作原理可以查阅[dumpsys介绍](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/19/Intro-to-dumpsys/)一文
+  工作原理可以查阅[dumpsys介绍](/2015-07-19-Intro-to-dumpsys)一文
 
 - **traces** 该文件记录了一个时间段的函数调用栈信息，通常在应用发生ANR(Application Not Responding)时，会触发打印各进程的函数调用栈。
   站在Linux的角度，其实就是向进程发送SIGNAL_QUIT(3)请求，譬如，我们可以通过`adb shell kill -3 <pid>`命令，打印指定进程<pid>的的trace。
@@ -382,7 +382,7 @@ Watchdog告诉我们**Monitor Checker**超时了，具体在哪呢？ 名为**an
 - 最后，调用了JNI方法：at libcore.io.Posix.writeBytes(Native method)
 
 **Binder_C**线程要出现这种函数调用栈，我们可以初步确定是Android接受了如下命令
-(dumpsys原理请查阅[dumpsys介绍](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/19/Intro-to-dumpsys/)一文)：
+(dumpsys原理请查阅[dumpsys介绍](/2015-07-19-Intro-to-dumpsys)一文)：
 
 {% highlight console %}
 $ adb shell dumpsys window
@@ -390,7 +390,7 @@ $ adb shell dumpsys window
 
 当通过命令行运行以上命令时，客户端(PC)的adb server会向服务端(手机)的adbd发送指令，
 adbd进程会fork出一个叫做dumpsys的子进程，dumpsys进程再利用Binder机制和system_server通信
-(adb的实现原理可以查阅[adb介绍](http://duanqz.github.io/rom%E9%80%86%E5%90%91%E9%80%82%E9%85%8D/2015/05/21/Intro-adb/)一文)。
+(adb的实现原理可以查阅[adb介绍](/2015-05-21-Intro-adb)一文)。
 
 仅凭这个还是分析不出问题所在，我们需要启用内核的日志了。当调用JNI方法libcore.io.Posix.writeBytes()时，会触发系统调用，
 Linux会从用户态切换到内核态，内核的函数调用栈也可以从traces中找到：

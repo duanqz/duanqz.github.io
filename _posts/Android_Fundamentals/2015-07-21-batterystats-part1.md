@@ -381,4 +381,4 @@ private void processMiscUsage() {
 - **电量统计需要完成哪些具体工作？** 电量使用信息收集，存储和计算
 
 本文分析了软件层面的电量统计原理，电量统计的结果，一般可以在“设置”这个程序的电池信息中可以看到。另一方面，Android提供的`dumpsys batterystats`功能，也能输出所有的电量统计信息，
-在[电量统计(2)-日志](http://duanqz.github.io/android%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/2015/07/21/batterystats-part2/)一文中，我们对Android的Log进行了详细的分析。
+在[电量统计(2)-日志](/2015-07-21-batterystats-part2)一文中，我们对Android的Log进行了详细的分析。

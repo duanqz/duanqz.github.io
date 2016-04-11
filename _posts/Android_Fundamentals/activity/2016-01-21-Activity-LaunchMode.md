@@ -22,7 +22,7 @@ Activity的启动模式一共有四种：Standard、SingleTop、SingleTask和Sin
         public static final int LAUNCH_SINGLE_TASK = 2;
         public static final int LAUNCH_SINGLE_INSTANCE = 3;
 
-   > ActivityInfo类的具体结构可以参见[Android四大组件之Activity--管理方式]()一文。
+   > ActivityInfo类的具体结构可以参见[Android四大组件之Activity--管理方式](/2016-02-01-Activity-Maintenance)一文。
 
 2. 通过**Intent Flags**设置Activity的启动方式：
 
