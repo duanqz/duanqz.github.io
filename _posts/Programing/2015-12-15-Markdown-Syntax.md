@@ -3,7 +3,7 @@ layout: post
 category : 编程思想
 title: Markdown语法
 tagline:
-tags : [markdown]
+tags : 编程
 ---
 {% include JB/setup %}
 

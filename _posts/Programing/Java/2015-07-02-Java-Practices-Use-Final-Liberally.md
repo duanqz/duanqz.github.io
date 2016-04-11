@@ -3,7 +3,7 @@ layout: post
 category : 编程思想
 title: Java的final关键字
 tagline: 
-tags : [Java编程]
+tags : 编程
 ---
 {% include JB/setup %}
 

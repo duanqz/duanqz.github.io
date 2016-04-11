@@ -3,7 +3,7 @@ layout: post
 title: Repo介绍
 category: Android系统原理
 tagline: Repo
-tags: repo 代码管理
+tags: 代码管理
 ---
 
 阅读本文之前，需要对git有一定的了解。

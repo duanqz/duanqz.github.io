@@ -3,7 +3,7 @@ layout: post
 category: Android系统原理
 title: dumpsys介绍
 tagline:
-tags:  dumpsys Android调试
+tags:  Android调试
 ---
 {% include JB/setup %}
 

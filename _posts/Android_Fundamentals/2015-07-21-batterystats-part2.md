@@ -3,7 +3,7 @@ layout: post
 category: Android系统原理
 title: 电量统计(2)-日志
 tagline: batterystats
-tags:  [日志分析]
+tags:  日志分析
 ---
 {% include JB/setup %}
 
