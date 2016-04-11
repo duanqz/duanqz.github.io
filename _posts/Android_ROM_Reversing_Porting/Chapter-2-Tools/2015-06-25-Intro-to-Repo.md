@@ -1,11 +1,10 @@
 ---
 layout: post
 title: Repo介绍
-category: ROM逆向适配
+category: Android系统原理
 tagline: Repo
-tags: [工具使用]
+tags: repo 代码管理
 ---
-{% include JB/setup %}
 
 阅读本文之前，需要对git有一定的了解。
 

@@ -70,7 +70,7 @@ class Passport {                                 |
 {% highlight java %}
 class Manager extends Employee {
     List<Worker> workers = new ArrayList<Worker>();
-        
+
     void add(Worker worker) {       <>------+
         workers.add(worker)                 |
     }                                       |
@@ -108,7 +108,7 @@ class Project {                   |           |
         mManager = manager;       |
     }                             |
                                   |
-    boolean isSuccess() { }   <---+    
+    boolean isSuccess() { }   <---+
 }
 {% endhighlight %}
 
@@ -128,14 +128,14 @@ class Project {                   |           |
 
 笔者总结了三个语义维度来区分对象之间的关联、聚合、组合关系：
 
-                 关联关系         聚合关系         组合关系
-    主权对象         无             单一            单一
-                  
-    生命周期      互不影响         互不影响         相互影响
-                  
-    从属对象      完全独立       属于主权对象      属于主权对象
-    
+类型        | 关联关系 | 聚合关系 | 组合关系
+-----       | -----   | -----   | -----
+**主权对象** | 双方不存在谁主宰谁 | 其中一方主宰另一方 | 其中一方主宰另一方
+**生命周期** | 双方互不影响 | 双方互不影响 | 双方相互影响
+**从属对象** | 双方没有从属关系，相互独立 | 其中一方属于另一方属于主权对象 | 其中一方属于另一方
 
+---
 
-英文原文地址：
-<http://www.codeproject.com/Articles/330447/Understanding-Association-Aggregation-and-Composit>
+**参考文献**：
+
+- <http://www.codeproject.com/Articles/330447/Understanding-Association-Aggregation-and-Composit>
