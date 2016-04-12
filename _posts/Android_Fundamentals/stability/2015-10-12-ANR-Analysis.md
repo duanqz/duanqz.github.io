@@ -959,7 +959,7 @@ private static void dumpStackTraces(String tracesPath, ArrayList<Integer> firstP
 ## 3.1 日志获取
 
 我们在上文中分析过，ANR报告机制的重要职能就是输出日志，
-这些日志如何取到呢？请参见[日志获取](/2015-10-12-Watchdog-Analysis/#section-2)
+这些日志如何取到呢？请参见[日志获取](/2015-10-12-Watchdog-Analysis#section-2)
 
 ## 3.2 问题定位
 
