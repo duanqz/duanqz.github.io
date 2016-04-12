@@ -30,7 +30,7 @@ function selectCategory(){
         }
     }
     if(allow){
-        var cate = thisId;
+        var cate = decodeURIComponent(thisId);
         $("section[post-cate!='" + cate + "']").hide(200);
         $("section[post-cate='" + cate + "']").show(200);
     } else {
