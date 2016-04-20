@@ -29,7 +29,7 @@ Android不断在变化，不同版本所包含的库的清单是不一样，所�
 
 - 部分对**default.xml**的修改，不需要上传到代码服务器; 而定期同步最新的**default.xml**，就容易与本地的修改产生冲突;
 
-- 设备厂商大都在是多分支的环境下开发，然而对不同**default.xml**修改的内容都是相同的，导致需要在多分支上重复提交相同的修改。
+- 设备厂商大都是在多分支的环境下开发，对不同**default.xml**修改的内容都往往是相同的，导致需要在多分支上重复提交相同的修改。
 
 `repo`还支持另外一种定制方式：**Local Manifests**，在`repo sync`之前，会将**.repo/manifests/default.xml**和**.repo/local_manifests/**目录下存在清单文件进行合并，再根据融合的清单文件进行代码同步。
 这样一来，只需要将清单文件的修改项放到**.repo/local_manifests/**目录下，
@@ -162,8 +162,7 @@ CyanogenMod所有机型的device库和vendor库都放到了<https://github.com/>
 
 <div align="center"><img src="/assets/images/localmanifests/6-local-manifests-scene2-plus-manifests.png"/></div>
 
-通过**local_manifests**，每个分支就能编译出定制化的固件，**local_manifests**就像一个切面，在已有的每个分支中，
-都植入了相同的差异化内容。
+通过**local_manifests**，每个分支就能编译出定制化的固件，**local_manifests**就像一个切面，在已有的不同分支中，都植入了相同的差异化内容。
 
 以面向海外市场的定制版为例，需要在已有分支上都增加GMS(Google Mobile Services)，这时，可以将GMS组织成独立的git库，部署在代码服务器上，
 在编译海外定制版时，植入**local_manifests**，在清单文件中添加GMS这个git库的信息。这种方式能够以较低的成本实现对已有多个分支的定制。
