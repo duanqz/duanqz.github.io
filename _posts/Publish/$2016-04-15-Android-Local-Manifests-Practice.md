@@ -3,10 +3,10 @@ layout: post
 category: Publish
 title: Android Local Manifests机制的使用实践
 tagline:
-tag:
+tag: 代码管理
 ---
 
-# 1. Android源码管理的清单文件
+# 1. Android源码管理的清单
 
 为了便于管理多个git库，Android提供了一套Python脚本，称为`repo`[1]，它是全局管理Android源码的利器，Android系统开发的第一步就是获取源码，这时，就需要用到`repo`命令了：
 
@@ -35,7 +35,19 @@ Android不断在变化，不同版本所包含的库的清单是不一样，所�
 这样一来，只需要将清单文件的修改项放到**.repo/local_manifests/**目录下，
 就能够在不修改**default.xml**的前提下，完成对清单的文件的定制。
 
-# 2. Local Manifests机制的原理
+# 2. Local Manifests机制
+
+`repo`命令的执行依赖于解析清单文件的结果，解析时，就约定了在**manifests/default.xml**的基础上，融合**local_manifest.xml**文件和**local_manifests/**目录下的文件，生成一个的数据结构**manifest_xml**。**Local Manifests**机制的原理图如下所示：
+
+<div align="center"><img src="/assets/images/localmanifests/1-local-manifests-mechanism.png" alt="mechanisim"/></div>
+
+清单文件的解析由*[manifest_xml.py](https://gerrit.googlesource.com/git-repo/+/master/manifest_xml.py)*这个脚本负责;解析结果输出给其他命令，譬如`repo sync`。这里有一些隐含的规则：
+
+- 先解析**local_manifest.xml**，再解析**local_manifests/**目录下的清单文件;
+
+- **local_manifests**目录下的清单文件是没有命名限制的，但会按照字母序被解析，即字母序靠后的文件内容会覆盖之前的;
+
+- 所有清单文件的内容必须遵循`repo`定义的格式[3]才能被正确解析。
 
 笔者实现了Local Manifests机制的一个使用示例：<https://github.com/LocalManifestsDemo>，这是一个包含多个git库的项目。
 该项目中，默认的**[default.xml](https://github.com/LocalManifestsDemo/manifests/blob/master/default.xml)**文件内容如下：
@@ -94,8 +106,6 @@ LocalManifestsDemo
 </manifest>
 {% endhighlight %}
 
-> **注意**：**local_manifests**目录下的清单文件是没有命名限制的，但会按照字母序被解析，即字母序靠后的文件内容会覆盖之前的。
-> 所有清单文件的内容必须遵循`repo`定义的格式[3]才能被正确解析。
 
 执行完`repo sync`后，本地的代码目录结构如下所示：
 
@@ -107,8 +117,12 @@ LocalManifestsDemo
 
 可以看到, 项目 **A** 的代码目录被删除了，项目 **B** 被切换到了stable分支，新增了一个项目 **C**。
 
+# 3. Local Manifests应用
 
-# 3. Local Manifests机制的应用
+只要准备好本地的**local_manifests/**目录，**Local Manifests**机制就生效了。设计一套自动生成**local_manifests/**目录的方案，
+就能完成清单文件定制的需求。
+
+<div align="center"><img src="/assets/images/localmanifests/2-local-manifests-usage.png" alt="usage"/></div>
 
 ## 3.1 作为本地化清单
 
@@ -122,6 +136,5 @@ LocalManifestsDemo
 
 1. repo介绍: <https://duanqz.github.io/2015-06-25-Intro-to-Repo>
 2. CyanogenMod介绍：<https://wiki.cyanogenmod.org/w/About>
-2. 清单文件的格式: <https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.txt>
-2. manifest_xml.py: <https://gerrit.googlesource.com/git-repo/+/master/manifest_xml.py>
-3. CyanogenMod使用Local Manifests机制: <https://wiki.cyanogenmod.org/w/Doc:_Using_manifests>
+3. 清单文件的格式: <https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.txt>
+4. CyanogenMod使用Local Manifests机制: <https://wiki.cyanogenmod.org/w/Doc:_Using_manifests>
