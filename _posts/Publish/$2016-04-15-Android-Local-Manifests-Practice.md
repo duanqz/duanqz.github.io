@@ -119,16 +119,54 @@ LocalManifestsDemo
 
 # 3. Local Manifests应用
 
-只要准备好本地的**local_manifests/**目录，**Local Manifests**机制就生效了。设计一套自动生成**local_manifests/**目录的方案，
-就能完成清单文件定制的需求。
+只要准备好本地的**local_manifests/**目录，**Local Manifests**机制就生效了。因此，设计一套自动生成**local_manifests/**目录的方案，就能完成清单文件定制的需求，本文给出的方案图如下所示：
 
 <div align="center"><img src="/assets/images/localmanifests/2-local-manifests-usage.png" alt="usage"/></div>
 
-## 3.1 作为本地化清单
+- 在服务器上配置清单文件的定制信息;
+- 在本地植入生成**local_manifests/**目录的客户端。
 
-## 3.2 作为编译开关
+服务端和客户端的具体实现由业务场景决定，譬如：服务端可以部署很多git库，客户端可以输入git库的名称，向服务端发起查询请求，获取服务端返回的git库的信息，然后生成本地的**local_manifests/**目录，客户端和服务端通信可以基于HTTP实现。
 
+## 3.1 同一Android分支编译不同版本
 
+一个Android分支对应到一份清单文件，一份清单文件定义了Android源码中包含了git库(由&lt;project&gt;标签定义)和git库所在的分支(由&lt;project&gt;标签的revision属性定义)，所以，一个Android分支所包含的git库是不变的。
+然而，为了编译出不同版本的固件，需要在这个分支上增加或删除一些git库，一种方案是增加新的分支：
+
+<div align="center"><img src="/assets/images/localmanifests/3-local-manifests-scene1-plus-branches.png"/></div>
+
+对于设备厂商而言，增加分支会导致提高维护成本，所以，避免增加分支的方案也有很多，譬如编译时开关、运行时反射等，**Local Manifests**也是一种有效的方案。以CyanogenMod为例，在同一分支上编译出数百款机型，机型不同自然就会有很多差异的地方，譬如kernel、配置项、固件中的APK，所以CyanogenMod把不同机型的差异项抽离出来，放到了**local_manifests**中：
+
+<div align="center"><img src="/assets/images/localmanifests/4-local-manifests-scene1-plus-manifests.png"/></div>
+
+每一个机型都有自己的**local_manifests**，它们对默认的清单文件进行了定制，这样一来，只需要在编译时准备不同的**local_manifests**，就能在同一Android分支编译出不同固件。实际上，不同的固件还是对应到不同的清单文件，所以，本质上与增加一份**local_manifests**与增加一个分支并没有不同，都是对已有清单文件的定制，只不过通过**local_manifests**来集中维护有差异的git库，比维护一个分支的成本要低。
+
+CyanogenMod所有机型的device库和vendor库都放到了<https://github.com/>上，
+在执行lunch命令时，植入了生成**local_manifests**的客户端：
+
+- 根据lunch命令获取机型名称，通过github的Search API[4]，从服务器上查询机型的依赖库的信息;
+
+- 将获取到的依赖库信息重新组织成XML格式，添加到**local_manfiests/**目录下的清单文件中。
+
+## 3.2 多个Android分支编译不同版本
+
+设备厂商会基于同一Android版本构建很多分支，以适应不同芯片平台、不同发布版本的开发需要; 多个分支，就对应到多份清单文件。
+编译不同分支时，就需要指定到不同的清单文件下载代码。通过`repo init`命令的 *-b* 参数指定不同的分支，其实就是指定不同的清单文件。
+每个分支都可能出定制版本，譬如针对运营商的定制版(移动/联通/电信版)、针对海外市场的定制版，一种解决方案是增加分支：
+
+<div align="center"><img src="/assets/images/localmanifests/5-local-manifests-scene2-plus-branches.png"/></div>
+
+设备厂商一般不会采用以上方案，每一类定制版都增加一个分支，会导致分支成倍的扩张，这会变得不可维护。
+通过编译开关等手段，还是可以在已有分支上编出不同的定制版，但在同一份代码中兼容太多的差异，也会提升代码的维护成本。
+将差异的git库放到**local_manifests**中，实现已有分支的定制需求，是一种有效的方案：
+
+<div align="center"><img src="/assets/images/localmanifests/6-local-manifests-scene2-plus-manifests.png"/></div>
+
+通过**local_manifests**，每个分支就能编译出定制化的固件，**local_manifests**就像一个切面，在已有的每个分支中，
+都植入了相同的差异化内容。
+
+以面向海外市场的定制版为例，需要在已有分支上都增加GMS(Google Mobile Services)，这时，可以将GMS组织成独立的git库，部署在代码服务器上，
+在编译海外定制版时，植入**local_manifests**，在清单文件中添加GMS这个git库的信息。这种方式能够以较低的成本实现对已有多个分支的定制。
 
 ---
 
@@ -137,4 +175,4 @@ LocalManifestsDemo
 1. repo介绍: <https://duanqz.github.io/2015-06-25-Intro-to-Repo>
 2. CyanogenMod介绍：<https://wiki.cyanogenmod.org/w/About>
 3. 清单文件的格式: <https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.txt>
-4. CyanogenMod使用Local Manifests机制: <https://wiki.cyanogenmod.org/w/Doc:_Using_manifests>
+4. CyanogenMod的Search API文档：<https://developer.github.com/v3/search/>
