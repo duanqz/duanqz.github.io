@@ -1,6 +1,6 @@
 ---
 layout: post
-category: Publish
+category: Android系统原理
 title: Android Local Manifests机制的使用实践
 tagline:
 tag: 代码管理

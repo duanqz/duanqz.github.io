@@ -5,7 +5,6 @@ title: AOSP中间件实践方案
 tagline:
 tags:  [Middleware]
 ---
-{% include JB/setup %}
 
 # 1. 现状和问题
 
