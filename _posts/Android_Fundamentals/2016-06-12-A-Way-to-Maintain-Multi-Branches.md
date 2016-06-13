@@ -1,6 +1,6 @@
 ---
 layout: post
-category: Publish
+category: Android系统原理
 title: 一种Android多分支的自动合并方案
 tagline:
 tag: [多分支管理]
