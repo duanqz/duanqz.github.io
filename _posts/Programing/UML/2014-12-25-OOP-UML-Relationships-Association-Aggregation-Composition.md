@@ -5,7 +5,6 @@ title: UML关联、聚合、组合关系的区别
 tagline: "Association, Aggregation, Composition"
 tags : 编程
 ---
-{% include JB/setup %}
 
 # 概要
 
