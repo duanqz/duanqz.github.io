@@ -1,9 +1,9 @@
 ---
 layout: post
 category: Android系统原理
-title: Android四大组件之Activity--ActivityManagerService的角色
+title: ActivityManagerService的启动过程
 tagline:
-tags:  [Android四大组件]
+tags:  [Android系统服务]
 ---
 {% include JB/setup %}
 
@@ -12,12 +12,17 @@ tags:  [Android四大组件]
 ActivitityManagerService(下文简称AMS)作为系统中最重要的服务，在开机时就会被启动，而且一直存在。
 那么，Android是如何启动AMS，以及启动AMS时做了哪些初始化工作呢？
 
+从进入Android系统进程(SystemServer)到用户所见的桌面(HomeActivity)，整个过程中，AMS都扮演着主角。
+AMS就像一个大管家，总管着四大组件、进程调度、各类统计等信息。在AMS启动时，就表明了自己的身份：引导服务(BootstrapService)，意味着AMS是最重要的一类服务，大多数其他系统服务的启动都依赖于AMS。
+
+本章分析的对象是AMS在系统进程中的启动过程，虽然仅仅是启动，涉及到的知识点已然非常多。
+
 # 2. 在系统进程中启动AMS
 
 AMS对象随系统进程启动而构建，随着系统进程退出而消亡，可以说，AMS与系统进程共存亡。
 本章分析的内容是系统进程启动时与AMS相关的一些初始化操作，先上一张总的启动时序图:
 
-<div align="center"><img src="/assets/images/activity/roleofams/1-activity-roleofams-sequence-diagram.png" alt="Sequence Diagram"/></div>
+<div align="center"><img src="/assets/images/systemservice/amslaunching/1-amslaunching-sequence-diagram.png" alt="Sequence Diagram"/></div>
 
 可以分为三个步骤:
 
@@ -125,7 +130,7 @@ Android对待系统进程，也像对待普通的应用进程一样，都需要�
 
 我们通过一张类图来总结一下，与系统进程运行环境初始化相关的各个类之间的关系：
 
-<div align="center"><img src="/assets/images/activity/roleofams/2-activity-roleofams-classes-diagram.png" alt="Classes Diagram"/></div>
+<div align="center"><img src="/assets/images/systemservice/amslaunching/2-amslaunching-activitythread-classes-diagram.png" alt="Classes Diagram"/></div>
 
 1. Android要为应用进程创造一个运行环境，同样也需要为系统进程创造一个运行环境，在系统进程启动伊始，这个运行环境就需要创建完毕;
 
@@ -253,7 +258,7 @@ public static final class Lifecycle extends SystemService {
 
 我们通过类图来总结一下SystemServiceManager, SystemService以及AMS三者之间的关系：
 
-<div align="center"><img src="/assets/images/activity/roleofams/3-activity-roleofams-systemservice-classes-diagram.png" alt="Classes Diagram"/></div>
+<div align="center"><img src="/assets/images/systemservice/amslaunching/3-amslaunching-systemservice-classes-diagram.png" alt="System Service  Classes Diagram"/></div>
 
 1. SystemService是系统服务的抽象类，封装了onStart()和onBootPhase()等生命周期函数供SystemServiceManager回掉;
 
@@ -613,7 +618,7 @@ private final List<ProviderInfo> generateApplicationProvidersLocked(ProcessRecor
 - **第2步**,  通过PackageManager获取到的ProviderInfo只是一个静态的信息, 还需要绑定到具体的ProcessRecord。
    要理解这个绑定关系,需要先了解AMS对Provider的管理方式:
 
-<div align="center"><img src="/assets/images/activity/roleofams/3-activity-roleofams-provider-classes-diagram.png" alt="Provider Classes Diagram"/></div>
+<div align="center"><img src="/assets/images/systemservice/amslaunching/4-amslaunching-provider-classes-diagram.png" alt="Provider Classes Diagram"/></div>
 
    - AMS中使用ContentProviderRecord来管理一个ContentProvider。ProviderInfo, ApplicationInfo, 运行ContentProvider的ProcessRecord等信息都保存在ContentProviderRecord中。
 
@@ -1073,8 +1078,14 @@ final void finishBooting() {
 
 以上函数的逻辑不复杂，主要经过以下流程：进行ABI检查，注册一些系统广播，启动之前被抑制启动的进程，发送ACTION_BOOT_COMPLETED广播，调度性能统计功能。
 
----
+# 3 总结
 
-**参考资料**
+本章节分析了系统进程启动过程中与AMS相关的逻辑，总体而言，可以分为三步：
 
-1. 
+1. **初始化系统进程的运行环境**。所谓运行环境，就是指的Context，Context蕴含了代码执行过程中所需要的信息，包括进程信息、包信息、资源信息等等。Android有意弱化进程的概念，强化Context的概念，在Android编程时，一定避免不了与Context打交道。对于系统进程而言，Context有一定的特殊性，所以单独造了一个SystemContext。
+
+2. **初始化AMS对象**。AMS对象在系统进程构建，作为最重要的系统服务，AMS初始化要做的事情非常多。由于各种系统服务耦合在一块，相互影响，Android设计了“系统进程启动阶段”这个概念，就像一个简单的状态机，只有进入的某个阶段，才能做某些操作。譬如，只有进入PHASE_ACTIVITY_MANAGER_READY，AMS才能正常工作，这时才可以进行派发广播、管理进程等操作。
+
+    因为系统进程也在AMS的管辖范围之内，所以，AMS对象构建后有一个重要的任务，就是设置系统进程的一些属性。这时，会将第一个启动的应用frameworks-res.apk的信息装载到系统进程中，创建一个系统进程的ProcessRecord对象以便AMS管理。
+
+3. **AMS初始化的配套工作**。这里所谓配套工作是指，系统要完全运行起来，还需要经由AMS进行一系列的运作：系统设置SettingsProvider会经由AMS装载到系统进程中；其他系统服务在AMS准备就绪后，也会进入就绪状态，表示可以正常工作；桌面会经由AMS启动，最终ACTION_BOOT_COMPLETED广播发出。

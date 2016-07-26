@@ -11,3 +11,5 @@ Thumbs.db
 
 .idea
 .jekyll-metadata
+
+*.~vsdx
