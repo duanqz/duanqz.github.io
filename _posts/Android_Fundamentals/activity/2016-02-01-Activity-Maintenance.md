@@ -28,7 +28,7 @@ Activity的管理有**静态**和**动态**两层涵义：
 Activity的管理离不开基础的数据结构以及它们之间的相互关联，
 所以，笔者会从基础的数据结构出发，分析类的属性和行为，并结合一些场景进行源码分析; 进一步，会分析各个类之间关联关系的构建过程。
 这样一来，整个Activity管理运转的模型就清楚了，这个模型承载的很多业务，本文不会具体展开，
-在[Android四大组件之Activity--启动过程]()一文中，笔者会再详细介绍一种典型的业务。
+在[Android四大组件之Activity--启动过程](2016-07-29-Activity-LaunchProcess-Part1)一文中，笔者会再详细介绍一种典型的业务。
 
 ## 2.1 数据结构
 
@@ -76,7 +76,7 @@ ActivityRecord是AMS调度Activity的基本单位，它需要记录AndroidManife
 **resultTo** | 在当前ActivityRecord看来，resultTo表示上一个启动它的ActivityRecord，当需要启动另一个ActivityRecord，会把自己作为resultTo，传递给下一个ActivityRecord
 **state** | ActivityRecord所处的状态，初始值是ActivityState.INITIALIZING
 **app** | ActivityRecord的宿主进程
-**task** | ActivityRecord的宿主任务栈
+**task** | ActivityRecord的宿主任务
 **inHistory** | 标识当前的ActivityRecord是否已经置入任务栈中
 **frontOfTask** | 标识当前的ActivityRecord是否处于任务栈的根部，即是否为进入任务栈的第一个ActivityRecord
 **newIntents** | Intent数组，用于暂存还没有调度到应用进程Activity的Intent
@@ -87,7 +87,7 @@ ActivityRecord是AMS调度Activity的基本单位，它需要记录AndroidManife
 ----- | -----
 **putInHistory(), takeFromHistory(), isInHistory()** | 基于inHistory属性，来判定和更新ActivityRecord是否在任务栈的状态值
 **isHomeActivity(), isRecentsActivity(), isApplicationActivity()** | 基于mActivityType属性，判定Activity的类型
-**setTask()** | 设置ActivityRecord的宿主任务栈
+**setTask()** | 设置ActivityRecord的宿主任务
 **deliverNewIntentLocked()** | 向当前ActivityRecord继续派发Intent。在一些场景下，位于任务栈顶的ActivityRecord会继续接受新的Intent(譬如以singleTop方式启动的同一个Activity)，这时候，会触发调度**Activity.onNewIntent()**函数
 **addNewIntentLocked()** | 如果Intent没有派发到应用进程，则通过该函数往**newIntents**数组中添加一个元素。
 
@@ -158,7 +158,7 @@ ActivityRecord(ActivityManagerService _service, ProcessRecord _caller,
 ### TaskRecord
 
 TaskRecord的职责是管理多个ActivityRecord，本文所述的任务、任务栈指的就是TaskRecord。
-启动Activity时，需要找到Activity的宿主任务栈，如果不存在，则需要新建一个，也就是说所有的ActivityRecord都必须有宿主。
+启动Activity时，需要找到Activity的宿主任务，如果不存在，则需要新建一个，也就是说所有的ActivityRecord都必须有宿主。
 TaskRecord与ActivityRecord是一对多的关系，TaskRecord的属性中包含了ActivityRecord的数组;
 同时，TaskRecord还需要维护任务栈本身的状态。
 
@@ -182,7 +182,7 @@ TaskRecord的行为侧重在TaskRecord本身的管理：增/删/改/查任务栈
 **addActivityToTop(), addActivityAtBottom()** | 将ActivityRecord添加到任务栈的顶部或底部
 **moveActivityToFrontLocked()** | 该函数将一个ActivityRecord移至TaskRecord的顶部，实现方法就是先删除已有的，再在栈顶添加一个新的
 **setFrontOfTask()** | ActivityRecord有一个属性是frontOfTask，表示ActivityRecord是否为TaskRecord的根Activity。该函数设置TaskRecord中所有ActivityRecord的frontOfTask属性，从栈底往上开始遍历，第一个不处于finishing状态的ActivityRecord的frontOfTask属性置成true，其他都为false
-**performClearTaskLocked()** | 清除TaskRecord中的ActivityRecord。当启动Activity时，用了**Intent.FLAG_ACTIVITY_CLEAR_TOP**参数，那么在宿主任务栈中，待启动ActivityRecord之上的其他ActivityRecord都会被清除
+**performClearTaskLocked()** | 清除TaskRecord中的ActivityRecord。当启动Activity时，用了**Intent.FLAG_ACTIVITY_CLEAR_TOP**参数，那么在宿主任务中，待启动ActivityRecord之上的其他ActivityRecord都会被清除
 
 仅仅把类的属性和行为罗列出来，当然不足以理解TaskRecord的工作原理。
 接下来，将深入部分函数的代码，分析TaskRecord在一些场景下的具体执行逻辑。
@@ -373,12 +373,12 @@ Activity状态的变迁，不仅仅是给ActivityRecord.state赋一个状态值�
 **isAttached()** | 用于判定当前ActivityStack是否已经绑定到显示设备
 **isOnHomeDisplay()** | 用于判定当前是否为默认的显示设备(Display.DEFAULT_DISPLAY)，通常，默认的显示设备就是手机屏幕
 **isHomeStack()** | 用于判定当前ActivityStack是否为Home Stack，即判定当前显示的是否为桌面(Launcher)
-**moveTaskToFrontLocked()** | 该函数用于将指定的任务栈挪到当前ActivityStack的最前面。在Activity状态变化时，需要对已有的ActivityStack中的任务栈进行调整，待显示Activity的宿主任务栈需要挪到前台
+**moveTaskToFrontLocked()** | 该函数用于将指定的任务栈挪到当前ActivityStack的最前面。在Activity状态变化时，需要对已有的ActivityStack中的任务栈进行调整，待显示Activity的宿主任务需要挪到前台
 **insertTaskAtTop()** | 将任务插入ActivityStack栈顶
 
 ActivityStack还有很多与**迁移Activity状态**相关的行为： **startActivityLocked()**， **resumeTopActivityLocked()**，
 **completeResumeLocked()**， **startPausingLocked()**， **completePauseLocked()**， **stopActivityLocked()**，
-**activityPausedLocked()**， **finishActivityLocked()**， **activityDestroyedLocked()**， 它们与Activity的生命周期调度息息相关，在[Android四大组件之Activity--启动过程]()一文中，会再详细分析这几个函数的实现逻辑，本文还是通过一个简单的场景来分析ActivityStack的行为。
+**activityPausedLocked()**， **finishActivityLocked()**， **activityDestroyedLocked()**， 它们与Activity的生命周期调度息息相关，在[Android四大组件之Activity--启动过程](2016-07-29-Activity-LaunchProcess-Part1)一文中，会再详细分析这几个函数的实现逻辑，本文还是通过一个简单的场景来分析ActivityStack的行为。
 
 **`场景 1`** 以singleTask的方式启动一个处于后台的Activity，那么，就需要将Activity挪到前台。怎么挪呢？
 
@@ -785,4 +785,4 @@ void startSpecificActivityLocked(ActivityRecord r,
 
 **参考资料**
 
-1. 
+1.
