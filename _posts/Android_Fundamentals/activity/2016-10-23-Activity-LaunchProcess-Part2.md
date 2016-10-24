@@ -6,7 +6,7 @@ tagline:
 tags:  [Android四大组件]
 ---
 
-在[Activity的启动过程(上)](2016-07-29-Activity-LaunchProcess-Part1.md)一文中，我们介绍了Activity启动过程的上半部分，
+在[Activity的启动过程(上)](2016-07-29-Activity-LaunchProcess-Part1)一文中，我们介绍了Activity启动过程的上半部分，
 按照Activity的启动时序，涉及内容到多达11个函数，最终落脚点在创建一个应用进程。Activity启动过程的上半部分都还是在系统进程中完成，
 都是系统进程内部数据结构和状态的调整。本文分析Activity启动过程的下半部分，涉及到系统进程和应用进程的通信，建议读者先读完[应用进程与系统进程的通信](2016-01-29-Activity-IPC)，了解两个进程的通信方式。
 
