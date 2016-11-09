@@ -5,7 +5,6 @@ title: 电量统计(2)-日志
 tagline: batterystats
 tags:  日志分析
 ---
-{% include JB/setup %}
 
 # 概要
 
@@ -61,5 +60,3 @@ Battery History (2% used, 6184 used of 256KB, 36 strings using 2418):
        +1h02m12s472ms (2) 095 data_conn=hspap
                   ...
 {% endhighlight %}
-
-

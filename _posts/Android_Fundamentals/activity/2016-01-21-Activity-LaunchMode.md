@@ -5,7 +5,6 @@ title: Android四大组件之Activity--启动模式
 tagline:
 tags:  [Android四大组件]
 ---
-{% include JB/setup %}
 
 
 Activity的启动模式一共有四种：Standard、SingleTop、SingleTask和SingleInstance。

@@ -5,7 +5,6 @@ title: StrictMode机制以及使用场景
 tagline:
 tags:  Android调试 稳定性
 ---
-{% include JB/setup %}
 
 # 1. 概览
 

@@ -5,7 +5,6 @@ title: GMS(Google Mobile Services)介绍
 tagline:
 tag: []
 ---
-{% include JB/setup %}
 
 
 `GMS`是Google针对移动终端提供的一系列服务，主要是面向于Android设备，不同于AOSP(Android Open Source Project)，GMS需要Google的授权才能使用。本文从以下问题来探讨GMS：
@@ -88,4 +87,3 @@ Google通过OHA构建了Android生态圈，与Apple iOS和Windows Phone形成三
 对于其他APK而言，只需要在Android.mk中添加类似的代码块即可，如此以来，这些APK就能编译产出到AOSP的**out/target/product/$TARGET_DEVICE**目录。为了将APK打包进最终的刷机包，还需要在对应**$TARGET_DEVICE**的device.mk中添加：
 
 	PRODUCT_PACKAGES += GmsCore
-

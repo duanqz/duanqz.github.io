@@ -5,7 +5,6 @@ title: Android四大组件之Activity--管理方式
 tagline:
 tags:  [Android四大组件]
 ---
-{% include JB/setup %}
 
 # 1. 概览
 

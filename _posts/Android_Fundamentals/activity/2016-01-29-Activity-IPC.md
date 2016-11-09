@@ -5,7 +5,6 @@ title: Android四大组件之Activity--应用进程与系统进程的通信
 tagline:
 tags:  [Android四大组件]
 ---
-{% include JB/setup %}
 
 Android中有一个系统进程(system_process，在Lollipop之前，叫system_server)，运行着系统的重要服务(AMS, PMS, WMS)，
 针对Activity而言，系统进程需要不断地调度Activity执行，管理Activity的状态;

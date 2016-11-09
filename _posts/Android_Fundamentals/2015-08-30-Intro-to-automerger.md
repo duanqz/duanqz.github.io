@@ -5,7 +5,6 @@ title: AOSP代码管理
 tagline:
 tag: [代码管理]
 ---
-{% include JB/setup %}
 
 # 1. 概要
 
@@ -76,7 +75,7 @@ Android采用`git merge`的方式，自动将一个分支的改动合并到其�
 来看一下[AOSP的官方负责人Jean-Baptiste Queru的解释](https://groups.google.com/forum/#!msg/android-building/oJxZ92kC70E/IP9UlsoFoWgJ)：
 
 > We (Google) routinely develop on multiple branches at the same time. In order to make sure that the later branch (e.g. ics-mr1) contains all the new features and bugfixes developed in an older branch (e.g.ics-mr0), we have a server that automatically takes every commit made in ics-mr0 and merges it into ics-mr1.
-> However, sometimes the engineer making a change in ics-mr0 knows that this change doesn't apply to ics-mr1, e.g. because a similar issue was fixed differently in ics-mr1 and the fix from ics-mr0 wasn't necessary. In that case, the engineer includes the words "do not merge" in their change description, and the auto-merger performs a "git merge -s ours" instead of "git merge" when handling that change. 
+> However, sometimes the engineer making a change in ics-mr0 knows that this change doesn't apply to ics-mr1, e.g. because a similar issue was fixed differently in ics-mr1 and the fix from ics-mr0 wasn't necessary. In that case, the engineer includes the words "do not merge" in their change description, and the auto-merger performs a "git merge -s ours" instead of "git merge" when handling that change.
 > There's a bit more complexity involved, but that's the high-level view.
 
 在上下游分支之间，有一个自动合并代码的工具*auto-merger*，对于上游分支的每一个提交而言，都会通过`git merge`命令将提交内容自动合并到下游分支。
@@ -197,7 +196,7 @@ upstream和downstream两个分支**merge**，会出现一个新的提交 *M1* �
 
 - 上游分支的**Commit ID**得以保留，在使用Gerrit进行代码Review的时候，旧的**Commit ID**并不会产生新的Review任务。所以在使用Gerrit进行代码审查的场景下，并不会增加无效的Review任务。
 
-  - **Change-ID**：Gerrit针对每一个Review任务，引入了一个Change-ID，每一个提交上传到Gerrit，都会对应到一个Change-ID， 为了区分于Commit-ID，Gerrit设定Change-ID都是以大写字母 “I” 打头的。 
+  - **Change-ID**：Gerrit针对每一个Review任务，引入了一个Change-ID，每一个提交上传到Gerrit，都会对应到一个Change-ID， 为了区分于Commit-ID，Gerrit设定Change-ID都是以大写字母 “I” 打头的。
     Change-ID与Commit-ID并非一一对应的，每一个Commit-ID都会关联到一个Change-ID，但Change-ID可以关联到多个Commit-ID
 
   - **Patch-Set**：当前需要Review的改动内容。一个Change-ID关联多个Commit-ID，就是通过Patch-Set来表现的，当通过git commit --amend命令修正上一次的提交并上传时，

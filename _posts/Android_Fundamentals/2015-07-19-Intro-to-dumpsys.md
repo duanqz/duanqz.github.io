@@ -5,7 +5,6 @@ title: dumpsys介绍
 tagline:
 tags:  Android调试
 ---
-{% include JB/setup %}
 
 # 1. 概要
 
@@ -128,7 +127,7 @@ Android中，所有的系统服务都是**Binder**的子类，**Binder**作为�
 
 - Android中的系统服务，譬如ActivityManagerService, PackageManagerService， BatteryStatsService等都是运行在**system_server**这个进程中，
   在Android启动的时候，就会按照系统服务的重要性，按序来启动这些的系统服务，它们作为服务端，为整个Android系统提供服务支撑。
-  
+
 - Android中的应用程序是运行在独立的进程中的，如过某个应用程序需要使用系统服务，则需要发起跨进程调用(Remote Procedure Call， RPC),应用程序将作为客户端，
   与系统服务进行数据交换。
 
@@ -183,4 +182,4 @@ protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
 目前，已经有一些工具，对`dumpsys`的输出内容进行解析，并作图形化的展示，便于系统开发人员分析问题。例如：
 
 - [Battery Historian](https://github.com/google/battery-historian) 分析**batterystats**这个系统服务的dumpsys输出，生成HTML页面
-- [Android Log Suite](https://github.com/duanqz/androidlogsuite) 
+- [Android Log Suite](https://github.com/duanqz/androidlogsuite)

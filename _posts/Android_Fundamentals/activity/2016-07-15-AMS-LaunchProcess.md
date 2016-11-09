@@ -5,7 +5,6 @@ title: ActivityManagerService的启动过程
 tagline:
 tags:  [Android系统服务]
 ---
-{% include JB/setup %}
 
 # 1. 概览
 

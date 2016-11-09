@@ -5,7 +5,6 @@ title: 电量统计(1)-原理
 tagline: batterystats
 tags: 日志分析
 ---
-{% include JB/setup %}
 
 说明：本文的代码以**android-5.1.1_r8**为蓝本，代码的在线网址是<{{ site.android_source }}/>
 
@@ -142,7 +141,7 @@ wifi.on, wifi.active, wifi.scan分别表示wifi模块在打开、工作和扫描
 
 - **Android如何计算耗电量？** 并不是直接跟踪电流消耗量，而是采用“单位时间电流量(I)×使用时间(t)”来做近似计算。不同硬件模块的单位时间电流量是需要厂商给定的。
 
-  
+
 # 3. 电量统计服务的工作过程
 
 电量统计包含几个重要的功能：信息收集、信息存储和电量计算。
@@ -314,7 +313,7 @@ private void processAppUsage(SparseArray<UserHandle> asUsers) {
     final double mobilePowerPerMs = getMobilePowerPerMs();
     final double wifiPowerPerPacket = getWifiPowerPerPacket();
     ...
-    
+
     // 对一个UID进行电量统计， UID几乎可以等同于一个应用程序
     SparseArray<? extends Uid> uidStats = mStats.getUidStats();
     final int NU = uidStats.size();
@@ -340,7 +339,7 @@ private void processAppUsage(SparseArray<UserHandle> asUsers) {
 
 - 最后，我们来总结一下应用程序的电量计算过程。Android通过一个名为**BatteryStats.Uid**的数据结构来维护一个应用程序的电量统计信息。
   这个数据结构中，又包含很多子结构：
-  
+
   - Proc：表示属于Uid的进程，一个Uid中可能会有多个进程，每个进程都有CPU占用时间
   - WakeLock：表示Uid持有的WakeLock锁的电量统计，一个Uid也可能会持有多个锁
   - Mobile Raido：表示Uid使用数据流量的电量统计，譬如3G流量、4G流量

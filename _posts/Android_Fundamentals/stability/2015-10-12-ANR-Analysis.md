@@ -5,7 +5,6 @@ title: ANR机制以及问题分析
 tagline:
 tags:  Android调试 稳定性
 ---
-{% include JB/setup %}
 
 # 1. 概览
 

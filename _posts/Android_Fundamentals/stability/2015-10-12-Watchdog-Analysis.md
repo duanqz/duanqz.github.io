@@ -5,7 +5,6 @@ title: Watchdog机制以及问题分析
 tagline:
 tags:  Android调试 稳定性
 ---
-{% include JB/setup %}
 
 # 1. 概览
 
@@ -50,7 +49,7 @@ private Watchdog() {
 }
 {% endhighlight %}
 
-两类**HandlerChecker**的侧重点不同，**Monitor Checker**预警我们不能长时间持有核心系统服务的对象锁，否则会阻塞很多函数的运行; 
+两类**HandlerChecker**的侧重点不同，**Monitor Checker**预警我们不能长时间持有核心系统服务的对象锁，否则会阻塞很多函数的运行;
 **Looper Checker**预警我们不能长时间的霸占消息队列，否则其他消息将得不到处理。这两类都会导致系统卡住(System Not Responding)。
 
 ## 2.2 添加Watchdog监测对象
@@ -288,7 +287,7 @@ Watchdog告诉我们**Monitor Checker**超时了，具体在哪呢？ 名为**an
 
 1. WindowManagerService实现了Watchdog.Monitor这个接口，并将自己作为**Monitor Checker**的对象加入到了Watchdog的监测集中
 
-2. monitor()方法是运行在**android.fg**线程中的。Android将**android.fg**设计为一个全局共享的线程，意味着它的消息队列可以被其他线程共享， 
+2. monitor()方法是运行在**android.fg**线程中的。Android将**android.fg**设计为一个全局共享的线程，意味着它的消息队列可以被其他线程共享，
    Watchdog的**Monitor Checker**就是使用的**android.fg**线程的消息队列。因此，出现**Monitor Checker**的超时，肯定是**android.fg**线程阻塞在monitor()方法上。
 
 我们打开system_server进程的traces，检索 **android.fg** 可以快速定位到该线程的函数调用栈：
@@ -418,9 +417,9 @@ Linux会从用户态切换到内核态，内核的函数调用栈也可以从tra
 - **[管道挂起的案例](http://blog.csdn.net/sj13051180/article/details/47865803)**
 
   管道是一个生产者-消费者模型，当缓冲区满时，则生产者不能往管道中再写数据了，需等到消费者读数据。如果消费者来不及处理缓冲区的数据，或者锁定缓冲区，则生产者就挂起了。
-  
+
   结合到例子中的场景，system_server进程无法往管道中写数据，很可能是dumpsys进程一直忙碌来不及处理新的数据。
-  
+
 接下来，需要再从日志中寻找dumpsys进程的运行状态了：
 
 - 是不是dumpsys进程的负载太高？
@@ -546,4 +545,3 @@ Android中Watchdog用来看护system_server进程，system_server进程运行着
 Watchdog的实现利用了锁和消息队列机制。当system_server发生死锁或消息队列一直处于忙碌状态时，则认为系统已经没有响应了(System Not Responding)。
 
 在分析Watchdog问题的时候，首先要有详尽的日志，其次要能定位出导致Watchdog超时的直接原因，最重要的是能还原出问题发生的场景。
-
