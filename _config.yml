@@ -30,6 +30,8 @@ production_url : https://duanqz.github.io
 # Android source code url
 android_source : https://android.googlesource.com
 
+gems: ["jekyll-sitemap"]
+
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
 JB :
