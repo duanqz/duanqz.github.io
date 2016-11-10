@@ -1,5 +1,7 @@
 {% include JB/is_production %}
 
+{% include JB/analytics-providers/baidu %}
+
 {% if is_production and site.JB.analytics.provider and page.JB.analytics != false %}
 
 {% case site.JB.analytics.provider %}
