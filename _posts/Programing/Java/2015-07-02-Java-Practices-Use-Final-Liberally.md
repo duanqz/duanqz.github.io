@@ -1,12 +1,10 @@
 ---
 layout: post
-category : 编程思想
+category : 编程
 title: Java的final关键字
-tagline: 
-tags : 编程
+tagline:
+tags : java final
 ---
-{% include JB/setup %}
-
 
 # final关键字的使用场景
 

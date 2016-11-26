@@ -1,9 +1,9 @@
 ---
 layout: post
-category : 编程思想
+category : 编程
 title: UML关联、聚合、组合关系的区别
 tagline: "Association, Aggregation, Composition"
-tags : 编程
+tags : UML依赖关系
 ---
 
 # 概要
@@ -31,7 +31,7 @@ tags : 编程
 
 {% highlight java %}
 class Employee { ... }
-    
+
 class Manager extends Employee { ... }
 {% endhighlight %}
 
