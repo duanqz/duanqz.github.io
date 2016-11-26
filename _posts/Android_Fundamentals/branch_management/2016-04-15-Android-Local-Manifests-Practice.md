@@ -6,6 +6,8 @@ tagline:
 tag: [LocalManifest,代码管理]
 ---
 
+本文介绍Android代码管理中的一种本地化定制机制：**Local Manifest**。Android使用`repo`来管来管理庞大的源码，`repo`所管辖的源码都记录在一个清单文件**manifest.xml**，**Local Manifest**是对**manifest.xml**的一种扩展。
+
 # 1. Android源码管理的清单
 
 为了便于管理多个git库，Android提供了一套Python脚本，称为`repo`[1]，它是全局管理Android源码的利器，Android系统开发的第一步就是获取源码，这时，就需要用到`repo`命令了：
