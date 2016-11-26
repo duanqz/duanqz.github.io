@@ -6,6 +6,8 @@ tagline:
 tags : java final
 ---
 
+final是Java语言中的修饰符，可以修饰类、方法、属性、函数入参、局部变量，意图表达被修饰对象的最终状态，即不可再被修改。
+
 # final关键字的使用场景
 
 使用**final**关键字一般有以下显示的作用：
@@ -30,10 +32,10 @@ tags : java final
 
 以下是一个**final**修饰符的使用实例：
 
-{% highlight java %}
+```java
 import java.util.*;
 import java.lang.reflect.Field;
-    
+
 /** 该类不能被继承. */
 public final class Boat {
 
@@ -42,12 +44,12 @@ public final class Boat {
         fLength = aLength;
 
         fDateManufactured = new Date(aDateManufactured.getTime());
-    
+
         // 以下两行代码会导致编译报错，因为对final修饰函数入参做了赋值操作
         //aDateManufactured = null;
         //aLength = 0;
     }
-        
+
     public Integer bestRaceScore(){
         // 返回值result，没有使用final修饰，因为返回值需要为调用者所用
         Integer result = Integer.valueOf(0); 
@@ -63,14 +65,14 @@ public final class Boat {
         }
         return result;
     }
-         
+
     // PRIVATE
     private final String fName;
     private final int fLength;
     private List<Integer> fRaceScores = new ArrayList<>();
     private final Date fDateManufactured;
 }
-{% endhighlight %}
+```
 
 **在早期的Java实现版本中，使用final方法的原因有两个。第一个原因是把锁定，以防任何继承类修改它的含义；第二个原因是效率，编译器会将final方法转为内嵌调用，节省函数调用的时间。
 但是函数调用时间一般不会成为性能瓶颈，当函数体过大时，内嵌调用带来的任何性能提升也是微乎其微的，所以，新的Java实现版本中，已经没有这项优化了。**
@@ -90,16 +92,15 @@ final修饰局部变量，相当于给编译器一个信号，与普通局部变
 
 具体可以看如下代码：
 
-{% highlight java %}
+```java
 final String final_str = "ABC";
 String common_str = "ABC";
 System.out.println(final_str == common_str); // 打印值为true
-    
+
 String combined_final_str = final_str + "D";
 String combined_common_str = common_str + "D";
 System.out.println(combined_final_str == combined_common_str); //打印值为false
-
-{% endhighlight %}
+```
 
 由于**final_str**在编译时就已经确定下来了，所以，在**combined_final_str**中，编译器直接将**final_str**替换成了字符串，存储到常量池中，所以**combined_final_str**的地址是指向常量池的。
 而**combined_common_str**变量的地址是需要运行时链接生成的，地址显然与**combined_final_str**变量的地址是不一样的。
@@ -110,7 +111,7 @@ System.out.println(combined_final_str == combined_common_str); //打印值为fal
 
 在Java内部类可以访问外围类的局部变量，这是内部类的一项特性，如下代码所示：
 
-{% highlight java %}
+```java
 public void test(final String outParam) {   // 必须通过final修饰形参
     final String outLocal = "ABC";          // 必须通过final修饰局部变量
     new Thread(){
@@ -120,7 +121,7 @@ public void test(final String outParam) {   // 必须通过final修饰形参
         };
     }.start();
 }
-{% endhighlight %}
+```
 
 局部变量是有生命周期的，**outParam和outLocal**的生命周期，伴随这test()方法结束而结束，但此时内部类的生命周期可能还未结束，要做到访问外围的生命周期有限的变量，Java想出了一套办法：**就是将这些变量拷贝到内部类的作用域中。**
 
