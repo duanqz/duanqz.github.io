@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: 一种Android多分支的自动合并方案
 tagline:
-tag: [多分支管理]
+tag: [代码管理]
 ---
 
 # 1. 背景

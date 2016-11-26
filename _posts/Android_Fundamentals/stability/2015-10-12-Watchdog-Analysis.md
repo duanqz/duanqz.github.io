@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: Watchdog机制以及问题分析
 tagline:
-tags:  Android调试 稳定性
+tags:  Watchdog机制
 ---
 
 # 1. 概览

@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: StrictMode机制以及使用场景
 tagline:
-tags:  Android调试 稳定性
+tags:  StrictMode机制
 ---
 
 # 1. 概览

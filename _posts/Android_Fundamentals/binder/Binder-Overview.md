@@ -1,11 +1,10 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: Binder概览
 tagline:
-tags:  [Android系统原理]
+tags:  [Binder机制]
 ---
-{% include JB/setup %}
 
 # 1. 前言
 

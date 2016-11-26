@@ -1,11 +1,10 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: Binder驱动
 tagline:
-tags:  [Android系统原理]
+tags:  [Binder机制]
 ---
-{% include JB/setup %}
 
 # 1. 概览
 
@@ -18,7 +17,7 @@ binder_update_page_range() 将进程的内核空间和用户空间针对同一�
 
 # 2. 数据结构
 
-binder_proc: 
+binder_proc:
 
 binder_node: BBinder
 
@@ -62,5 +61,3 @@ system/core/libsysutils/src/ServiceManager.cpp
 
 Driver层
 kernel/$OEM/drivers/android/binder.c
-
-

@@ -1,12 +1,10 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: OOM机制以及问题分析
 tagline:
-tags:  Android调试 稳定性
+tags:  OOM机制
 ---
 {% include JB/setup %}
 
 # 1. 概览
-
-

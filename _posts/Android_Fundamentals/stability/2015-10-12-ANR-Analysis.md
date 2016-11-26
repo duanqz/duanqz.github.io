@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: ANR机制以及问题分析
 tagline:
-tags:  Android调试 稳定性
+tags:  ANR机制
 ---
 
 # 1. 概览

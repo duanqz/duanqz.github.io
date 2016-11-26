@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: 电量统计(2)-日志
 tagline: batterystats
-tags:  日志分析
+tags:  [电量统计,日志分析]
 ---
 
 # 概要

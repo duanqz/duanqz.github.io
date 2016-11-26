@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: Selinux
 tagline:
-tags:  [selinux]
+tags:  [SELinux机制]
 ---
 {% include JB/setup %}
 

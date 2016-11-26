@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: 电量统计(1)-原理
 tagline: batterystats
-tags: 日志分析
+tags: [电量统计,日志分析]
 ---
 
 说明：本文的代码以**android-5.1.1_r8**为蓝本，代码的在线网址是<{{ site.android_source }}/>

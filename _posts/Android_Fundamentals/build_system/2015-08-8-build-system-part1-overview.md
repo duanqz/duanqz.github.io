@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: 编译系统(1)-概览
-tagline: 
-tags:  [编译系统]
+tagline:
+tags:  编译系统
 ---
 {% include JB/setup %}
 
@@ -142,7 +142,7 @@ $ lunch                     # 通过lunch来交互式的完成参数配置
 
   该文件需要置于Android源码的根目录，Android提供一个配置模板[build/buildspec.mk.default]({{ site.android_source }}/platform/build/+/master/buildspec.mk.default)，
   只需要将拷贝到根目录，重命名后，根据需要修改文件内容便可完成参数的配置。
-  
+
   **注**：支持这种文件配置的方式来完成初始化，是考虑到有些固定的编译场景，不需要每次都重复运行**envsetup.sh**脚本来配置相同的参数。
 
 ### 3.1.1 产品级(Product)的参数配置
@@ -151,13 +151,13 @@ $ lunch                     # 通过lunch来交互式的完成参数配置
 
 - **TARGET_PRODUCT**：目标产品。这个参数的取值来自于一个具体产品的定义，通常位于**device/[manufacture]/[product]**下的**AndroidProducts.mk**文件中，
   通过**PRODUCT_MAKEFILES**这个属性来汇集所有产品级别的配置，包括产品名称**PRODUCT_NAME**，产品品牌**PRODUCT_BRAND**等。产品名称**PRODUCT_NAME**实际上就对应到了**TARGET_PRODUCT**。
-  
+
   Android 5.0.1提供了一些默认的目标产品：aosp_arm、aosp_arm64、aosp_mips、aosp_mips64、aosp_x86、aosp_x86_64，分别表示arm, mips, x86上32位和64位的产品类型。
   到Android实际支持的机型，就有aosp_hammerhead, aosp_manta,分别表示LGE Nexus 5和SAMSUNG 4S。
 
 - **TARGET_BUILD_VARIANT**：目标产品的版本。每一个模块都可以通过**LOCAL_MODULE_TAGS**这个参数来标记自己，可选的标记值有user, debug, eng, tests, optional, 或samples。
   设定目标产品的类型，就能筛选出指定标记的模块，只将符合要求的模块编译打包到最终的产品中去。
-  
+
   **TARGET_BUILD_VARIANT**有以下取值，除了筛选模块，还有一些调试级别的差异：
 
   - **eng**：对应到工程版。编译打包所有模块。同时ro.secure=0， ro.debuggable=1， ro.kernel.android.checkjni=1，表示adbd处于ROOT状态，所有调试开关打开
@@ -227,7 +227,7 @@ Android编译系统的设计理念是将模块级别的配置独立出来，每�
 最终**Makefile**文件中仅仅引入了*main.mk*, *main.mk*位于*build/core*目录，望文生意，这就表示已经进入Android编译系统最为核心的部分了，*main.mk*会做编译环境检查，定义最重要的编译目标(droid)，**依次**引入其他功能片段:
 
 - *help.mk*，最优先引入的片段，文件内容很简单，就是定义了一个名为**help**的目标，通过输入`make help`命令，就可以看到该目标的输出结果是一些最主要的**make**目标的帮助信息。
-  
+
 - *config.mk*，文件内容很庞大，目的就是为了配置编译环境。该文件定义了用于其他模块编译的常量(BUILD_JAVA_LIBRARY, CLEAR_VARS等)，也定义了编译时所依赖工具的本地路径(aapt, minigzip等)，同时也会引入与基于机型配置相关的其他片段(BoardConfig.mk, AndroidProducts.mk等)。
 
 - *cleanbuild.mk*，定义了**installclean**这个编译目标，不同于**clean**，执行`make installclean`的时候，并不会完整的删除*out/*目录，而是仅仅删除与当前**TARGET_PRODUCT, TARGET_BUILD_VARIANT, PRODUCT_LOCALES**这属性关联到的编译产出。通俗一点来说，就是删除*out/target/product/*目录下本次机型编译的产物，*out/host*目录下的文件是保留下来的。

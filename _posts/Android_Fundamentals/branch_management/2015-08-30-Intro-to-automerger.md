@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: AOSP代码管理
 tagline:
-tag: [代码管理]
+tag: [分支合并,代码管理]
 ---
 
 # 1. 概要

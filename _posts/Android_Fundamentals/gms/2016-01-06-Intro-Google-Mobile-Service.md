@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: GMS(Google Mobile Services)介绍
 tagline:
-tag: []
+tag: GMS
 ---
 
 

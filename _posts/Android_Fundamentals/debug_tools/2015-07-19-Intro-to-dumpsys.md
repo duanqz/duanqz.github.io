@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: dumpsys介绍
 tagline:
-tags:  Android调试
+tags:  dumpsys Android工具
 ---
 
 # 1. 概要

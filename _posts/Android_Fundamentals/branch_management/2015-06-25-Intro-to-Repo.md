@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Repo介绍
-category: Android系统原理
+category: Android启智观
 tagline: Repo
-tags: 代码管理
+tags: [repo,代码管理,Android工具]
 ---
 
 阅读本文之前，需要对git有一定的了解。
@@ -153,7 +153,7 @@ $ repo --trace init -u $URL -b $BRANCH -m $MANIFEST
   cd ..
   git checkout $BRANCH -- .
   cd ..
-  ln -s manifests/$MANIFEST manifest.xml 
+  ln -s manifests/$MANIFEST manifest.xml
 {% endhighlight %}
 
 首先，在当前目录下创建.repo子目录，后续所有的操作都在.repo子目录下完成;
@@ -339,15 +339,15 @@ CyanogenMod(CM)适配了上百款机型，不同机型所涉及到的git库很�
 <manifest>
     <!-- add github as a remote source -->
     <remote name="github" fetch="git://github.com" />
-     
+
     <!-- remove aosp standard projects and replace with cyanogenmod versions -->
     <remove-project name="platform/bootable/recovery" />
     <remove-project name="platform/external/yaffs2" />
     <remove-project name="platform/external/zlib" />
     <project path="bootable/recovery" name="CyanogenMod/android_bootable_recovery" remote="github" revision="cm-10.1" />
     <project path="external/yaffs2" name="CyanogenMod/android_external_yaffs2" remote="github" revision="cm-10.1" />
-    <project path="external/zlib" name="CyanogenMod/android_external_zlib" remote="github" revision="cm-10.1" /> 
-     
+    <project path="external/zlib" name="CyanogenMod/android_external_zlib" remote="github" revision="cm-10.1" />
+
     <!-- add busybox from the cyanogenmod repository -->
     <project path="external/busybox" name="CyanogenMod/android_external_busybox" remote="github" revision="cm-10.1" />
 
@@ -420,7 +420,7 @@ $ repo start BRANCH --all
 {% highlight console %}
 $ repo upload
 {% endhighlight %}
- 
+
 不用担心会漏提交或者误提交，upload会提供一个交互界面，开发人员选择需要提交的git库和分支即可。
 
 如果需要省去Gerrit上填写reviewer的操作，可以使用**--reviewer**参数指定Reviewer的邮箱地址：
@@ -448,4 +448,3 @@ $ repo forall -c "git branch | grep tmp | xargs git branch -D; git branch"
 {% endhighlight %}
 
 参数**-c**指定的命令序列可以很复杂，多条命令只需要用“;”间隔。
-

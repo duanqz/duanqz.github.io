@@ -1,9 +1,9 @@
 ---
 layout: post
-category: Android系统原理
+category: Android启智观
 title: Android Local Manifests机制的使用实践
 tagline:
-tag: 代码管理
+tag: [LocalManifest,代码管理]
 ---
 
 # 1. Android源码管理的清单
