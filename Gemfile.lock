@@ -1,0 +1,67 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.5.0)
+      public_suffix (~> 2.0, >= 2.0.2)
+    celluloid (0.16.0)
+      timers (~> 4.0.0)
+    colorator (1.1.0)
+    ffi (1.9.8)
+    forwardable-extended (2.6.0)
+    hitimes (1.2.2)
+    jekyll (3.3.0)
+      addressable (~> 2.4)
+      colorator (~> 1.0)
+      jekyll-sass-converter (~> 1.0)
+      jekyll-watch (~> 1.1)
+      kramdown (~> 1.3)
+      liquid (~> 3.0)
+      mercenary (~> 0.3.3)
+      pathutil (~> 0.9)
+      rouge (~> 1.7)
+      safe_yaml (~> 1.0)
+    jekyll-minimagick (0.0.3)
+      jekyll (>= 0.10.0)
+      mini_magick (>= 3.3)
+    jekyll-sass-converter (1.3.0)
+      sass (~> 3.2)
+    jekyll-sitemap (0.8.1)
+    jekyll-watch (1.2.1)
+      listen (~> 2.7)
+    kramdown (1.7.0)
+    liquid (3.0.6)
+    listen (2.10.0)
+      celluloid (~> 0.16.0)
+      rb-fsevent (>= 0.9.3)
+      rb-inotify (>= 0.9)
+    mercenary (0.3.5)
+    mini_magick (4.5.1)
+    pathutil (0.14.0)
+      forwardable-extended (~> 2.6)
+    posix-spawn (0.3.11)
+    public_suffix (2.0.4)
+    pygments.rb (0.6.3)
+      posix-spawn (~> 0.3.6)
+      yajl-ruby (~> 1.2.0)
+    rb-fsevent (0.9.4)
+    rb-inotify (0.9.5)
+      ffi (>= 0.5.0)
+    rouge (1.11.1)
+    safe_yaml (1.0.4)
+    sass (3.4.13)
+    timers (4.0.1)
+      hitimes
+    yajl-ruby (1.2.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  jekyll (~> 3.1)
+  jekyll-minimagick
+  jekyll-sitemap
+  mini_magick
+  pygments.rb
+
+BUNDLED WITH
+   1.13.6
