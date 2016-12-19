@@ -981,11 +981,13 @@ Android中，有**权限持有者**和**权限申请者**两个角色，一个An
 
 以上这些权限的持有者其实就是**framework-res.apk**，这个APK的签名是**platform**，运行在系统进程(system_process)之中，可以理解为系统权限，几乎所有应用都要申请其中若干项权限。当然，一个应用可以自定义权限，设计其权限保护级别，供其他申请者所用。
 
-有了上面的权限级别限制，就可以理解，部分权限需要申请者满足一定的条件才能被授予，最终授予的权限有两种类型：
+有了上面的权限级别限制，就可以理解，部分权限需要申请者满足一定的条件才能被授予，从Android M(6.0)开始，对最终授予的权限进行了分类：
 
 - **install**：安装时授予的权限。**normal**、**signature**、**signatureOrPrivilege**的授予都属于这一类。
 
 - **runtime**：运行时由用户决定是否授予的权限。在Android M(6.0)以前，**dangerous**的权限属于**install**类型，但从Android M(6.0)以后，**dangerous**的权限改为属于**runtime**一类了。在使用这类权限时，会弹出一个对话框，让用户选择是否授权。
+
+**注意**，授权类型是**Android M(6.0)**才引进的，之前只有是否授权的区分。之所以做授权类型的区分，是为了适应多用户使用的场景，**install**类型的授权，对所有用户都是一样的；**runtime**类型的授权，不同用户使用的选择不一样，譬如一个用户在使用的会授予某个应用访问联系人数据的权限，但另一个用户使用时会选择拒绝授权。
 
 在深入分析应用授权的逻辑之前，我们先介绍一下授权机制涉及到的数据结构：
 
@@ -1010,31 +1012,381 @@ Android中，有**权限持有者**和**权限申请者**两个角色，一个An
 在包扫描完成以后，PMS会调用**updatePermissionsLPw()**函数，来更新所有APK的授权状态。
 
 ```java
+private void updatePermissionsLPw(String changingPkg,
+        PackageParser.Package pkgInfo, int flags) {
+    ... // 此处省略大段逻辑。需要删除没有归属的BasePermission，
+    // 如果一个BasePermission找不到其关联的包，则需要删除之
+
+    // 遍历包扫描的结果，依次对每个包进行授权。
+    // PMS初始化调用该函数时，传入的pkgInfo为null。
+    if ((flags&UPDATE_PERMISSIONS_ALL) != 0) {
+        for (PackageParser.Package pkg : mPackages.values()) {
+            if (pkg != pkgInfo) {
+                grantPermissionsLPw(pkg, (flags&UPDATE_PERMISSIONS_REPLACE_ALL) != 0,
+                        changingPkg);
+            }
+        }
+    }
+
+    if (pkgInfo != null) {
+        grantPermissionsLPw(pkgInfo, (flags&UPDATE_PERMISSIONS_REPLACE_PKG) != 0, changingPkg);
+    }
+}
+```
+
+该函数的调用场景比较多，譬如安装、卸载、更新系统应用时，都会调用到。此处分析流程是处于PMS构造时调用的，在开机扫描完所有的包后，便会掉用该函数，一次性来更新所有包的权限。
+
+其实，该函数仅仅是完成授权的准备工作，需要保证所有的扫描出来的权限都有归属，才能开始授权。真正的授权函数是**grantPermissionsLPw()**，带上**LP**后缀表示需要获取**mPackages**这个锁，多了一个**w**表示需要对**mPackages**进行写操作。
+
+```java
 private void grantPermissionsLPw(PackageParser.Package pkg, boolean replace,
         String packageOfInterest) {
+    // 1. 初始化授权相关的数据
     final PackageSetting ps = (PackageSetting) pkg.mExtras;
     if (ps == null) {
         return;
     }
-    // 申请者的授权状态PermissionState
+    // 申请者的授权状态PermissionsState，在后文的逻辑中，会以origPermissions这个变量来表示
     PermissionsState permissionsState = ps.getPermissionsState();
     PermissionsState origPermissions = permissionsState;
+    ...
+    if (replace) {
+        // 如果replace为true，表示包权限需要更新
+        // PackageSettings.installPermissionsFixed这个布尔变量表示
+        // 包的**install**类型的权限已经确定下来，在安装成功后，该变量会被置为true
+        // 此处，需要重新更新权限，故又将其置为false
+        ps.installPermissionsFixed = false;
+        if (!ps.isSharedUser()) {
+            origPermissions = new PermissionsState(permissionsState);
+            permissionsState.reset();
+        }
+    }
+    ...
+    // 2. 遍历所有申请的权限，依次判断是否授权
+    final int N = pkg.requestedPermissions.size();
+    for (int i=0; i<N; i++) {
+        // name表示待申请的权限名
+        final String name = pkg.requestedPermissions.get(i);
+        // bp表示待申请权限的数据结构，bp根据name从已有的权限列表中获取的
+        final BasePermission bp = mSettings.mPermissions.get(name);
+        if (bp == null || bp.packageSetting == null) {
+            // 如果没有匹配到bp，则说明当前系统中还不存在name指定的权限
+            if (packageOfInterest == null || packageOfInterest.equals(pkg.packageName)) {
+                Slog.w(TAG, "Unknown permission " + name
+                        + " in package " + pkg.packageName);
+            }
+            continue;
+        }
+
+        final String perm = bp.name;
+        boolean allowedSig = false;
+        int grant = GRANT_DENIED;
+        ...
+        // 根据所申请权限的保护级别，确定授权类型
+        final int level = bp.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE;
+        switch (level) {
+            case PermissionInfo.PROTECTION_NORMAL: {
+                grant = GRANT_INSTALL;
+            } break;
+
+            case PermissionInfo.PROTECTION_DANGEROUS: {
+                if (pkg.applicationInfo.targetSdkVersion <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    grant = GRANT_INSTALL_LEGACY;
+                } else if (origPermissions.hasInstallPermission(bp.name)) {
+                    grant = GRANT_UPGRADE;
+                } else if (mPromoteSystemApps
+                        && isSystemApp(ps)
+                        && mExistingSystemPackages.contains(ps.name)) {
+                    grant = GRANT_UPGRADE;
+                } else {
+                    grant = GRANT_RUNTIME;
+                }
+            } break;
+
+            case PermissionInfo.PROTECTION_SIGNATURE: {
+                allowedSig = grantSignaturePermission(perm, pkg, bp, origPermissions);
+                if (allowedSig) {
+                    grant = GRANT_INSTALL;
+                }
+            } break;
+        }
+
+        // 3. 根据授权类型，更新包的PermissionsState
+        if (grant != GRANT_DENIED) {
+            // 小插曲，对于Data分区的应用而言，原则上是不会授予新的install类型的权限
+            if (!isSystemApp(ps) && ps.installPermissionsFixed) {
+                if (!allowedSig && !origPermissions.hasInstallPermission(perm)) {
+                    if (!isNewPlatformPermissionForPackage(perm, pkg)) {
+                        grant = GRANT_DENIED;
+                    }
+                }
+            }
+
+            switch (grant) {
+                case GRANT_INSTALL: {
+                    // 收回所有已授予的runtime权限。因为runtime可能在新版本中变成install类型
+                    // runtime是面向多用户的，所以涉及到runtime授权时，都会有一个循环遍历所有的用户
+                    for (int userId : UserManagerService.getInstance().getUserIds()) {
+                        if (origPermissions.getRuntimePermissionState(
+                                bp.name, userId) != null) {
+                            origPermissions.revokeRuntimePermission(bp, userId);
+                            origPermissions.updatePermissionFlags(bp, userId,
+                                  PackageManager.MASK_PERMISSION_FLAGS, 0);
+                            changedRuntimePermissionUserIds = ArrayUtils.appendInt(
+                                    changedRuntimePermissionUserIds, userId);
+                        }
+                    }
+                    // 授予install类型的权限
+                    if (permissionsState.grantInstallPermission(bp) !=
+                            PermissionsState.PERMISSION_OPERATION_FAILURE) {
+                        changedInstallPermission = true;
+                    }
+                } break;
+
+                case GRANT_INSTALL_LEGACY: {
+                    if (permissionsState.grantInstallPermission(bp) !=
+                            PermissionsState.PERMISSION_OPERATION_FAILURE) {
+                        changedInstallPermission = true;
+                    }
+                } break;
+
+                case GRANT_RUNTIME: {
+                    for (int userId : UserManagerService.getInstance().getUserIds()) {
+                        PermissionState permissionState = origPermissions
+                                .getRuntimePermissionState(bp.name, userId);
+                        final int flags = permissionState != null
+                            ? permissionState.getFlags() : 0;
+                        if (origPermissions.hasRuntimePermission(bp.name, userId)) {
+                            if (permissionsState.grantRuntimePermission(bp, userId) ==
+                                    PermissionsState.PERMISSION_OPERATION_FAILURE) {
+                                changedRuntimePermissionUserIds = ArrayUtils.appendInt(
+                                    changedRuntimePermissionUserIds, userId);
+                            }
+                        }
+                        permissionsState.updatePermissionFlags(bp, userId, flags, flags);
+                }
+               } break;
+
+               case GRANT_UPGRADE: {
+                   // 先回收之前授予的install权限，再重新授予runtime权限
+                   ...
+               }
+
+               default: {
+                   // 如果进入这个分支，表示并没有拒绝授权，但权限又没有真正授予给申请者
+                   // 因为当时申请的权限还不存在，即便后来有了待申请的权限，也不会授予给申请者
+                   if (packageOfInterest == null
+                           || packageOfInterest.equals(pkg.packageName)) {
+                       Slog.w(TAG, "Not granting permission " + perm
+                               + " to package " + pkg.packageName
+                               + " because it was previously installed without");
+                   }
+               } break;
+           }
+       else {
+           // 拒绝授权，则需要回收已经授予的权限
+           ...
+       }
+    }
+    if ((changedInstallPermission || replace) && !ps.installPermissionsFixed &&
+            !isSystemApp(ps) || isUpdatedSystemApp(ps)){
+        ps.installPermissionsFixed = true;
+    }
+    for (int userId : changedRuntimePermissionUserIds) {
+        mSettings.writeRuntimePermissionsForUserLPr(userId, false);
+    }
 }
 ```
 
-## 系统就绪
+先从整体来思考一下这个函数，该函数完成对一个包授权，接收三个输入参数：
 
-systemReady()
+函数参数 | 说明
+--- | ---
+**pkg** | 包解析器解析出来的对象PackageParser.Package。这就是待授权的包。
+**replace** | 是否需要替换已有包的权限。初始化PMS时，如果不是OTA升级系统版本，则该参数为false。
+**packageOfInterest** | 感兴趣的包，主要是为了打印日志。不影响函数的主体逻辑。
+
+在调用这个函数之前，所有包的信息都写入了PMS的Settings中，每一个包都有一个**PermissionsState**对象，用于记录授权状态。在调用这个函数之后，包的**PermissionsState**对象的数据会更新。该函数其实就是Android的包授权规则的实现函数，要更新的数据就是**PermissionsState**对象。授权规则体现在函数的逻辑中：
+
+1. 初始化授权相关的数据：
+
+    - **origPermissions**：表示一个包已有的授权状态，包扫描完后，这个数据结构就已经构建完毕了。
+    - **changedRuntimePermissionUserIds**：表示已经授予的**runtime**类型的权限发生了变化的那些用户。
+    - **changedInstallPermission**：表示已经授予的**install**类型的权限发生的变化，默认为false。
+    - **PackageSettings.installPermissionsFixed**: 表示包的**install**类型的权已经确定。如果传入的函数参数**replace**为true，则意味着需要对**install**类型的授权进行调整，故会将此变量重新置为false。
+
+2. 遍历所有申请的权限，根据所申请权限的保护级别(protectionLevel)，会得到几种结果：
+
+    - **GRANT_INSTALL**：对于Normal级别的权限而言，都是在安装时授予给申请者的。对于Signature级别的权限，如果签名匹配或者满足Previlege系统应用的要求，则也是在安装时授予给申请者的。
+
+    - **GRANT_INSTALL_LEGACY**：带上**LEGACY**表示这属于遗留的安装权限，在Android M(6.0)之前，Dangerous级别的权限都是授予**install**类型，到Android M(6.0)之后，Dangerous级别的权限都是以**runtime**类型来授予。这是Android为了保证向下兼容的设计：对于一个应用程序而言，如果是基于Android M(6.0)之前的SDK进行开发，而且申请了Dangerous级别的权限，这一类权限就是以**GRANT_INSTALL_LEGACY**类型来授予。
+
+    - **GRANT_UPGRADE**: 与**GRANT_INSTALL_LEGACY**一样，也是为了向下兼容。如果应用程序没有指明一定要运行在Android M(6.0)以前的版本，那申请的Dangerous级别的权限，将会以**GRANT_UPGRADE**来授权，表示对于Dangerous权限，之前授权为**install**类型的，已经记录在PMS的Settings中，现在整个系统通过OTA升级到Android M(6.0)了，需要将**install**类型的授权升级为**runtime**类型。
+
+    - **GRNAT_RUNTIME**：如果运行在Android M(6.0)上的应用程序申请了Dangerous权限，则以**runtime**类型来授权。
+
+    - **GRANT_DENIED**：拒绝授权。有两大类情况会拒绝授权：其中一类是申请保护级别为SignatureOrPrivelege的权限，但不满足签名匹配或为系统应用的约束条件，则拒绝授权。另一类，在下文中见。
+
+3. 根据授权类型来更新授权状态PermissionsState。如果需要授予权限，则会根据授权类型区别对待，最开始初始化的两个变量changedInstallPermission和changedRuntimePermissionUserIds在这一个步骤中可能会被更新。
+
+    如果拒绝授权，则需要收回。这里就出现了另一类拒绝授权的场景：对于一个Data分区的普通应用而言，之前申请的权限不存在，但现在申请的权限又有了，则仍然拒绝授权给这个普通应用，除非这个普通应用申请的权限时平台新增的权限。这一点，其实不难理解，譬如一个普通应用A，申请了普通应用B定义的权限，A先于B安装，那么，在A安装的时候，所申请的权限还不存在。B安装以后，即便权限有了，也不会再重新授予给A。如果普通应用A申请的是一个Android平台自身添加的权限，则会授予。
+
+> 如果读者还没有接触到Android M(6.0)之后的代码，那应用授权机制还不至于这么复杂，因为Android M(6.0)对扩展了授权类型，并做了大量向下兼容的设计。所以，这段代码读起来总是不那么利索。其实，越往Android高版本学习，就越能看到这些向下兼容的代码，设计上总是不那么优美，但又无处不体验向下兼容的精神。
+>
+> 没有一个系统一开始就兼顾到了所有后续发展策略，绝对的优美设计或许只是停留在一个时间段。或许更加好的，只是那些活下来的、不断发展的代码。
 
 
-# 包查询服务
+# 4 包查询服务
+
+在管理所有包的同时，包管理者需要对外提供服务，诸如获取包的信息、安装或删除包、解析Intent等，都是包管理者在Android世界的职能。
+
+本节先介绍包管理者的服务方式，再分析一个最常见的包查询实例。
+
+## 4.1 服务方式
+
+包管理者以什么形式对外提供服务呢？在写应用程序时，我们通常会利用应用自身的上下文环境Context来获取包管理服务：
+
+```java
+// 获取一个PackageManager的对象实例
+PackageManager pm = context.getPackageManager();
+// 通过PackageManager对象获取指定包名的包信息
+PackageInfo pi = pm.getPackageInfo("com.android.contacts", 0);
+```
+
+这么一段简单的代码，其实蕴含着很多深意：
+
+1. 前文介绍的PMS和其管理的各种数据结构，都是运行在系统进程之中。在应用进程中获取的PackageManager对象，只是PMS在应用进程中的一个代理，不同的应用进程都不同的代理，意味着不同应用进程中的PackageManager对象是不同的，但管理者PMS只有一个。
+
+2. 运行在应用进程中的PackageManager要与运行在系统进程中的PMS进行通信，通信的手段是什么吗？自然是Android中最常见的Binder机制。因此，会有一个IPackageManager.aidl文件，用于描述两者通信的接口。
+另外，应用进程中的PackageInfo对象，在上文分析“包信息体”的时候，我们已经见过它，还记得吗？包解析后，需要跨进程传递的数据结构都实现了Parcelable接口，PackageInfo其实就是由系统进程传递到应用进程的对象。
+
+不同应用进程通过Binder机制与PMS通信的过程如下图：
+
+<div align="center"><img src="/assets/images/packagemanager/8-packagemanager-ipackagemanager-aidl.png" alt="PMS Binder Transaction"/></div>
+
+PMS作为包管理的最核心组成部分，伴随着系统的启动而创建，并一直运行系统进程中。当应用程序需要获取包管理服务时，会生成一个PackageManager对象与PMS进行通信。在包解析时就会生成包信息，即XXXInfo这一类数据结构，PMS会将这些数据传递给需要的应用进程。
+
+> 管理者对内设计了复杂的管理机制，对外封装了简单的使用接口。这种设计在Android中大量出现，ActivityManagerService、WindowManagerService、PowerManagerService等，基本所有的系统服务都遵循这种设计规范。对于应用程序而言，不需要关心管理者的实现原理，只需要理解接口的使用场景。
+
+应用进程通过Binder接口获取包管理服务，这仅仅是包管理者提供服务的概貌，接下来可以更深入地思考一个问题：通过Context就能获取到PackageManager，那么PackageManager对象是如何生成到应用进程的运行环境中去的呢？我们通过源码来回答。
+
+**Context.getPackageManager()**函数的实现如下：
+
+```java
+// frameworks/base/core/java/android/app/ContextImpl.java
+public PackageManager getPackageManager() {
+    if (mPackageManager != null) {
+        return mPackageManager;
+    }
+
+    // 从ActivityThread获取了PackageManager对象
+    IPackageManager pm = ActivityThread.getPackageManager();
+    if (pm != null) {
+        // 通过ApplicationPackageManager对进行了一层封装
+        return (mPackageManager = new ApplicationPackageManager(this, pm));
+    }
+
+    return null;
+}
+```
+
+**ActivityThread.getPackageManager()**函数实现如下：
+
+```java
+// frameworks/base/core/java/android/app/ActivityThread.java
+public static IPackageManager getPackageManager() {
+    if (sPackageManager != null) {
+        return sPackageManager;
+    }
+    // 早在系统进程(SystemServer)启动PMS时，就将PMS添加到了系统服务中
+    // 因此，通过ServiceManager便可以获取到包服务。
+    IBinder b = ServiceManager.getService("package");
+    sPackageManager = IPackageManager.Stub.asInterface(b);
+    return sPackageManager;
+}
+```
+
+通过Context获取PackageManager最终得到的对象是ApplicationPackageManager，它是PackageManager的子类，其实就是对PackageManager的一个封装，目的是为了方便应用程序编程。
+
+**现在，可以完整的梳理一下包管理的服务方式了：**
+
+1. 全局定义了**IPackageManager**接口，描述了包管理者对外提供的功能；运行在系统进程中的PMS实现了**IPackageManager**接口，作为包管理的服务端；客户端通过**IPackageManager**接口请求包服务；
+
+2. 为了方便客户端使用包服务，Android做了多层封装。应用进程作为客户端，通过**PackageManager**便可使用包服务，客户端实际存在的对象是**ApplicationPackageManager**，它封装了**IPackageManager**的所有接口；
+
+3. **在应用进程看来，客户端和服务端的概念是模糊的，明确的只有运行环境的概念，即Context。包服务就存在于应用进程的运行环境中，需要时直接拿出来使用即可**。
+
+> “运行环境(Context)”是Android的设计哲学之一，Android有意弱化进程，强化运行环境，这是面向应用开发者的设计。运行环境是什么并不是一个好回答的问题，可以将其类比为我们的工作环境，当我们需要办公设备时，只需要向管理部门申请，并不需要关心办公设备如何采购，办公设备对一般的工作人员而言，就像是工作环境中天然存在的东西。
+
+## 4.2 Intent的解析
+
+Android中，使用Intent来表达意图，最终会有一个响应者。当系统产生一个Intent后，如何找到它的响应者呢？这需要对Intent进行解析。作为所有包信息管理者的中枢，PMS自然有义务承担解析Intent的责任。要解析Intent，就需要先了解Intent的结构，标识一个Intent身份的信息由两部分构成：
+
+- **主要信息**：Action和Data。Action用于表明Intent所要执行的操作，譬如ACTION_VIEW，ACTION_EDIT; Data用于表明执行操作的数据，譬如联系人数据，数据是以URI来表达的。再举两个Action和Data成对出现的例子：
+
+    ACTION_VIEW: content://contacts/people/1  # 表示查看联系人数据库中，ID为1的联系人信息
+
+    ACTION_DIAL: tel:119    # 表示拨打电话给119
+
+    以上例子中的URI并不一样，完整的URI格式为`scheme://host:port/path`。
+
+- **次要信息**：除了主要的标记信息，Intent还可以附加很多额外的信息，Category，Type，Component和Extra：
+
+	- Category表示Intent的类别，譬如CATEGORY_LAUNCHER表示要对属于桌面图标这一类的对象执行操作；
+	- Type表示Intent所操作的数据类型，就是MIMEType，譬如要操作PNG图片，那Type就可以设置为*png*；
+	- Component表示Intent要操作的对象；
+	- Extra表示Intent所传递的数据，这些数据都实现了Parcelable接口。
+
+Intent的身份信息，其实就是Android的一种设计语言，譬如“打电话给119”，只需要发出Action为*ACTION_DIAL*，URI为*tel:119*的Intent即可，剩下的就交由Android系统去理解这个意图。任何组件只要按照规则发声，都会被Android系统正确的理解。
+
+根据解析Intent方式的不同，可以将Intent分为两类：
+
+- **显式(Explicit)**: 明确指名需要谁来响应Intent。这一类Intent的解析过程比较简单。
+
+- **隐式(Implicit)**：由系统找到合适的目标来响应Intent。这一类Intent的解析过程比较复杂，由于目标不明确，所以需要经过层层筛选才能找到最合适的响应者。
+
+> 之所以Intent的信息有**主次之分**，是因为解析Intent的规则需要有一个依据，主要信息是最能表达意图的，而次要信息则是解析规则的一个补充。这就像大家在做自我介绍的时候，总是先说姓名、籍贯这些主要的信息，再额外补充爱好、特长这些次要信息，这样一来在和其他人交朋友的时候，其他人就可以先根据姓名、籍贯直接锁定的我。如果我们只介绍爱好、特长，那别人锁定的范围就比较广，因为有相同爱好或特长的人比较多。
+>
+> 之所以Intent有**显隐之分**，是因为解析Intent的方式不同，如果我指定要和某某人交朋友，那发出的这一类请求，就是**显式**的Intent；如果没有指定交朋友的对象，只是说找到跟我爱好相同的人，那发出的这一类请求，就是**隐式**的Intent。对待这两种Intent显然有不同的解析方式。
+>
+> 如同“运行环境(Context)”一样，Intent也是面向应用程序的设计，同样是弱化了进程的概念。应用程序只需表明“我想要什么”，不需要关心所要的东西在什么地方，如何找到所要的东西。Intent是Android通信的手段之一，可以承载要传递的信息，至于信息怎么从发起进程传递到目标进程，应用程序可以毫不关心。
+
+Intent最后的响应者是一个Android组件，Android的组件都可以定义IntentFilter，还记得前文中包解析器的类图结构吗？每一个Component类中都有一个IntentInfo对象的数组，而IntentInfo则是IntentFilter的子类。既然一个Android组件可以定义多个IntentFilter，那么，Intent想要匹配到最终的组件，则需要通过组件所定义的所有IntentFilter：
+
+<div align="center"><img src="/assets/images/packagemanager/9-packagemanager-intent-and-intentfilter.png" alt="Intent and IntentFilter"/></div>
+
+多个IntentFilter之间是**“或”**的关系，哪怕其他所有的IntentFilter都匹配失败，只要有一个IntentFilter通过，最终Intent还是找到了可以响应的组件。
+
+每一个IntentFilter就像是一个定义了白名单规则的过滤器，只有满足白名单的要求才会放行。IntentFilter的过滤规则，其实就是针对Intent的身份信息的匹配规则，当Intent的身份信息与IntentFilter所规定的要求匹配上，则允许通过；否则，Intent就被过滤掉了。IntentFilter的过滤规则包含以下三个方面：
+
+- **Action**: 每一个IntentFilter可以定义零个或多个&lt;action&gt;标签，如果Intent想要通过这个IntentFilter，则Intent所辖的Action需要匹配其中至少一个。
+
+- **Category**： 每一个IntentFilter可以定义零个或多个&lt;category&gt;标签，如果Intent想要通过这个IntentFilter，则Intent所辖的Category必须是IntentFilter所定义的Category的子集，才能通过IntentFilter。譬如Intent设置了两个Category：CATEGORY_LAUNCHER和CATEGORY_MAIN，只有那些至少定义了这两项Category的IntentFilter，才会放行该Intent。
+
+  启动Activity时，会为Intent设置默认的Category，即CATEGORY_DEFAULT。目标Activity需要添加一个category为CATEGORY_DEFAULT的IntentFilter来匹配这一类隐式的Intent。
+
+- **Data**：每一个IntentFilter可以定义零个或多个&lt;data&gt;，数据可以通过类型(MIMEType)和位置(URI)来描述，如果Intent想要通过这个IntentFilter，则Intent所辖的Data需要匹配其中至少一个。
+
+在了解了Intent的身份信息和IntentFilter的规则定义之后，就可以介绍Intent解析的过程了，这里借用类图来示例一下Intent解析过程中相关的数据结构：
+
+<div align="center"><img src="/assets/images/packagemanager/10-packagemanager-intent-resolver-class-diagram.png" alt="Intent Resolver Class Diagram"/></div>
+
+PMS中有四大组件的Intent解析器，分别是**ActivityIntentResolver**用于解析发往Activity或Broadcast的Intent，**ServiceIntentResolver**用于解析发往Service的Intent，**ProviderIntentResolver**用于解析发往Provider的Intent，系统每收到一个Intent的解析请求时，就会使用应的解析器，它们都是**IntentResolver**的子类。
+
+**IntentResolver**的职能就是解析Intent，它包含了所有的**IntentFilter**，同时有一个重要的成员函数**queryIntent()**，接收Intent作为参数，返回查询结果：一个ResolveInfo对象的数组。因为可能有多个组件来响应一个Intent，所以返回结果是一个数组。可想而知，该函数就是针对输入的Intent，按照前文所述的过滤规则，逐个与IntentFilter进行匹配，直到找到最终的响应者，便加入返回结果的列表。
+
+**ResolveInfo**是最终的Intent解析结果的数据结构，并不复杂，就是各类组件信息的一个包装。需要注意的是，其中的组件信息ActivityInfo、ProviderInfo、ServiceInfo只有一个不为空，这样就可以区分不同组件的解析结果。
 
 
-# APK的安装过程
+# 5 APK的安装过程
+
+
+# 6 APK的卸载过程
 
 ---
 
 # 参考文献
 
-1. [应用程序清单文件介绍]<https://developer.android.com/guide/topics/manifest/manifest-intro.html>
-2.
+1. 应用程序清单文件介绍: <https://developer.android.com/guide/topics/manifest/manifest-intro.html>
+
+2. Intent Filters介绍: <https://developer.android.com/guide/components/intents-filters.html>
