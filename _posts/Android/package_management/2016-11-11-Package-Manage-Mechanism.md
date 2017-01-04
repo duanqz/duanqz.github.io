@@ -6,6 +6,8 @@ tagline:
 tag: 包管理机制
 ---
 
+# 1 概要
+
 每一个社会群落都有管理机制，其中有三个要素：被管理者、管理者以及管理机制的运转。在Android的世界中，有一处群落叫“包管理”，要研究Android的包管理机制，同样可以从以下几个角度来思考：
 
 1. 被管理的对象是什么？
@@ -18,28 +20,13 @@ tag: 包管理机制
 
 Android的世界就如同一个井然有序的人类社会，除了包管理部门，还有其他各种管理部门，譬如电源管理、窗口管理、活动管理等等，大家不仅各司其职，而且也有交流往来。从APK的安装到Activity的显示这么一个看似简单的过程，却需要大量管理部门参与进来，不断地进行数据解析、封装、传递、呈现，内部机理十分复杂。
 
-# 1 概要
-
-- PackageInfo
-- PackageItemInfo
-- ComponentInfo
-- ActivityInfo
-- ServiceInfo
-- ProviderInfo
-- ApplicationInfo
-- PermissionInfo
-- InstrumentationInfo
-- PackageParser
-- PackageManagerService
-- com.android.server.pm.Settings
-
-PackageManagerService是包管理中最重要的服务，为了描述方便，本文会简写成**PMS**。
-
+> PackageManagerService是包管理中最重要的服务，为了描述方便，本文会简写成**PMS**。
+>
 > PMS的部分函数带有**LI**后缀，表示需要获取**mInstalllock**这个锁时才能执行；部分函数带有**LP**后缀，表示需要获取**mPackages**这个锁才能执行。
 
 # 2 被管理对象的形态
 
-Android中的APK和JAR包都以静态文件的形式分布在不同的硬件分区，包管理者面临的第一个任务就是将这些静态的文件转化成内存的数据结构，这样才能将其管理起来。负责将静态文件转换内存中数据结构的工具就是PackageParser，包解析器。
+Android中的APK和JAR包都以静态文件的形式分布在不同的硬件分区，包管理者面临的第一个任务就是将这些静态的文件转化成内存的数据结构，这样才能将其管理起来。Android中最重要的包管理对象就是APK，APK可以包含so文件，负责将静态文件转换内存中数据结构的工具就是PackageParser，包解析器。
 
 <div align="center"><img src="/assets/images/packagemanager/1-packagemanager-package-from-static-to-dynamic.png" alt="Package from static to dynamic"/></div>
 
@@ -1236,6 +1223,14 @@ private void grantPermissionsLPw(PackageParser.Package pkg, boolean replace,
 > 没有一个系统一开始就兼顾到了所有后续发展策略，绝对的优美设计或许只是停留在一个时间段。或许更加好的，只是那些活下来的、不断发展的代码。
 
 
+## 3.4 小结
+
+PMS是伴随系统进程启动而启动的，最终会构造一个PMS对象，此后，PMS便作为Android世界中的包管理者，对外提供包的增/删/改/查操作。
+
+在PMS的启动过程中，最重要的是对所有的静态APK文件进行扫描，生成一个包在内存中的数据结构Package，PMS实际上就是维护着所有包在内存中的数据结构。已有包的历史信息会写入磁盘，PMS的Settings专门来管理写入磁盘的包信息。
+
+所有包的信息扫描完以后，需要对应用进行授权，这是Android权限管理的一部分。随着Android版本的升级，授权机制略有区别，总体的框架是：每个APK都可以声明权限，并为权限设定保护级别，其他APk需要使用这些权限的时候，需要先申请，再由系统判定是否进行授权。
+
 # 4 包查询服务
 
 在管理所有包的同时，包管理者需要对外提供服务，诸如获取包的信息、安装或删除包、解析Intent等，都是包管理者在Android世界的职能。
@@ -1377,16 +1372,592 @@ PMS中有四大组件的Intent解析器，分别是**ActivityIntentResolver**用
 
 **ResolveInfo**是最终的Intent解析结果的数据结构，并不复杂，就是各类组件信息的一个包装。需要注意的是，其中的组件信息ActivityInfo、ProviderInfo、ServiceInfo只有一个不为空，这样就可以区分不同组件的解析结果。
 
+前文中提到包查询服务的形式，应用进程通过PackageManager提供的接口，发起跨进程调用，最终接口实现是在系统进程的PMS中。下面我们就分析**PMS.queryIntentActivities()**函数：
+
+```java
+public List<ResolveInfo> queryIntentActivities(Intent intent,
+        String resolvedType, int flags, int userId) {
+    if (!sUserManager.exists(userId)) return Collections.emptyList();
+    enforceCrossUserPermission(Binder.getCallingUid(), userId, false, false, "query intent activities");
+    // 1. 解析“显式”的Intent
+    ComponentName comp = intent.getComponent();
+    if (comp == null) {
+        if (intent.getSelector() != null) {
+            intent = intent.getSelector();
+            comp = intent.getComponent();
+        }
+    }
+    if (comp != null) {
+        final List<ResolveInfo> list = new ArrayList<ResolveInfo>(1);
+        final ActivityInfo ai = getActivityInfo(comp, flags, userId);
+        if (ai != null) {
+            final ResolveInfo ri = new ResolveInfo();
+            ri.activityInfo = ai;
+            list.add(ri);
+        }
+        return list;
+    }
+    // 2. 解析“隐式”的Intent
+    synchronized (mPackages) {
+        ... // 省略多用户情况下CrossProfileIntentFilter相关的代码
+        List<ResolveInfo> result = mActivities.queryIntent(
+                intent, resolvedType, flags, userId);
+        ...
+        return result;
+    }
+}
+```
+
+1. 解析“显式”的Intent，如果Intent中有设置Component，则说明已经显式的指名由谁来响应Intent。根据Component可以获取到对应的ActivityInfo，再在封装成ResolveInfo便可作为结果返回了。
+
+2. 解析“隐式”的Intent，该处省略了大段与多用户相关的Intent解析逻辑，仅展示了核心的函数调用**mActivities.queryIntent()**，mActivities是ActivityIntentResolver类型的对象，它负责完成对Intent的解析。
+
+其他类似的查询有**queryIntentReceivers(), queryIntentServices(), queryIntentContentProviders()**。
+
+## 4.3 小结
+
+包管理对外提供服务的形式基于Binder机制，服务端是运行在系统进程中的PMS。包查询服务是使用范围很广的一类服务，很多其他系统服务都需要用到包的信息，都是通过PMS获取的。
+
+包查询服务的核心是Intent的解析，PMS中实现了不同组件的解析器。针对一个输入的Intent，解析得到可以响应的组件。Android为此设计了IntentFilter机制，定义了Intent的匹配规则，最终的解析实现在IntentResolver.queryIntent()函数中。
 
 # 5 APK的安装过程
 
+APK安装是一个比较耗时的操作，PMS将这项工作放到了一个服务进程**com.android.defcontainer**，通过消息传递和跨进程调用的方式来驱动整个安装过程，如下图所示：
 
-# 6 APK的卸载过程
+<div align="center"><img src="/assets/images/packagemanager/11-packagemanager-default-container-service.png" alt="com.android.defcontainer"/></div>
 
----
+运行在系统进程中的PMS控制了整个安装流程，具体的安装任务由运行在**com.android.defconainer**进程的**DefaultContainerService**来完成。
 
-# 参考文献
+> 在Android最终的编译产物中，/system/priv-app/目录下，有一个DefaultContainerService.apk，对应的就是**com.android.defconainer**进程，它只运行一个&lt;service&gt;，就是DefaultContainerService。
+>
+> 在Android ICS(4.0)以前的版本中，并没有DefaultContainerService.apk，整个安装过程是耦合在PMS中的，直到Android ICS之后的版本，才将其解耦出来。
 
-1. 应用程序清单文件介绍: <https://developer.android.com/guide/topics/manifest/manifest-intro.html>
+下面，我们就来分析APK安装相关的数据结构和整体的安装流程。
 
-2. Intent Filters介绍: <https://developer.android.com/guide/components/intents-filters.html>
+## 5.1 数据结构
+
+PMS为APK的安装设计了一个庞大的数据结构，各个数据结构的类图如下所示：
+
+<div align="center"><img src="/assets/images/packagemanager/12-packagemanager-install-package-class-diagram.png" alt="Install Package Class Diagram"/></div>
+
+- APK的安装是**PackageHandler**这个消息处理器来驱动的，通过**HandlerParams**封装了消息所承载的数据。在PMS对象构造时，**PackageHandler**对象就会随之构造，它绑定到一个后台的工作线程，线程名为PackageManager；
+
+- **HandlerParams**是**PackageHandler**所处理的消息承载的数据，有两类：InstallParams对应包安装的数据；MeasureParams对应到包测量的数据，譬如包的大小；
+
+- APK可以安装在内部存储空间或SD卡上，已经安装的APK也可以在内部存储和SD卡之间进行移动，PMS为此设计了**InstallArgs**这个数据结构，它有不同的子类：**FileInstallArgs**对应将包安装到内部存储空间，即Data分区；**AsecInstallArgs**对应到将包安装到外部存储空间，即SD卡；**MoveInstallArgs**对应将包在内外存储空间移动，譬如将包从Data分区挪到SD卡。
+
+对包安装相关的数据结构有一个初步认识后，就可以深入具体的安装流程，看这些数据结构是怎么串联起来的。
+
+## 5.2 安装流程
+
+安装APK这个动作可以由具备**android.Manifest.permission.INSTALL_PACKAGES**授权的进程发起，譬如应用商店，系统进程等。通过`adb install`命令来安装APK，其实也是通过一个进程发起调用，最终都是PMS来响应。下图是APK安装的调用时序：
+
+<div align="center"><img src="/assets/images/packagemanager/13-packagemanager-install-package-sequence.png" alt="Install Package Sequence"/></div>
+
+安装APK都是通过跨进程调用到PMS中的，PMS的响应函数是**installPackageAsUser()**：
+
+```java
+public void installPackageAsUser(String originPath, IPackageInstallObserver2 observer,
+        int installFlags, String installerPackageName, VerificationParams verificationParams,
+        String packageAbiOverride, int userId) {
+   // 判断是否具备包安装权限：INSTALL_PACKAGES
+   mContext.enforceCallingOrSelfPermission(android.Manifest.permission.INSTALL_PACKAGES, null);
+   final int callingUid = Binder.getCallingUid();
+   enforceCrossUserPermission(callingUid, userId, true, true, "installPackageAsUser");
+   if (isUserRestricted(userId, UserManager.DISALLOW_INSTALL_APPS)) {
+       // 如果用户安装受限，则退出安装过程
+       // 在多用户的场景下，有些用户可能被禁止安装
+       ...
+       return;
+   }
+
+   // 根据安装来源修正安装参数
+   if ((callingUid == Process.SHELL_UID) || (callingUid == Process.ROOT_UID)) {
+       // 通过adb install来安装，就会带上INSTALL_FROM_ADB这个安装参数
+       installFlags |= PackageManager.INSTALL_FROM_ADB;
+   } else {
+       installFlags &= ~PackageManager.INSTALL_FROM_ADB;
+       installFlags &= ~PackageManager.INSTALL_ALL_USERS;
+   }
+
+   UserHandle user;
+   if ((installFlags & PackageManager.INSTALL_ALL_USERS) != 0) {
+       user = UserHandle.ALL;
+   } else {
+       user = new UserHandle(userId);
+   }
+
+   if ((installFlags & PackageManager.INSTALL_GRANT_RUNTIME_PERMISSIONS) != 0
+           && mContext.checkCallingOrSelfPermission(Manifest.permission
+           .INSTALL_GRANT_RUNTIME_PERMISSIONS) == PackageManager.PERMISSION_DENIED) {
+       throw new SecurityException("You need the "
+               + "android.permission.INSTALL_GRANT_RUNTIME_PERMISSIONS permission "
+               + "to use the PackageManager.INSTALL_GRANT_RUNTIME_PERMISSIONS flag");
+   }
+
+   verificationParams.setInstallerUid(callingUid);
+   final File originFile = new File(originPath);
+   // 生成OriginInfo对象，包含APK的原始路径等信息
+   final OriginInfo origin = OriginInfo.fromUntrustedFile(originFile);
+   final Message msg = mHandler.obtainMessage(INIT_COPY);
+   // 将安装信息封装成一个InstallParams对象
+   msg.obj = new InstallParams(origin, null, observer, installFlags, installerPackageName,
+           null, verificationParams, user, packageAbiOverride, null);
+   // 向消息队列发出**INIT_COPY**消息
+   mHandler.sendMessage(msg);
+}
+```
+
+该函数的逻辑较为简单，完成安装权限检查后，便开始构造APK安装信息的数据结构，发出**INIT_COPY**消息。
+
+接下来的流程转入到了**PackageHandler**对消息的处理中，就像一个状态机，**INIT_COPY**是安装APK的初始状态：
+
+```java
+void doHandleMessage(Message msg) {
+    switch (msg.what) {
+        case INIT_COPY: {
+            HandlerParams params = (HandlerParams) msg.obj;
+            int idx = mPendingInstalls.size();
+            if (!mBound) {
+                if (!connectToService()) {
+                    params.serviceError();
+                    return;
+                } else {
+                    mPendingInstalls.add(idx, params);
+                }
+            } else {
+                mPendingInstalls.add(idx, params);
+                if (idx == 0) {
+                    mHandler.sendEmptyMessage(MCS_BOUND);
+                }
+            }
+        }
+        break;
+    }
+}
+```
+
+**INIT_COPY**这个状态下，首先需要做的工作是连接DefaultContainerServcie，有一个标识位mBound，用于表示是否已经连接上。当连接成功后，便将APK加入安装队列mPendingInstalls，发出**MCS_BOUND**消息：
+
+```java
+    case MCS_BOUND: {
+        if (msg.obj != null) {
+            mContainerService = (IMediaContainerService) msg.obj;
+        }
+        if (mContainerService == null) {
+            if (!mBound) {
+                ... // DefaultContainerService连接失败，清除安装队列
+                mPendingInstalls.clear();
+            } else {
+               // 继续等待连接
+            }
+        } else if (mPendingInstalls.size() > 0) {
+            HandlerParams params = mPendingInstalls.get(0);
+            if (params != null) {
+                if (params.startCopy()) {
+                    if (mPendingInstalls.size() > 0) {
+                        mPendingInstalls.remove(0);
+                    }
+                }
+                if (mPendingInstalls.size() == 0) {
+                    if (mBound) {
+                        // 所有APK已经安装完成，需要断开与DefaultContainerService连接
+                        removeMessages(MCS_UNBIND);
+                        Message ubmsg = obtainMessage(MCS_UNBIND);
+                        sendMessageDelayed(ubmsg, 10000);
+                    }
+                } else {
+                    // 还有待安装的APK，继续处理MSC_BOUND消息
+                    mHandler.sendEmptyMessage(MCS_BOUND);
+                }
+            }
+        }
+    }
+```
+
+**MCS_BOUND**表示MediaContainerService这个服务已经连接上，服务端的实现是DefaultContainerService，其内部实现了IMediaContainerService这个AIDL接口。在该状态下，需要从安装队列中取出一个待安装的APK，进行安装操作。安装完一个APK后，又会循环发出MSC_BOUND消息，继续安装下一个APK，知道安装队列为空，才断开与DefaultContainerService的连接。
+
+在**MCS_BOUND**状态下，会针一个待安装的APK发起**HandlerParam.startCopy()**调用：
+
+```java
+final boolean startCopy() {
+    boolean res;
+    try {
+        if (++mRetries > MAX_RETRIES) {
+            mHandler.sendEmptyMessage(MCS_GIVE_UP);
+            handleServiceError();
+            return false;
+        } else {
+            handleStartCopy();
+            res = true;
+        }
+    } catch {...}
+
+    handleReturnCode();
+    return res;
+}
+```
+
+该函数的主干逻辑是调用**handleStartCopy()**和**handleReturnCode()**，另外有一个检查逻辑，如果尝试安装的次数达到了上线MAX_TRETRIES(4)，则会放弃安装过程。
+
+**HandlerParams**是一个抽象类，**handleStartCopy()**，**handleReturnCode()**和**handleServiceError()**都是抽象函数，安装APK的实现类是**InstallParams**，我们先来看**InstallParams.handleStartCopy()**函数：
+
+```java
+public void handleStartCopy() throws RemoteException {
+    int ret = PackageManager.INSTALL_SUCCEEDED;
+    if (origin.staged) {
+        ... // 安装一个新APK时，staged为false
+    }
+
+    // 确定APK的安装位置，onSd表示安装到SD卡上，onInt表示安装到内部存储，即Data分区
+    final boolean onSd = (installFlags & PackageManager.INSTALL_EXTERNAL) != 0;
+    final boolean onInt = (installFlags & PackageManager.INSTALL_INTERNAL) != 0;
+
+    PackageInfoLite pkgLite = null;
+    if (onInt && onSd) {
+        // APK不能同时安装在SD卡和Data分区
+        ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
+    } else {
+        // 1. 获取APK的包信息PackageInfoLite，此处还只是获取一些少量的包信息，所以叫Lite
+        pkgLite = mContainerService.getMinimalPackageInfo(origin.resolvedPath, installFlags,
+                packageAbiOverride);
+        if (!origin.staged && pkgLite.recommendedInstallLocation
+                == PackageHelper.RECOMMEND_FAILED_INSUFFICIENT_STORAGE) {
+            ... // 存储空间不足，则需要释放Cache的一些空间
+        }
+        if (ret == PackageManager.INSTALL_SUCCEEDED) {
+            int loc = pkgLite.recommendedInstallLocation;
+            // 2. 判定安装位置
+            if (loc == PackageHelper.RECOMMEND_FAILED_INVALID_LOCATION) {
+                ret = PackageManager.INSTALL_FAILED_INVALID_INSTALL_LOCATION;
+            }
+            ...
+        }
+    }
+    // 3. 根据安装位置创建InstallArgs对象
+    final InstallArgs args = createInstallArgs(this);
+    mArgs = args;
+    if (ret == PackageManager.INSTALL_SUCCEEDED) {
+        // 重新调整INSTALL_FROM_ADB的user标识，用做APK的检查
+        int userIdentifier = getUser().getIdentifier();
+        if (userIdentifier == UserHandle.USER_ALL
+                && ((installFlags & PackageManager.INSTALL_FROM_ADB) != 0)) {
+            userIdentifier = UserHandle.USER_OWNER;
+        }
+        final int requiredUid = mRequiredVerifierPackage == null ? -1
+                : getPackageUid(mRequiredVerifierPackage, userIdentifier);
+        if (!origin.existing && requiredUid != -1
+                && isVerificationEnabled(userIdentifier, installFlags)) {
+            ... // 此处省略大段APK的检查逻辑。
+            // 目前，Android只是定义了检查逻辑，并没实现真正的检查器，所以改段逻辑都不会运行
+        } else {
+            // 4. 调用InstallArgs.copyApk函数
+            ret = args.copyApk(mContainerService, true);
+        }
+    }
+
+    mRet = ret;
+}
+```
+
+该函数的主要逻辑如下：
+
+1. 获取待安装APK的信息，这时候只需要少量的信息即可，所以创建了一个PackageInfoLite的对象。通过跨进程调用getMinimalPackageInfo()后，在DefaultContainerService所在的进程中，会进行一次简单的包解析操作，得到待安装APK的包名、版本号和安装路径等基本信息；
+
+2. 调整安装位置，InstallParams类的**installLocationPolicy()**函数用于确定最终APK的安装位置，本文不展开分析这个函数，读者可自行参考源码；
+
+3. 根据安装位置创建InstallArgs对象，前文说过，InstallArgs有多个子类，分别对应不同的安装位置，**FileIntallArgs**对应的安装位置是内部存储，即Data分区。
+
+4. 在安装之前会进行APK的检查，不过Android一直还没有检查器的实现者，所有APK的安装都会直接到**InstallArgs.copyApk()**函数。
+
+以安装到Data分区的APK为例，实现类是**FileInstallArgs**，其copyApk()函数的逻辑如下：
+
+```java
+int copyApk(IMediaContainerService imcs, boolean temp) throws RemoteException {
+    if (origin.staged) {
+        ... // 对于新安装的APK，staged为false
+    }
+    try {
+        // 1. 生成临时目录，譬如: /data/app/vmdl239812321.tmp
+        final File tempDir = mInstallerService.allocateStageDirLegacy(volumeUuid);
+        codeFile = tempDir;
+        resourceFile = tempDir;
+    } catch (IOException e) {
+        // 空间不足，退出安装流程
+        return PackageManager.INSTALL_FAILED_INSUFFICIENT_STORAGE;
+    }
+
+    // 2. 创建一个用于跨进程传递的文件描述符
+    final IParcelFileDescriptorFactory target = new IParcelFileDescriptorFactory.Stub() {
+        @Override
+        public ParcelFileDescriptor open(String name, int mode) throws RemoteException {
+            if (!FileUtils.isValidExtFilename(name)) {
+                throw new IllegalArgumentException("Invalid filename: " + name);
+            }
+            try {
+                final File file = new File(codeFile, name);
+                final FileDescriptor fd = Os.open(file.getAbsolutePath(),
+                        O_RDWR | O_CREAT, 0644);
+                Os.chmod(file.getAbsolutePath(), 0644);
+                return new ParcelFileDescriptor(fd);
+            } catch (ErrnoException e) {
+                throw new RemoteException("Failed to open: " + e.getMessage());
+            }
+        }
+    };
+
+    int ret = PackageManager.INSTALL_SUCCEEDED;
+    // 3. 跨进程调用DefaultContainerService进程中的copyPackage()函数
+    ret = imcs.copyPackage(origin.file.getAbsolutePath(), target);
+    if (ret != PackageManager.INSTALL_SUCCEEDED) {
+        return ret;
+    }
+
+    // 4. 拷贝Native库
+    final File libraryRoot = new File(codeFile, LIB_DIR_NAME);
+    NativeLibraryHelper.Handle handle = null;
+    try {
+        handle = NativeLibraryHelper.Handle.create(codeFile);
+        ret = NativeLibraryHelper.copyNativeBinariesWithOverride(handle, libraryRoot,
+                abiOverride);
+    } catch (IOException e) {...}
+
+    return ret;
+}
+```
+
+该函数的主体逻辑如下：
+
+1. 生成一个临时目录，命名如/data/app/vmdl29300388.tmp，其中数字部分**29300388**在每一次安装过程都不同，是安装时的SessionId。由于PMS监控了/data/app目录，如果该目录下有后缀名为.apk的文件生成，便会触发PMS扫描，为了避免这种情况，安装APK时，先用了临时的文件名。
+
+2. 基于临时目录创建拷贝目标target，一个可以跨进程传递的文件描述符；
+
+3. 发起跨进程调用，DefaultContainerService所在的进程，实现了IMediaContainerService.aidl中所定义的接口，其中**copyPackage()**函数接收两个参数：
+
+    - 一个是APK的源文件路径，如果通过`adb install`安装APK，会将APK先拷贝到**/data/local/tmp**目录下，源文件的路径就是**/data/local/tmp/Test.apk**，就作为第一个参数; 如果通过Google Play这个应用市场来安装APK，那么Google Play会将APK下载到Cache分区，源文件的路径就是**/cache/Test.apk**；
+
+    - 一个是拷贝的目的路径，即刚刚创建的target，路径为**/data/app/vmdl29300388.tmp**，在DefaultContainerService进程中，会完成实际的拷贝操作，将APK的源文件拷贝到**/data/app/vmdl29300388.tmp/base.apk**。
+
+4. 完成Native库的拷贝，此处不展开分析。
+
+通过以上的过程，就已经将APK拷贝到/data/app目录下，不过，此时还是临时的文件，后续还需要重命名。如果以上过程没有异常产生，那最终会返回一个INSTALL_SUCCEEDED(1)这个整数；否则，会返回对应的错误码。
+
+接下来，就会交由**InstallParams.handleReturnCode()**函数来针对上面的返回值进行处理：
+
+```java
+void handleReturnCode() {
+    if (mArgs != null) {
+        processPendingInstall(mArgs, mRet);
+    }
+}
+
+private void processPendingInstall(final InstallArgs args, final int currentStatus) {
+    // 往消息队列抛出一个可执行任务，完成接下来的安装过程
+    mHandler.post(new Runnable() {
+        public void run() {
+            mHandler.removeCallbacks(this);
+            PackageInstalledInfo res = new PackageInstalledInfo();
+            res.returnCode = currentStatus;
+            res.uid = -1;
+            res.pkg = null;
+            res.removedInfo = new PackageRemovedInfo();
+            if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) {
+                args.doPreInstall(res.returnCode);
+                synchronized (mInstallLock) {
+                    // 安装一个包
+                    installPackageLI(args, res);
+                }
+                args.doPostInstall(res.returnCode, res.uid);
+            }
+            ...
+        }
+    }
+}
+```
+
+**handleReturnCode()**将直接调用了**processPendingInstall()**，表示需要继续处理APK的过程。
+
+在此之前，我们见到的很多函数名都与**copy**相关，其实就是要将APK拷贝的安装目录。到了**handleReturnCode()**这个函数之后，就正式要将APK纳入包管理的范围了，如何纳入呢？前文介绍过开机时的包扫描过程：将静态的APK文件解析成动态的数据结构，便完成了Android对一个APK的识别，从而可以方便的管理这个APK。安装APK时，也需要经过包解析的过程。
+
+在**processPendingInstall()**函数中，有几处关键调用：**doPreInstall()**安装之前的检查工作；**installPackageLI()**实际的安装过程，下文重点分析；**dePostInstall()**安装之后的检查工作。
+正常安装完之后，还有与APK备份相关的操作，本文不与分析，下面，我们深入**installPackageLI()**，看看一个APK是如何装载到系统中去的：
+
+```java
+private void installPackageLI(InstallArgs args, PackageInstalledInfo res) {
+    // 1. 准备安装参数
+    final int installFlags = args.installFlags;
+    final String installerPackageName = args.installerPackageName;
+    final String volumeUuid = args.volumeUuid;
+    final File tmpPackageFile = new File(args.getCodePath());
+    ...
+    // 2. 解析APK
+    PackageParser pp = new PackageParser();
+    pp.setSeparateProcesses(mSeparateProcesses);
+    pp.setDisplayMetrics(mMetrics);
+    final PackageParser.Package pkg;
+    try {
+        pkg = pp.parsePackage(tmpPackageFile, parseFlags);
+    } catch (PackageParserException e) {
+        res.setError("Failed parse during installPackageLI", e);
+        return;
+    }
+    ...
+    // 3. 获取签名和MD5值
+    try {
+        pp.collectCertificates(pkg, parseFlags);
+        pp.collectManifestDigest(pkg);
+    } catch (PackageParserException e) {
+        res.setError("Failed collect during installPackageLI", e);
+        return;
+    }
+    ...
+    synchronized (mPackages) {
+        // 4. 判定是否需要覆盖安装
+        if ((installFlags & PackageManager.INSTALL_REPLACE_EXISTING) != 0) {
+            ... // 如果待安装的APK已经存在，则会将replace变量设置为true，表示需要覆盖安装
+        }
+
+        // 5. 如果Settings中已经记录了待安装的APK信息，需要验证APK的签名
+        PackageSetting ps = mSettings.mPackages.get(pkgName);
+        if (ps != null) {
+            ...
+        }
+
+        // 6. 检查待安装的APK是否有定义新的权限
+        int N = pkg.permissions.size();
+        for (int i = N-1; i >= 0; i--) {
+            ...
+        }
+        ...
+    }
+
+    // 7. 将之前的临时文件名vmdl239812321.tmp重名为正式的名字
+    if (!args.doRename(res.returnCode, pkg, oldCodePath)) {
+        ...
+    }
+    // 8. 通过PackageHandler发起START_INTENT_FILTER_VERIFICATIONS消息
+    startIntentFilterVerifications(args.user.getIdentifier(), replace, pkg);
+    // 9. 替换升级或者安装一个新的APK
+    if (replace) {
+        replacePackageLI(pkg, parseFlags, scanFlags | SCAN_REPLACING, args.user,
+                installerPackageName, volumeUuid, res);
+    } else {
+        installNewPackageLI(pkg, parseFlags, scanFlags | SCAN_DELETE_DATA_ON_FAILURES,
+                args.user, installerPackageName, volumeUuid, res);
+    }
+    // 10. 更新APK的所属用户
+    synchronized (mPackages) {
+        final PackageSetting ps = mSettings.mPackages.get(pkgName);
+        if (ps != null) {
+            res.newUsers = ps.queryInstalledUsers(sUserManager.getUserIds(), true);
+        }
+    }
+}
+```
+
+该函数实现了这个逻辑：在安装一个APK时，需要判断系统中是否已经存在同包名的APK，如果存在，则需要判断新旧APK的签名以及版本信息，来决定是否需要升级安装；如果不存在，则安装一个新的APK。
+
+具体的细节本文不展开分析了，挑几个关键点：
+
+- 如果相同包名的APK已经安装过，则在PMS的Settings中，可以根据包名获取到该APK的信息，否则获取到的APK信息为空。因此，包名可以视为APK的唯一关键字。
+
+- 再次安装相同包名的APK，需要判断签名是否匹配，这对应的很大一类场景就是已有APK的升级。试想，如果签名不匹配就能完成APK的替换升级，那已有的APK岂不是全都可以被替换为同包名的其他APK吗？那整个系统毫无安全性可言；
+
+- 之前拷贝APK时用的临时文件名需要改成正式的名字，譬如 /data/app/vmdl239817273.tmp/base.apk 需要更名成 /data/app/packagename-1/base.apk。新名字会带上一个后缀，如果我们不断的升级一个已有的APK，那这个数字会从1开始不断累加。这部分逻辑在PMS.getNextCodePath()函数中，读者可自行查阅；
+
+- 该函数执行到最后，会根据**replace**变量判断是否需要替换已有的APK，还是安装一个新的APK。**replace**变量值是之前确定下来的，这一步有不同的两个函数调用：**replacePackageLI()**和**installNewPackageLI()**。
+
+下文以安装一个全新的APK为例，分析**installNewPackageLI()**函数：
+
+```java
+private void installNewPackageLI(PackageParser.Package pkg, int parseFlags, int scanFlags,
+        UserHandle user, String installerPackageName, String volumeUuid,
+        PackageInstalledInfo res) {
+    ...
+    // 判断是否存在APK的数据。如果一个APK不是经过正常的卸载流程，那其历史数据是可能还保留下来的
+    final boolean dataDirExists = Environment
+            .getDataUserPackageDirectory(volumeUuid, UserHandle.USER_OWNER, pkgName).exists();
+    ...
+    try {
+        // APK扫描
+        PackageParser.Package newPackage = scanPackageLI(pkg, parseFlags, scanFlags,
+                System.currentTimeMillis(), user);
+        // 更新PMS的Settings
+        updateSettingsLI(newPackage, installerPackageName, volumeUuid, null, null, res, user);
+        if (res.returnCode != PackageManager.INSTALL_SUCCEEDED) {
+            // 如果安装失败，则需要删除APK的数据目录
+            deletePackageLI(pkgName, UserHandle.ALL, false, null, null,
+                    dataDirExists ? PackageManager.DELETE_KEEP_DATA : 0,
+                            res.removedInfo, true);
+        }
+    } catch (PackageManagerException e) {...}
+}
+```
+
+该函数调用了前文分析过的包扫描**scanPackageLI()**函数，这样一来APK的各种信息都会记录在PMS中；描完以后，会调用**updateSettingsLI()**函数来更新APK的权限，设置安装状态等，如果一切顺利，那最终APK的安装状态是PKG_INSTALL_COMPLETE(1)。最终APK的信息会持久化到PMS的Settings中。
+
+## 5.3 小结
+
+APK的安装过程可能比大家预想的要复杂。粗略来看，可以分成两个阶段：
+
+1. 拷贝APK到安装目录。譬如通过`adb install`命令安装APK，APK文件会先拷贝到手机的**/data/local/tmp**目录，然后拷贝到手机的**/data/app**目录。这个过程是由PMS消息驱动的，**INIT_COPY**这个消息会触发PMS连接DefaultContainerService，**MCS_BOUND**这个消息表示已经连接上DefaultContainerService，实际的拷贝操作会在DefaultContainerService所在的进程中完成；
+
+2. APK拷贝到安装目录后，便可以扫描APK文件。这个过程同开机时的包扫描过程相似，不同的仅仅是扫描一个APK文件，相同的是需要检查APK的合法性，判断APK的签名是否匹配，更新APK的权限，更新PMS的Settings等。
+
+# 6 总结
+
+包管理涉及到的数据结构非常多，在分析源码时，很容易陷入各种数据结构之间的关系，难以自拔，以至于看不到包管理的全貌。作为本文最后的汇总，总结一下各数据结构的职能：
+
+- PackageManagerService  #包管理的核心服务
+- com.android.server.pm.Settings # 所有包的管理信息
+  - PackageSetting # 每一个包的信息
+  - BasePermission  # 系统中已有的权限
+  - PermissionsState  # 授权状态
+- PackageParser # 包解析器
+  - Package # 解析得到的包信息
+  - Component # 组件的基类，其子类对应到&lt;AndroidManifest.xml&gt;中定义的不同组件
+    - Activity
+    - Provider
+    - Service
+    - Instrumentation
+    - Permission
+    - PermissionGroup
+  - PackageInfo  # 跨进程传递的包数据，包解析时生成
+    - PackageItemInfo
+      - ApplicationInfo
+      - InstrumentationInfo
+      - PermissionInfo
+      - PermissionGroupInfo
+      - ComponentInfo
+        - ActivityInfo
+        - ServiceInfo
+        - ProviderInfo
+  - PackageLite  # 轻量的包信息
+  - ApkLite
+- IntentFilter # Intent过滤器
+  - IntentInfo # 组件所定义的&lt;intent-filter&gt;信息
+    - ActivityIntentInfo
+    - ServiceIntentInfo
+    - ProviderIntentInfo
+- Intent
+  - ResolveInfo
+  - IntentResolver # Intent解析器，其子类用于不同组件的Intent解析
+    - ActivityIntentResolver
+    - ServiceIntentResolver
+    - ProviderIntentResolver
+- PackageHandler # 包管理的消息处理器
+  - HandlerParams # 消息的数据载体
+    - InstallParams
+    - MeasureParams
+  - InstallArgs # APK的安装参数
+    - FileInstallArgs
+    - AsecInstallArgs
+    - MoveInfoArgs
+
+如果读者肯花时间同这些繁杂的数据结构周旋，那对于包管理的细节一定可以拿捏的很准确。但猛然一下要理解这么庞大的数据结构设计，实在不是学习包管理机制的上策，毕竟Android也不是一开始就是这么庞大的，譬如包的拆分机制就是较高版本的Android才引入的。随着使用场景的不断丰富，包管理的机制还会更加复杂，建议各位读者还是抓住包管理的几条主线：
+
+- **包扫描的过程**：经过这个过程，Android就能将一个APK文件的静态信息转化为可以管理的数据结构
+- **包查询的过程**：Intent的定义和解析是包查询的核心，通过包查询服务可以获取到一个包的信息
+- **包安装的过程**：这个过程是包管理者接纳一个新入成员的体现
+
+诚然，本文不可能涵盖整个包管理的内容，诸如包的删除过程、SELinux等相关的内容，本文都没有涉及。
