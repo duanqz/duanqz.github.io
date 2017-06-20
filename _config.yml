@@ -85,12 +85,17 @@ JB :
   # Set 'provider' to false to turn commenting off globally.
   #
   comments :
+    provider : gitment
+      owner : duanqz
+      client_id : 7fefa39a3f16f8b4dc72
+      client_secret : e3d4f165ad7f46184555a61425a3a44e1377312c
+      repo :　https://github.com/duanqz/duanqz.github.io.git
     #provider : duoshuo
     #duoshuo :
     # short_name : duanqz
-    provider : disqus
-    disqus :
-      short_name : duanqz
+    #provider : disqus
+    #disqus :
+    #  short_name : duanqz
     #livefyre :
     #  site_id : 123
     #intensedebate :

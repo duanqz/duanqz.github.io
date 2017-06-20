@@ -1,0 +1,12 @@
+<script type="text/javascript">
+const gitment = new Gitment({
+  owner: {{ site.JB.comments.gitment.owner }},
+  repo: {{ site.JB.comments.gitment.repo }},
+  oauth: {
+    client_id: {{ site.JB.comments.gitment.client_id }},
+    client_secret: {{ site.JB.comments.gitment.client_secret }},
+  }
+})
+
+gitment.render('comments')
+</script>
