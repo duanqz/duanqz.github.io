@@ -11,8 +11,8 @@
   {% include JB/comments-providers/intensedebate %}
 {% when "facebook" %}
   {% include JB/comments-providers/facebook %}
-{% when "gitment" %}
-  {% include JB/comments-providers/gitment %}
+{% when "gitalk" %}
+  {% include JB/comments-providers/gitalk %}
 {% when "custom" %}
   {% include custom/comments %}
 {% endcase %}

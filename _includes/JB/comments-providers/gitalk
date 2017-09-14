@@ -1,0 +1,10 @@
+<script type="text/javascript">
+var gitalk = new Gitalk({
+  owner: '{{ site.JB.comments.gitalk.owner }}',
+  repo: '{{ site.JB.comments.gitalk.repo }}',
+  clientId: '{{ site.JB.comments.gitalk.clientId }}',
+  clientSecret: '{{ site.JB.comments.gitalk.clientSecret }}',
+})
+
+gitalk.render('gitalk-container')
+</script>
