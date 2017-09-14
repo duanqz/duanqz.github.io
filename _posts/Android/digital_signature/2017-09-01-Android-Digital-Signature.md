@@ -55,7 +55,7 @@ Digital Signature直译成中文就是数字签名，是Whitfield Diffie和Marti
 
 下图示意了数字签名的运行机制：
 
-<div align="center"><img src="/assets/images/digitalsignature/1-digital-signature-mechanisum.svg" alt="数字签名机制"/></div>
+<div align="center"><img src="/assets/images/digitalsignature/1-digital-signature-mechanisum.png" alt="数字签名机制"/></div>
 
 - 对待发送的数据明文进行Hash，通常可采用MD5或SHA算法，然后采用私钥对Hash值进行加密，得到签名。将数据明文和签名一同发送出去。为什么要先对原始数据进行Hash后再用私钥加密呢？因为原数据可能比较大，直接使用私钥加密将会非常耗时。
 
