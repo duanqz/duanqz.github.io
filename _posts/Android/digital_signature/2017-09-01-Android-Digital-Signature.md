@@ -38,13 +38,13 @@ Digital Signature直译成中文就是数字签名，是Whitfield Diffie和Marti
 
 **数字签名是如何保证可认证、不可抵赖和完整性的呢？**这得从数字签名的算法说起。数字签名的实现包含三个算法：
 
-1. 密钥生成算法。数字签名采用的是非对称密钥生成算法，即会生成一对密钥：私钥和公钥。用私钥加密的数据，只能用对应的公钥解密。私钥是应该要保护起来，不会泄露给其他人；公钥是完全公开的，会随着加密数据一起在公开网络上传送。
+- 密钥生成算法。数字签名采用的是非对称密钥生成算法，即会生成一对密钥：私钥和公钥。用私钥加密的数据，只能用对应的公钥解密。私钥是应该要保护起来，不会泄露给其他人；公钥是完全公开的，会随着加密数据一起在公开网络上传送。
 
   > 密钥有对称(symmetric)和非对称(public)之分。对称密钥只有一个，同时用于加密和解密，就像我们用同一把钥匙开门和锁门，谁拿到钥匙，谁就掌握了房间的使用权。DES和AES这种加密算法采用的是对称密钥，而上文提到的RSA算法采用的是非对称密钥。
 
-2. 签名算法。给定私钥(private key)和数据(message)，可以生成一个签名(signature)。
+- 签名算法。给定私钥(private key)和数据(message)，可以生成一个签名(signature)。
 
-3. 签名验证算法。给定数据(message)、公钥(public key)和签名(signature)，可以解密数据并验证数据的来源和完整性。
+- 签名验证算法。给定数据(message)、公钥(public key)和签名(signature)，可以解密数据并验证数据的来源和完整性。
 
 下图示意了数字签名的运行机制：
 
@@ -70,7 +70,9 @@ Digital Signature直译成中文就是数字签名，是Whitfield Diffie和Marti
 
 在使用SSH(Secure SHell)进行远程登录或其他网络请求时(譬如下载git库)，会接触到**ssh-keygen**。相比Telent, FTP这些协议，SSH是安全的，因为可以使用ssh-keygen生成一对密钥，对通信过程进行加密，防止第三方攻击。
 
-举一个最常见的例子，github上的开源项目均支持采用HTTP或SSH进行克隆，而采用SSH协议下载时，需要在github上添加一个**SSH Key**，否则无法正常同步github上的项目。按照操作手册，会先在本地使用**ssh-keygen**命令生成一个密钥对：
+举一个最常见的例子，github上的开源项目均支持通过SSH协议进行下载，这就需要在github上添加一个**SSH Key**，否则无法正常下载github上的项目。
+
+首先，会先在本地使用**ssh-keygen**命令生成一个密钥对：
 
 ```
 $ ssh-keygen
@@ -96,9 +98,9 @@ The key's randomart image is:
 +-----------------+
 ```
 
-该命令执行完后，会在用户目录下的**.ssh**子目录生成两个文件：id_rsa和id_rsa.pub。操作手册的下一步，便是将id_rsa.pub的文件内容粘贴到github的**SSH Key**中。
+该命令执行完后，会在用户目录下的**.ssh**子目录生成两个文件：`id_rsa`和`id_rsa.pub`。
 
-一般我们都是按照操作手册的要求，完成配置后便可通过SSH下载远程代码，知其然却不知其所以然。在理解了数字签名的基本概念后，再来看这个过程：
+然后，便是将id_rsa.pub的文件内容粘贴到github的**SSH Key**中。完成配置后便可通过SSH下载远程代码，知其然却不知其所以然。在理解了数字签名的基本概念后，再来看这个过程：
 
 - **ssh-keygen**默认采用RSA算法生成了私钥(id_rsa)和公钥(id_rsa.pub)。上文中采用的是RSA 2048位的算法，因为256,512位的RSA算法已经被破解了。这里需要提出的是，除了RSA，还有其他密钥对的生成算法，譬如DSA(Digital Signature Algorithm)、EdDSA(Edwards-curve Digital Signature Algorithm)等，可以通过**ssh-keygen**的*-t*参数指定密钥对的生成算法。
 
