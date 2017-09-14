@@ -3116,7 +3116,7 @@ function renderFooter() {
   var container = document.createElement('div');
   container.lang = "en-US";
   container.className = 'gitment-container gitment-footer-container';
-  container.innerHTML = '\n    Powered by\n    <a class="gitment-footer-project-link" href="https://github.com/imsun/gitment" target="_blank">\n      Gitment\n    </a>\n  ';
+  container.innerHTML = 'Powered by Gitment';
   return container;
 }
 
@@ -3413,6 +3413,7 @@ var Gitment = function () {
       }, options);
 
       this.state.user.isLoggingIn = true;
+      //_utils.http.post('https://gh-oauth.imsun.net', {
       _utils.http.post('https://gh-oauth.imsun.net', {
         code: code,
         client_id: client_id,
