@@ -3,9 +3,8 @@ layout: post
 category: Android启智观
 title: Android数字签名机制和应用
 tagline:
-tags:  [Activity数字签名]
+tags:  [Android数字签名]
 ---
-
 
 # 1 数字签名
 
@@ -56,7 +55,7 @@ Digital Signature直译成中文就是数字签名，是Whitfield Diffie和Marti
 
 下图示意了数字签名的运行机制：
 
-<div align="center"><img src="/assets/images/digitalsignature/1-digital-sigature-mechanisum.svg" alt="数字签名机制"/></div>
+<div align="center"><img src="/assets/images/digitalsignature/1-digital-signature-mechanisum.svg" alt="数字签名机制"/></div>
 
 - 对待发送的数据明文进行Hash，通常可采用MD5或SHA算法，然后采用私钥对Hash值进行加密，得到签名。将数据明文和签名一同发送出去。为什么要先对原始数据进行Hash后再用私钥加密呢？因为原数据可能比较大，直接使用私钥加密将会非常耗时。
 
@@ -124,7 +123,7 @@ The key's randomart image is:
 
 **keytool**是JDK的一个工具，用于密钥和证书的管理。**keytool**的主要操作对象是**keystore文件**，该文件一般以*.keystore或*.jks(Java KeyStore)为后缀名，用于密钥和证书的存储，其存储结构如下图所示：
 
-<div align="center"><img src="/assets/images/digitalsignature/2-digital-sigature-keystore.png" alt="keystore的存储结构"/></div>
+<div align="center"><img src="/assets/images/digitalsignature/2-digital-signature-keystore.png" alt="keystore的存储结构"/></div>
 
 **keystore**可以存储多个密钥对(Key Pair)，每一个密钥对包含私钥(Private Key)和多个证书(Certificate)。想必诸位读者一定心生怪异了，上文说的密钥对都是一个私钥和一个公钥配对，然而**keystore**中存储的却是私钥和多个证书的配对，到底密钥对是怎么一样对应关系呢？这里有必要把证书和公钥的关系说明清楚了。
 
@@ -141,7 +140,7 @@ The key's randomart image is:
 
 当然，除了Eclipse/Android Studio里面的keystore操作工具，还有很多其他好用的工具，笔者通过[KeyStore Explorer](http://keystore-explorer.org/)工具打开Android的debug.keystore文件(位于~/.android/，存储了Android应用的默认签名)，可以看到如下信息：
 
-<div align="center"><img src="/assets/images/digitalsignature/3-digital-sigature-keystore-content.png" alt="keystore的存储内容"/></div>
+<div align="center"><img src="/assets/images/digitalsignature/3-digital-signature-keystore-content.png" alt="keystore的存储内容"/></div>
 
 通过**keytool**命令可以显示出相同的内容：
 
