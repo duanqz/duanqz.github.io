@@ -6,5 +6,5 @@ var gitalk = new Gitalk({
   clientSecret: '{{ site.JB.comments.gitalk.clientSecret }}',
 })
 
-gitalk.render('gitalk-container')
+gitalk.render('post-comment')
 </script>
