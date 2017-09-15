@@ -89,7 +89,8 @@ JB :
     gitalk :
      owner : duanqz
      repo : duanqz.github.io
-     clientId : 7fefa39a3f16f8b4dc72
+     admin: [duanqz]
+     clientID : 7fefa39a3f16f8b4dc72
      clientSecret : e3d4f165ad7f46184555a61425a3a44e1377312c
     #duoshuo :
     # short_name : duanqz
