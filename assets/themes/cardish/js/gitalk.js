@@ -3892,6 +3892,7 @@ var GitalkComponent = function (_Component) {
           owner = _options.owner,
           repo = _options.repo,
           id = _options.id,
+          title = _options.title,
           labels = _options.labels,
           clientID = _options.clientID,
           clientSecret = _options.clientSecret;
@@ -3901,7 +3902,7 @@ var GitalkComponent = function (_Component) {
         params: {
           client_id: clientID,
           client_secret: clientSecret,
-          labels: labels.concat(id).join(',')
+          labels: labels.concat(title).join(',')
         }
       }).then(function (res) {
         var _options2 = _this4.options,
