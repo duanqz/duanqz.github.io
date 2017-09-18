@@ -4099,11 +4099,11 @@ var GitalkComponent = function (_Component) {
           _react2.default.createElement(
             'div',
             { className: 'gt-header-controls' },
-            _react2.default.createElement(
-              'a',
-              { className: 'gt-header-controls-tip', href: 'https://guides.github.com/features/mastering-markdown/', target: '_blank' },
-              _react2.default.createElement(_svg2.default, { className: 'gt-ico-tip', name: 'tip', text: this.i18n.t('support-markdown') })
-            ),
+            // _react2.default.createElement(
+            //   'a',
+            //   { className: 'gt-header-controls-tip', href: 'https://guides.github.com/features/mastering-markdown/', target: '_blank' },
+            //   _react2.default.createElement(_svg2.default, { className: 'gt-ico-tip', name: 'tip', text: this.i18n.t('support-markdown') })
+            // ),
             user && _react2.default.createElement(_button2.default, {
               getRef: this.getRef,
               className: 'gt-btn-public',
@@ -4155,11 +4155,11 @@ var GitalkComponent = function (_Component) {
             });
           })
         ),
-        !totalComments.length && _react2.default.createElement(
-          'p',
-          { className: 'gt-comments-null' },
-          this.i18n.t('first-comment-person')
-        ),
+        // !totalComments.length && _react2.default.createElement(
+        //   'p',
+        //   { className: 'gt-comments-null' },
+        //   this.i18n.t('first-comment-person')
+        // ),
         !isLoadOver && totalComments.length ? _react2.default.createElement(
           'div',
           { className: 'gt-comments-controls' },
@@ -4198,20 +4198,20 @@ var GitalkComponent = function (_Component) {
             { className: 'gt-action gt-action-login', onMouseDown: this.handleLogin },
             this.i18n.t('login-with-github')
           ),
-          _react2.default.createElement(
-            'div',
-            { className: 'gt-copyright' },
-            _react2.default.createElement(
-              'a',
-              { className: 'gt-link gt-link-project', href: 'https://github.com/gitalk/gitalk', target: '_blank' },
-              'Gitalk'
-            ),
-            _react2.default.createElement(
-              'span',
-              { className: 'gt-version' },
-              _const.GT_VERSION
-            )
-          )
+          // _react2.default.createElement(
+          //   'div',
+          //   { className: 'gt-copyright' },
+          //   _react2.default.createElement(
+          //     'a',
+          //     { className: 'gt-link gt-link-project', href: 'https://github.com/gitalk/gitalk', target: '_blank' },
+          //     'Gitalk'
+          //   ),
+          //   _react2.default.createElement(
+          //     'span',
+          //     { className: 'gt-version' },
+          //     _const.GT_VERSION
+          //   )
+          // )
         ),
         _react2.default.createElement(
           'div',
