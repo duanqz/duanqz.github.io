@@ -83,7 +83,7 @@ Digital Signature直译成中文就是数字签名，是Whitfield Diffie和Marti
 
 首先，会先在本地使用**ssh-keygen**命令生成一个密钥对：
 
-```
+```console
 $ ssh-keygen
 Generating public/private rsa key pair.
 Enter file in which to save the key (~/.ssh/id_rsa):
@@ -269,7 +269,7 @@ app-unsigned                    app-signed
 
 **ANDROIDD.RSA**其实是数字证书，RSA的文件后缀表示证书中包含了一个基于RSA算法生成的公钥。通过前文介绍的`keytool`命令，便可打印出该证书的信息，这与前文中keystore中打印的证书信息是一致的：
 
-```
+```console
 duanqizhi@xo:~/app-signed/META-INF$ keytool --printcert
 -file ANDROIDD.RSA
 Owner: CN=Android Debug, O=Android, C=US
@@ -311,7 +311,7 @@ Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Package /data/app/vmdl1995237626.
 
 同时，会出现如下日志：
 
-```
+```console
 1034  1271 E PackageInstaller: Commit of session 1995237626 failed: Package /data/app/vmdl1995237626.tmp/base.apk has no certificates at entry AndroidManifest.xml
 1034 11776 W System.err: java.lang.SecurityException: Caller has no access to session 1995237626
 1034 11776 W System.err: at com.android.server.pm.PackageInstallerService.abandonSession(PackageInstallerService.java:737)
@@ -367,7 +367,7 @@ Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Package /data/app/vmdl1995237626.
 
 理解了APK安装过程后，我们再回过头来看一下上文中提示安装错误的日志：
 
-```
+```console
 1034  1271 E PackageInstaller: Commit of session 1995237626 failed: Package /data/app/vmdl1995237626.tmp/base.apk has no certificates at entry AndroidManifest.xml
 ```
 
@@ -377,7 +377,7 @@ Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Package /data/app/vmdl1995237626.
 
 Android拒绝安装没有签名的APK，但Android并不会校验APK证书的有效性，即只要签名正确，不管证书是不是合法的，Android都会安装。我们可以使用`jarsigner`工具对APK的证书进行校验，会出现如下的警告，但APK依旧可以正常安装。
 
-```
+```java
 duanqizhi@xo:~$ jarsigner -verify app-signed.apk
 jar verified.
 
@@ -399,7 +399,7 @@ Without a timestamp, users may not be able to validate this jar after the signer
 
 举一个例子，对一个应用签两次不同的名，通过`adb install -r`命令重复安装，便会升级签名不匹配的错误：
 
-```
+```java
 duanqizhi@xo:~$ adb install -r app-signed-changed.apk
 1904 KB/s (2407277 bytes in 1.234s)
 Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Package com.xo.demo signatures do not match the previously installed version; ignoring!]
@@ -443,7 +443,7 @@ include $(BUILD_PACKAGE)
 
 先来看一个特殊的APK：framework-res.apk，其包名为**android**，在它的AndroidManifest.xml文件中，定义了一些系统权限：
 
-```
+```xml
   <!-- 安装应用的权限 -->
   <permission android:name="android.permission.INSTALL_PACKAGES"
       android:protectionLevel="signature|privileged" />
@@ -456,13 +456,13 @@ include $(BUILD_PACKAGE)
 
 除了framework-res.apk，其他应用也可以定义属于自己的权限，同样可以设定**protectionLevel**，通过Android的权限授予机制来保护API，防止滥用。譬如在[packages/apps/Launcer3/AndroidManifest.xml]()中，就定义了如下权限：
 
-```
-    <permission
-        android:name="com.android.launcher3.permission.WRITE_SETTINGS"
-        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
-        android:protectionLevel="signatureOrSystem"
-        android:label="@string/permlab_write_settings"
-        android:description="@string/permdesc_write_settings"/>
+```xml
+<permission
+    android:name="com.android.launcher3.permission.WRITE_SETTINGS"
+    android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+    android:protectionLevel="signatureOrSystem"
+    android:label="@string/permlab_write_settings"
+    android:description="@string/permdesc_write_settings"/>
 ```
 
 这就表明要想获取**com.android.launcher3.permission.WRITE_SETTINGS**这个权限，申请者要么与Launcher3具有相同的签名，要么是一个系统应用。
@@ -482,7 +482,7 @@ Android Lollipop强制使用SELinux后，极大的增强了Android系统的安�
 
 以Settings为例，手机上的系统分区会存在Settings.apk这个静态的文件，运行`ls -Z`命令可以查看其SELinux标签：
 
-```
+```console
 angler:/system/priv-app/Settings # ls -Z
 -rw-r--r-- 1 root root u:object_r:system_file:s0 Settings.apk
 ```
@@ -524,7 +524,7 @@ u:r:system_app:s0 system S com.android.settings
 
 对于Settings进程而言，SELinux标签的角色为r，域为system_app，这个标签与静态的Settings.apk文件不同，它是依据APK的签名打上去的，Android设计了一套为应用进程打标签的机制：维护签名到SELinux标签的映射表，记录在[system/sepolicy/mac_permissions.xml]()中，其初始内容如下所示：
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <policy>
     <signer signature="@PLATFORM" >
@@ -535,7 +535,7 @@ u:r:system_app:s0 system S com.android.settings
 
 以上内容只是一个模板，表达的意思是：签名为**@PLATFORM**的APK所在的进程，其seinfo为platform。**@PLATFORM**编译后会被替换成真实的platfrom类型的签名，以下是mac_permissions.xml经过编译后的结果：
 
-```
+```xml
 <?xml version="1.0" encoding="iso-8859-1"?>
 <policy>
   <signer signature="308204a83...8b1b357">
@@ -546,7 +546,7 @@ u:r:system_app:s0 system S com.android.settings
 
 对于在Android.mk中声明**LOCAL_CERTIFICATE := platform**的应用来说，其seinfo就被标记为**platform**了，那么**seinfo**又是什么呢？[frameworks/base/core/java/android/content/pm/ApplicationInfo.java]()文件中有其定义：
 
-```
+```java
     /**
      * String retrieved from the seinfo tag found in selinux policy. This value
      * can be overridden with a value set through the mac_permissions.xml policy
