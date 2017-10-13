@@ -97,7 +97,7 @@
                 <div class="content-navigation-list">
                     <ul>
                         {% for p in site.posts limit: 5 %}
-                        <li>{{ p.date | date: "%Y-%m-%d" }}&nbsp;<a href="{{ p.url }}" title="{{p.title }}">{{p.title }}</a></li>
+                        <li><a href="{{ p.url }}" title="{{p.title }}">{{p.title }}</a>&nbsp;{{ p.date | date: "%Y-%m-%d" }}</li>
                         {% endfor %}
                     </ul>
                 </div>
