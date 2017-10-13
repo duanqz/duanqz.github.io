@@ -57,14 +57,14 @@
                     <ul class="nav navbar-nav navbar-center">
                         <li>
                             <a href="{{ HOME_PATH }}#All" class="categories-item" cate="All">
-                                <span class="octicon octicon-home"></span>
+                                <span class="octicon octicon-book"></span>
                                 所有文章<span class="categories-badge">{{site.posts | size}}</span>
                             </a>
                         </li>
                         {% for category in site.categories %}
                         <li>
                             <a href="{{ HOME_PATH }}#{{ category | first }}" class="categories-item" cate="{{ category | first }}">
-                                <span class="octicon octicon-book"></span>
+                                <span class="octicon octicon-triangle-right"></span>
                                 {{ category | first }}<span class="categories-badge">{{ category | last | size }}</span>
                             </a>
                         </li>
