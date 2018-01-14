@@ -11,7 +11,7 @@ module Jekyll
         path = destination_path(file)
         if (File.file?(file))
           watermark_image(site, file, path)
-          create_thumb(site, path)
+          # create_thumb(site, path)
         end
       end
     end
@@ -44,32 +44,32 @@ module Jekyll
       add_to_static_file(site, new_file)
     end
 
-    def create_thumb(site, file)
-      thumb_file = File.join(File.join(File.dirname(file), "thumbs"), File.basename(file))
-      if (File.exist?(thumb_file) && File.mtime(thumb_file) > File.mtime(file))
-        return
-      end
-
-      FileUtils.mkdir_p(File.dirname(thumb_file))
-      image = MiniMagick::Image.open(file)
-
-      width = 140
-      height = 140
-      if (image["width"] > image["height"])
-        width = height * 1.6
-      end
-      image.resize "#{width}x#{nil}"
-      width = 140
-      woffset = (image["width"] - width) / 2
-      hoffset = (image["height"] - height) / 2
-      image.gravity('Center')
-      image.crop "#{width}x#{height}+#{woffset}+#{hoffset}"
-      result = image.composite(MiniMagick::Image.open('_plugins/watermark.png')) do |c|
-        c.gravity "southeast"
-      end
-      result.write thumb_file
-      result.destroy!
-      add_to_static_file(site, thumb_file)
-    end
+    # def create_thumb(site, file)
+    #   thumb_file = File.join(File.join(File.dirname(file), "thumbs"), File.basename(file))
+    #   if (File.exist?(thumb_file) && File.mtime(thumb_file) > File.mtime(file))
+    #     return
+    #   end
+    #
+    #   FileUtils.mkdir_p(File.dirname(thumb_file))
+    #   image = MiniMagick::Image.open(file)
+    #
+    #   width = 140
+    #   height = 140
+    #   if (image["width"] > image["height"])
+    #     width = height * 1.6
+    #   end
+    #   image.resize "#{width}x#{nil}"
+    #   width = 140
+    #   woffset = (image["width"] - width) / 2
+    #   hoffset = (image["height"] - height) / 2
+    #   image.gravity('Center')
+    #   image.crop "#{width}x#{height}+#{woffset}+#{hoffset}"
+    #   result = image.composite(MiniMagick::Image.open('_plugins/watermark.png')) do |c|
+    #     c.gravity "southeast"
+    #   end
+    #   result.write thumb_file
+    #   result.destroy!
+    #   add_to_static_file(site, thumb_file)
+    # end
   end
 end
