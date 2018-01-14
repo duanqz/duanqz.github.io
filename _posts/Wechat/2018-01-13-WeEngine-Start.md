@@ -21,7 +21,7 @@ tags: 微擎开发
 git clone https://github.com/etutorial/WeEngine.git
 ```
 
-## 1.2 安装Nginx
+## 1.2 安装nginx
 
 ```
 $ brew install nginx
