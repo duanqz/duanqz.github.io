@@ -1,6 +1,6 @@
 ---
 layout: post
-category : 编程
+category : 小白文
 title: Java的final关键字
 tagline:
 tags : java final

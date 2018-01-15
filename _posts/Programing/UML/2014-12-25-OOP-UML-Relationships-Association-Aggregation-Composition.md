@@ -1,6 +1,6 @@
 ---
 layout: post
-category : 编程
+category : 小白文
 title: UML关联、聚合、组合关系的区别
 tagline: "Association, Aggregation, Composition"
 tags : UML依赖关系

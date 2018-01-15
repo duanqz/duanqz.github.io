@@ -29,7 +29,7 @@ $ brew install nginx
 
 在浏览器中输入`localhost:8080`，如果看到如下界面内容，表示`nginx`安装成功：
 
-<div align="center"><img src="/assets/images/weengine/1-weengine-nginx-installed.png" /></div>
+<div align="center"><img src="/assets/images/junior/weengine/1-weengine-nginx-installed.png" /></div>
 
 配置文件`/usr/local/etc/nginx/nginx.conf`
 
@@ -58,11 +58,11 @@ $ php -S 127.0.0.1:8080 -t /Users/duanqz/Code/WeEngine
 
 在浏览器中输入`127.0.0.1:8080`，出现以下界面表示php环境运行正常：
 
-<div align="center"><img src="/assets/images/weengine/2-weengine-php-installed.png" /></div>
+<div align="center"><img src="/assets/images/junior/weengine/2-weengine-php-installed.png" /></div>
 
 点击`install.php 进入安装`，按照操作提示下一步即可。其中参数配置一步，需要配置数据库连接信息和微擎后台管理员账号：
 
-<div align="center"><img src="/assets/images/weengine/3-weegine-installing-config.png" /></div>
+<div align="center"><img src="/assets/images/junior/weengine/3-weegine-installing-config.png" /></div>
 
 在测试环境下:
 
@@ -73,7 +73,7 @@ $ php -S 127.0.0.1:8080 -t /Users/duanqz/Code/WeEngine
 
 成功安装微擎后，便会进入微擎后台的登录界面，输入刚才配置的管理员用户，便进入到微擎的主界面：
 
-<div align="center"><img src="/assets/images/weengine/4-weengine-installed.png" /></div>
+<div align="center"><img src="/assets/images/junior/weengine/4-weengine-installed.png" /></div>
 
 ## 1.5 常见问题
 
