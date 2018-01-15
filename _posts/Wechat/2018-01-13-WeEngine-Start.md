@@ -127,4 +127,43 @@ mysql> show tables;
 
 # 2. 微擎定制
 
-TODO
+## 2.1 内网穿透
+
+微信公众号的调试需要公网的域名，可以使用利用内网穿透技术，将一个本地的IP和端口映射成公网的域名。
+笔者罗列几个可以进行内网穿透的工具：
+
+- [NATAPP](https://natapp.cn)：需要注册才能使用。
+- [Sunny-Ngrok](https://www.ngrok.cc)：需要注册才能使用，免费版需要实名注册。
+- [Go-Tunnel](https://gotunnel.net)：无需注册，免费使用，速度有限。
+
+> 读者可以从网络上搜罗到的大部分内网穿透工具都是基于ngrok的
+
+笔者使用的是定制过的Go-Tunnel：<https://github.com/etutorial/WeEngine/tree/master/gotunnel>
+在下载的微擎源码根目录下，执行以下命令，便可启动内网穿透：
+
+```console
+$ cd gotunnel && ./nogrok start web 
+Tunnel Status                 online
+Version                       1.7/1.7
+Forwarding                    http://duanqz.gotunnel.net -> 127.0.0.1:8080
+Http Server                   127.0.0.1:8080 -> /Users/duanqz/Code/WeEngine
+Web Interface                 disabled
+# Conn                        82
+Avg Conn Time                 245.97ms
+```
+
+正常启动时，Tunnel Status应该是**online**状态，内网地址**127.0.0.1:8080**被映射到公网的域名**http://duanqz.gotunnel.net**。
+这里，还需简单说明一下Go-Tunnel的配置文件:
+
+```yml
+server_addr: "gotunnel.net:2333"
+tunnels:
+    web:   
+     subdomain: duanqz
+     root: "/Users/duanqz/Code/WeEngine"
+     proto:
+       http: ":8080"
+```
+
+- 配置文件中的服务器地址**server_addr**可能不稳定，导致内网穿透失败，此时，读者可以将其换成其他地址
+- 配置文件中定义了一个隧道**web**，子域名是**duanqz**，端口是**8080**，读者可以根据自己的需要进行修改
