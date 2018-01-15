@@ -13,6 +13,8 @@
   {% include JB/comments-providers/facebook %}
 {% when "gitalk" %}
   {% include JB/comments-providers/gitalk %}
+{% when "valine" %}
+  {% include JB/comments-providers/valine %}
 {% when "custom" %}
   {% include custom/comments %}
 {% endcase %}

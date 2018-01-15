@@ -1,0 +1,12 @@
+<script type="text/javascript">
+new Valine({
+    el: '#post-comment' ,
+    notify: false,
+    verify: false,
+    appId: '{{ site.JB.comments.valine.appId }}',
+    appKey: '{{ site.JB.comments.valine.appKey }}',
+    placeholder: 'just go go',
+    path:window.location.pathname, 
+    avatar:'mm' 
+});
+</script>
