@@ -5,7 +5,7 @@ new Valine({
     verify: false,
     appId: '{{ site.JB.comments.valine.appId }}',
     appKey: '{{ site.JB.comments.valine.appKey }}',
-    placeholder: 'just go go',
+    placeholder: '来啊，快活呀！',
     path:window.location.pathname, 
     avatar:'mm' 
 });
