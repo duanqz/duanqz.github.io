@@ -295,7 +295,7 @@ KeyIdentifier [
 ]
 ```
 
-**至此，APK签名前后的差异已经分析完毕。签名会在APK中的META-INF/目录下添加证书ANDROIDD.RSA和密文ANDROIDD.MF，有了这两个文件，就可以对APK进行校验了。**
+**至此，APK签名前后的差异已经分析完毕。签名会在APK中的META-INF/目录下添加证书ANDROIDD.RSA和密文ANDROIDD.SF，有了这两个文件，就可以对APK进行校验了。**
 
 ## 2.2 应用层面：Android对APK的签名要求
 
