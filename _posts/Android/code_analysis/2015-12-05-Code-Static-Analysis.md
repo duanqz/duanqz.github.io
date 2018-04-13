@@ -1,6 +1,6 @@
 ---
 layout: post
-category: Android启智观
+category: 小白文
 title: 静态代码检查工具--Klocwork
 tagline:
 tags:  [代码检查]
