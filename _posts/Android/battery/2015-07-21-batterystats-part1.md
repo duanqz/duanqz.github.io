@@ -51,7 +51,7 @@ Android框架层通过一个名为`batterystats`的系统服务，实现了电�
 
 电量统计服务是一个系统服务，名字为`batterystats`，在Android系统启动的时候，这个服务就会被启动，其启动时序如下图所示：
 
-![电量统计服务启动时序](/assets/images/batterystats/1-batterystats-booting-sequence-diagram.png)
+<div align="center"><img src="/assets/images/batterystats/1-batterystats-booting-sequence-diagram.png" alt="电量统计服务启动时序"/></div>
 
 电量统计服务是间接由ActivityManagerService(后文简称AMS)来启动，AMS是Android系统最为基础的服务，进入Android系统后，最优先启动的，就是这类服务。
 
@@ -59,54 +59,54 @@ Android框架层通过一个名为`batterystats`的系统服务，实现了电�
 
   注：Android提供了系统服务的基础类**SystemService**，子类通过实现系统回调函数，来完成具体系统服务的生命周期。ActivityManagerService.Lifecycle就是**SystemService**的子类。
 
-{% highlight java %}
-private void startBootstrapServices() {
-    ...
-    mActivityManagerService = mSystemServiceManager.startService(
-            ActivityManagerService.Lifecycle.class).getService();
-    mActivityManagerService.setSystemServiceManager(mSystemServiceManager);
-    ...
-}
-{% endhighlight %}
+    ```java
+    private void startBootstrapServices() {
+        ...
+        mActivityManagerService = mSystemServiceManager.startService(
+                ActivityManagerService.Lifecycle.class).getService();
+        mActivityManagerService.setSystemServiceManager(mSystemServiceManager);
+        ...
+    }
+    ```
 
 - 在**SystemServiceManager.startService()**这个方法中，利用反射构造出一个新的实例，当ActivityManagerService.Lifecycle作为参数传入的时候，就完成了ActivityManagerService的初始化，注册和启动的工作。
 
-{% highlight java %}
-public <T extends SystemService> T startService(Class<T> serviceClass) {
-    ...
-    Constructor<T> constructor = serviceClass.getConstructor(Context.class);
-    service = constructor.newInstance(mContext);
-    ...
-    mServices.add(service); // 注册新的系统服务
-    ...
-    service.onStart();      // 启动新的系统服务
-    ...
-}
-{% endhighlight %}
+    ```java
+    public <T extends SystemService> T startService(Class<T> serviceClass) {
+        ...
+        Constructor<T> constructor = serviceClass.getConstructor(Context.class);
+        service = constructor.newInstance(mContext);
+        ...
+        mServices.add(service); // 注册新的系统服务
+        ...
+        service.onStart();      // 启动新的系统服务
+        ...
+    }
+    ```
 
 - 在**ActivityManagerService.start()**方法中，伴随着ActivityManagerService启动的，BatteryStatService通过publish方法，将自己注册到系统服务中。
 
-{% highlight java %}
-private void start() {
-    ...
-    mBatteryStatsService.publish(mContext);
-    ...
-}
-{% endhighlight %}
+    ```java
+    private void start() {
+        ...
+        mBatteryStatsService.publish(mContext);
+        ...
+    }
+    ```
 
 - 在**BatteryStatsService.publish()**方法中，将**BatteryStats.SERVICE_NAME**这个名字注册到系统服务中，这个名字实际上就是**batterystats**，
 后续使用电量统计服务时，只需要通过这个名字向系统获取对应的服务就可以了。  
 
-{% highlight java %}
-public void publish(Context context) {
-    ...
-    ServiceManager.addService(BatteryStats.SERVICE_NAME, asBinder());
-    mStats.setNumSpeedSteps(new PowerProfile(mContext).getNumSpeedSteps());
-    mStats.setRadioScanningTimeout(mContext.getResources().getInteger(
-            com.android.internal.R.integer.config_radioScanningTimeout)
-            * 1000L);
-}
-{% endhighlight %}
+    ```java
+    public void publish(Context context) {
+        ...
+        ServiceManager.addService(BatteryStats.SERVICE_NAME, asBinder());
+        mStats.setNumSpeedSteps(new PowerProfile(mContext).getNumSpeedSteps());
+        mStats.setRadioScanningTimeout(mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_radioScanningTimeout)
+                * 1000L);
+    }
+    ```
 
 - **mStats**是BatteryStatsImpl类的一个对象，从类名可以看出BatteryStatsImpl是BatteryStats的实现类，它描述了所有与电量消耗有关的信息，其实现逻辑，后文再作具体分析。
 
@@ -114,26 +114,26 @@ public void publish(Context context) {
   除了CPU的运行频率，还有很多其他与耗电量相关参数，都是因设备而异的，**PowerProfile**类就是专门描述这些参数的，通过解析[frameworks/base/core/res/res/xml/power_profile.xml]({{ site.android_source }}/platform/frameworks/base/+/android-5.1.1_r8/core/res/res/xml/power_profile.xml)
 这个XML文件完成初始化。厂商需要根据硬件设备的实际情况，设置不同的参数，以下是Nexus 5(hammerhead)耗电参数配置的代码片段：
 
-{% highlight xml %}
-<device name="Android">
-    <!-- All values are in mAh except as noted -->
-    <item name="none">0</item>
-    ...
-    <item name="wifi.on">3.5</item>
-    <item name="wifi.active">73.24</item>
-    <item name="wifi.scan">75.48</item>
-    ...
-    <item name="battery.capacity">2300</item>
-</device>
-{% endhighlight %}
+    ```xml
+    <device name="Android">
+        <!-- All values are in mAh except as noted -->
+        <item name="none">0</item>
+        ...
+        <item name="wifi.on">3.5</item>
+        <item name="wifi.active">73.24</item>
+        <item name="wifi.scan">75.48</item>
+        ...
+        <item name="battery.capacity">2300</item>
+    </device>
+    ```
 
-wifi.on, wifi.active, wifi.scan分别表示wifi模块在打开、工作和扫描时的单位时间的电流量，这个值的单位的mAh。其他一些参数可以参见：<https://source.android.com/devices/tech/power/index.html#power-values>
+    wifi.on, wifi.active, wifi.scan分别表示wifi模块在打开、工作和扫描时的单位时间的电流量，这个值的单位的mAh。其他一些参数可以参见：<https://source.android.com/devices/tech/power/index.html#power-values>
 
-前面我们提到耗电量是通过计算：
+    前面我们提到耗电量是通过计算：
 
-    耗电量 = 单位时间的耗电量(w) × 使用时间(t) = 电压(U) × 单位时间电流量(I) × 使用时间(t)
+        耗电量 = 单位时间的耗电量(w) × 使用时间(t) = 电压(U) × 单位时间电流量(I) × 使用时间(t)
 
-在手机上电压一般是恒定的，所以，计算耗电量只需要知道单位时间电流量即可。有了power_profile.xml这个文件描述的单位时间电流量，再收集硬件模块在不同状态下的使用时间，就能够近似的计算出耗电量了。
+    在手机上电压一般是恒定的，所以，计算耗电量只需要知道单位时间电流量即可。有了power_profile.xml这个文件描述的单位时间电流量，再收集硬件模块在不同状态下的使用时间，就能够近似的计算出耗电量了。
 
 **至此，我们分析了以下两个问题：**
 
@@ -169,50 +169,50 @@ wifi.on, wifi.active, wifi.scan分别表示wifi模块在打开、工作和扫描
   接下来会调用**ActivityStack.resumeTopActivityInnerLocked()**方法来完成Activity的状态切换，在完成状态切换后，
   会调用**ActivityStackSupervisor.reportResumedActivityLocked()**方法，从这里开始，就开始通报了：“本Activity已经进入了显示状态”。
 
-{% highlight java %}
-boolean reportResumedActivityLocked(ActivityRecord r) {
-    final ActivityStack stack = r.task.stack;
-    if (isFrontStack(stack)) {
-        mService.updateUsageStats(r, true);
+    ```java
+    boolean reportResumedActivityLocked(ActivityRecord r) {
+        final ActivityStack stack = r.task.stack;
+        if (isFrontStack(stack)) {
+            mService.updateUsageStats(r, true);
+        }
+        ...
     }
-    ...
-}
-{% endhighlight %}
+    ```
 
 - 在**ActivityManagerService.updateUsageStats()**方法中，首先会获取一个统计信息的实例**BatteryStatsImpl**，它是**BatteryStats**的子类，描述了所有的统计信息；
   然后，根据是否处于resumed的状态，作出Resumed或Paused的通知。
 
-{% highlight java %}
-void updateUsageStats(ActivityRecord component, boolean resumed) {
-    ...
-    final BatteryStatsImpl stats = mBatteryStatsService.getActiveStatistics();
-    if (resumed) {
+    ```java
+    void updateUsageStats(ActivityRecord component, boolean resumed) {
         ...
-        stats.noteActivityResumedLocked(component.app.uid);
-    } else {
-        ....
-        stats.noteActivityPausedLocked(component.app.uid);
+        final BatteryStatsImpl stats = mBatteryStatsService.getActiveStatistics();
+        if (resumed) {
+            ...
+            stats.noteActivityResumedLocked(component.app.uid);
+        } else {
+            ....
+            stats.noteActivityPausedLocked(component.app.uid);
+        }
     }
-}
-{% endhighlight %}
+    ```
 
 - 在**BatteryStatsImpl.noteActivityResumedLocked()**方法中，会启动一个计时器(StopwatchTimer)，记录下了启动时间(uptime)
 
-{% highlight java %}
-public void noteActivityResumedLocked(long elapsedRealtimeMs) {
-    createForegroundActivityTimerLocked().startRunningLocked(elapsedRealtimeMs);
-}
-{% endhighlight %}
+    ```java
+    public void noteActivityResumedLocked(long elapsedRealtimeMs) {
+        createForegroundActivityTimerLocked().startRunningLocked(elapsedRealtimeMs);
+    }
+    ```
 
 - 在**BatteryStatsImpl.noteActivityPausedLocked()**方法中，会停止之前启动的计时器(StopwatchTimer)，并计算出使用时间。
 
-{% highlight java %}
-public void noteActivityPausedLocked(long elapsedRealtimeMs) {
-    if (mForegroundActivityTimer != null) {
-        mForegroundActivityTimer.stopRunningLocked(elapsedRealtimeMs);
+    ```java
+    public void noteActivityPausedLocked(long elapsedRealtimeMs) {
+        if (mForegroundActivityTimer != null) {
+            mForegroundActivityTimer.stopRunningLocked(elapsedRealtimeMs);
+        }
     }
-}
-{% endhighlight %}
+    ```
 
 除了应用程序前台运行时间，还有很多信息是`batterystats`服务关注的，包括WakeLock、Sendor、Wifi、Audio、Video等，这些信息的采集方式与上述过程雷同，都会经过以下步骤：
 
@@ -231,40 +231,40 @@ public void noteActivityPausedLocked(long elapsedRealtimeMs) {
 
 - **BatteryStatsService()**构造函数中，初始化了**BatteryStats**的子类**BatteryStatsImpl**
 
-{% highlight java %}
-BatteryStatsService(File systemDir, Handler handler) {
-    mStats = new BatteryStatsImpl(systemDir, handler);
-}
-{% endhighlight %}
+    ```java
+    BatteryStatsService(File systemDir, Handler handler) {
+        mStats = new BatteryStatsImpl(systemDir, handler);
+    }
+    ```
 
 - **BatteryStatsImpl()**构造函数中，一开始就会新建一个文件batterystats.bin，传入参数systemDir,就是“/data/system”。
   这个时候，还并没有从文件中读取数据来填充内存。
 
-{% highlight java %}
-public BatteryStatsImpl(File systemDir, Handler handler) {
-    if (systemDir != null) {
-        mFile = new JournaledFile(new File(systemDir, "batterystats.bin"),
-                new File(systemDir, "batterystats.bin.tmp"));
-    } else {
-        mFile = null;
+    ```java
+    public BatteryStatsImpl(File systemDir, Handler handler) {
+        if (systemDir != null) {
+            mFile = new JournaledFile(new File(systemDir, "batterystats.bin"),
+                    new File(systemDir, "batterystats.bin.tmp"));
+        } else {
+            mFile = null;
+        }
+        ...
     }
-    ...
-}
-{% endhighlight %}
+    ```
 
 - **ActivityManagerService()**构造函数中,有初始化电量统计服务的逻辑，会调用到**BatteryStatsImpl.readLocked()**方法，
    这个方法里面完成了将磁盘数据反序列化到内存。
 
-{% highlight java %}
-public ActivityManagerService(Context systemContext) {
-    ...
-    File systemDir = new File(dataDir, "system");
-    systemDir.mkdirs();
-    mBatteryStatsService = new BatteryStatsService(systemDir, mHandler);
-    mBatteryStatsService.getActiveStatistics().readLocked();
-    ...
-}
-{% endhighlight %}
+    ```java
+    public ActivityManagerService(Context systemContext) {
+        ...
+        File systemDir = new File(dataDir, "system");
+        systemDir.mkdirs();
+        mBatteryStatsService = new BatteryStatsService(systemDir, mHandler);
+        mBatteryStatsService.getActiveStatistics().readLocked();
+        ...
+    }
+    ```
 
 有数据的读取，就有数据的写入，通过调用**BatteryStatsImpl.writeLocked()**方法，就将数据写回到了 *batterystats.bin* 这个文件。
 **ActivityManagerService.updateCpuStatsNow()**方法会触发写 *batterystats.bin* 的操作，而这个方法，在更新电量使用信息的时候就会被调用到。
@@ -285,57 +285,57 @@ Setting.apk就引用了这个类。电量计算大体可以分为两块：
 
 - 首先，有一个统计时间段的概念，是通过统计类型**mStatsType**这个变量来表示的，有以下可选值：
 
-{% highlight java %}
-// 统计从上一次充电以来至现在的耗电量
-public static final int STATS_SINCE_CHARGED = 0;
+    ```java
+    // 统计从上一次充电以来至现在的耗电量
+    public static final int STATS_SINCE_CHARGED = 0;
 
-// 统计系统启动以来到现在的耗电量
-public static final int STATS_CURRENT = 1;
+    // 统计系统启动以来到现在的耗电量
+    public static final int STATS_CURRENT = 1;
 
-// 统计从上一次拔掉USB线以来到现在的耗电量
-public static final int STATS_SINCE_UNPLUGGED = 2;
-{% endhighlight %}
+    // 统计从上一次拔掉USB线以来到现在的耗电量
+    public static final int STATS_SINCE_UNPLUGGED = 2;
+    ```
 
 
 - 然后，我们来看一下这个函数体，它实现的是与APP耗电量计算的逻辑。
 
-{% highlight java %}
-private void processAppUsage(SparseArray<UserHandle> asUsers) {
-    // 根据power_profile.xml文件中的单位时间电流量定义，初始化一些计算参数
-    final int which = mStatsType;
-    final int speedSteps = mPowerProfile.getNumSpeedSteps();
-    final double[] powerCpuNormal = new double[speedSteps];
-    final long[] cpuSpeedStepTimes = new long[speedSteps];
-    for (int p = 0; p < speedSteps; p++) {
-        powerCpuNormal[p] = mPowerProfile.getAveragePower(PowerProfile.POWER_CPU_ACTIVE, p);
+    ```java
+    private void processAppUsage(SparseArray<UserHandle> asUsers) {
+        // 根据power_profile.xml文件中的单位时间电流量定义，初始化一些计算参数
+        final int which = mStatsType;
+        final int speedSteps = mPowerProfile.getNumSpeedSteps();
+        final double[] powerCpuNormal = new double[speedSteps];
+        final long[] cpuSpeedStepTimes = new long[speedSteps];
+        for (int p = 0; p < speedSteps; p++) {
+            powerCpuNormal[p] = mPowerProfile.getAveragePower(PowerProfile.POWER_CPU_ACTIVE, p);
+        }
+        final double mobilePowerPerPacket = getMobilePowerPerPacket();
+        final double mobilePowerPerMs = getMobilePowerPerMs();
+        final double wifiPowerPerPacket = getWifiPowerPerPacket();
+        ...
+
+        // 对一个UID进行电量统计， UID几乎可以等同于一个应用程序
+        SparseArray<? extends Uid> uidStats = mStats.getUidStats();
+        final int NU = uidStats.size();
+        for (int iu = 0; iu < NU; iu++) {
+            // 1. 计算每一个UID中所有进程在CPU运算时的耗电量，比如应用程序在前台显示，或者后台有服务在占用CPU
+            //    CPU有不同的运行频率，每一个频率和该频率下的单位时间电流都在power_profile.xml中有定义  
+
+            // 2. 计算Wakelock占用的耗电量，Wakelock被占用，意味着CPU处于唤醒状态
+            //    在有些时候，并不需要进行CPU运算，但CPU仍处于唤醒状态
+
+            // 3. 计算使用数据网络的耗电量
+            //    应用程序使用数据网络上网时的耗电量，完成这部分通信的射频模块(radio)
+
+            // 4. 计算使用wifi的耗电量
+            //    wifi的使用又可以分为两个情况：扫描可用wifi(SCAN)和进行数据传输(RUNNING)，
+            //    这两种情况下的单位时间电流量是不同的
+
+            // 5. 计算使用传感器的耗电量
+            //    GPS使用的耗电量计算也被包含在这里
+        }
     }
-    final double mobilePowerPerPacket = getMobilePowerPerPacket();
-    final double mobilePowerPerMs = getMobilePowerPerMs();
-    final double wifiPowerPerPacket = getWifiPowerPerPacket();
-    ...
-
-    // 对一个UID进行电量统计， UID几乎可以等同于一个应用程序
-    SparseArray<? extends Uid> uidStats = mStats.getUidStats();
-    final int NU = uidStats.size();
-    for (int iu = 0; iu < NU; iu++) {
-        // 1. 计算每一个UID中所有进程在CPU运算时的耗电量，比如应用程序在前台显示，或者后台有服务在占用CPU
-        //    CPU有不同的运行频率，每一个频率和该频率下的单位时间电流都在power_profile.xml中有定义  
-
-        // 2. 计算Wakelock占用的耗电量，Wakelock被占用，意味着CPU处于唤醒状态
-        //    在有些时候，并不需要进行CPU运算，但CPU仍处于唤醒状态
-
-        // 3. 计算使用数据网络的耗电量
-        //    应用程序使用数据网络上网时的耗电量，完成这部分通信的射频模块(radio)
-
-        // 4. 计算使用wifi的耗电量
-        //    wifi的使用又可以分为两个情况：扫描可用wifi(SCAN)和进行数据传输(RUNNING)，
-        //    这两种情况下的单位时间电流量是不同的
-
-        // 5. 计算使用传感器的耗电量
-        //    GPS使用的耗电量计算也被包含在这里
-    }
-}
-{% endhighlight %}
+    ```
 
 - 最后，我们来总结一下应用程序的电量计算过程。Android通过一个名为**BatteryStats.Uid**的数据结构来维护一个应用程序的电量统计信息。
   这个数据结构中，又包含很多子结构：
@@ -357,7 +357,7 @@ private void processAppUsage(SparseArray<UserHandle> asUsers) {
 
 在**BatteryStatsHelper.processMiscUsage()**这个方法中，实现了其他一些杂项的电量计算，函数的实现清晰了表明了意图。
 
-{% highlight java %}
+```java
 private void processMiscUsage() {
     addUserUsage();
     addPhoneUsage();
@@ -371,7 +371,7 @@ private void processMiscUsage() {
         addRadioUsage();
     }
 }
-{% endhighlight %}
+```
 
 **至此，我们进一步分析以下两个问题:**
 
