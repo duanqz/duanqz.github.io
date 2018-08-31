@@ -16,7 +16,7 @@ tags:  [电量统计,日志分析]
 Android提供的**dumpsys**命令用于查看系统服务的信息(实现原理可以查阅[dumpsys介绍](/2015-07-19-Intro-to-dumpsys))，
 将**batterystats**作为参数，就能输出完整的电量统计信息。
 
-{% highlight console %}
+```sh
 $ adb shell dumpsys batterystats
 Battery History (2% used, 6184 used of 256KB, 36 strings using 2418):
                     0 (9) RESET:TIME: 2015-07-23-07-59-11
@@ -59,4 +59,4 @@ Battery History (2% used, 6184 used of 256KB, 36 strings using 2418):
        +1h02m04s176ms (2) 095 data_conn=umts
        +1h02m12s472ms (2) 095 data_conn=hspap
                   ...
-{% endhighlight %}
+```
