@@ -2,7 +2,7 @@
 layout: post
 category: Android启智观
 title: 电量统计(1)-原理
-tagline: batterystats
+tagline: battery
 tags: [电量统计,日志分析]
 ---
 

@@ -2,7 +2,7 @@
 layout: post
 category: Android启智观
 title: 电量统计(2)-日志
-tagline: batterystats
+tagline: battery
 tags:  [电量统计,日志分析]
 ---
 
@@ -81,11 +81,11 @@ Discharge step durations:
   - **Cellular Statistics**: 移动数据网络状态和使用情况
   - **Wifi Statistics**: WIFI的网络状态和使用情况
   - **Bluetooth**: 蓝牙在不同工作状态下的使用情况
-  - **Estimated power use (mAh)**: 很重要的信息，近似计算出的各个用户(uid)的耗电量，一个APK通常对应到一个用户，当然，也有多个APK共享一个用户的情况
-  - **All kernel wake locks**: Kernel Wakelock的使用情况
-  - **All partial wake locks**: 应用层Wakelock的使用情况
+  - **Estimated power use (mAh)**: 近似计算出的各个用户(uid)的耗电量，一个APK通常对应到一个用户，当然，也有多个APK共享一个用户的情况
+  - **All kernel wake locks**: 内核锁的使用统计
+  - **All partial wake locks**: 应用锁的使用统计
   - **All wakeup reasons**: 所有的唤醒原因
-  - **uid**: 每一个uid下的进程以及使用硬件设备的情况
+  - **Statistics by uid**: 每一个uid的耗电细节
 
 对整个日志文件的结构有一个粗略的了解后，就可以开始逐个击破了。
 
@@ -327,7 +327,10 @@ Estimated power use (mAh):
 
 ### 2.5.3 All kernel wake locks
 
-按持锁时间排序，显示不同kernel wake lock的持锁时间和次数。
+按持锁时间排序，显示不同内核锁的持锁时间和次数。
+
+`batterystats`会从**/proc/wakelocks**和**/d/wakeup_sources**这两个文件中读取内核的持锁情况。有兴趣的读者可以查阅源码[KernelWakelockReader.java]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/com/android/internal/os/KernelWakelockReader.java)。
+
 
 ```
   All kernel wake locks:
@@ -338,9 +341,147 @@ Estimated power use (mAh):
   ...
 ```
 
-`batterystats`会从**/proc/wakelocks**和**/d/wakeup_sources**这两个文件中读取Kernel wake lock的持锁情况。
-有兴趣的读者可以查阅源码[KernelWakelockReader.java]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/com/android/internal/os/KernelWakelockReader.java)
+一旦有内核持锁，那CPU是无法休眠的，一直以较高的频率运行导致的结果就是耗电。
+上面日志中，累计持锁时间最长的是**[timerfd]**，累计持锁13238次，累计时长11分57秒。这是一份待机12天的日志，累计最长时间的内核锁仅仅持锁了不到12分钟，说明只是一些正常的唤醒。
+
+对于应用而言，是不能直接使用内核锁的，需要通过Android提供的Wake Lock机制，使用PowerManager接口来申请和释放锁。应用可以持有多个不同的锁，但反应到内核的锁也就三种：
+
+- **PowerManagerService.WakeLocks**：控制CPU状态的锁
+- **PowerManagerService.Display**： 控制屏幕状态的锁
+- **PowerManagerService.Broadcasts**：控制电源状态改变的通知锁
+
+如果在这部分日志中，发现以上三种锁持有时间很长，那说明很可能是应用使用Wake Lock不当导致的。
 
 ### 2.5.4 All partial wake locks
 
+按持锁时间排序，显示不同应用锁的持锁时间和次数。
+
+在一些应用场景下，需要保持CPU处于工作状态，譬如：打游戏、看视频、灭屏听音乐、后台下载等，这时候，就要向框架层的电源管理服务申请Wake Lock，再由框架层决策是否向内核申请锁。
+
+```
+  All partial wake locks:
+  Wake lock 1001 RILJ_ACK_WL: 24m 4s 809ms (6700 times) max=526 actual=1642274 (running for 0ms) realtime
+  Wake lock 1001 RILJ: 2m 53s 606ms (13642 times) max=220 actual=350673 realtime
+  Wake lock 1000 deviceidle_maint: 1m 7s 186ms (3 times) max=30307 actual=90799 realtime
+  ...
+```
+
+上面的日志中，**RILJ_ACK_WL**这个来自uid 1001的锁累计持锁时间最长，为24分4秒，累计被唤醒了6700次。
+
+这里介绍几个比较常见：
+
+- RIJ：通信上层需要向Modem发送数据时，会获取名为RIJ的锁
+- RILJ_ACK_WL：通信上层收到Modem上报的数据后，需要向Modem回复一个ACK，此时会获取名为RILJ_ACK_WL的锁
+- NetworkStats：进行流量统计时所持有的锁
+- \*walarm\*或者\*alarm\*： 通过AlarmManager唤醒所持有的锁
+- \*job\*/xxx：通过JobScheduler调度的任务所持有的锁
+- \*vibrator\*：在震动状态下所持有的锁
+- deviceidle_maint：进入Doze Maintainace状态所持有的锁，此时，手机从深度睡眠中唤醒，用很短的时间执行之前被搁置的CPU任务
+
+如果我们对常见的锁比较了解，就能够评估出CPU时间究竟被什么任务占用了。正常情况下，任何一个锁都不应该长时间不释放，导致严重耗电的往往是那些持锁时间较长的进程。
+
 ### 2.5.5 All wakeup reasons
+
+按唤醒次数排序，显示不同的持锁原因。
+
+```
+  All wakeup reasons:
+  Wakeup reason 168:qcom,smd-rpm-summary:280:681b8.qcom,mpm:174:400f000.qcom,spmi:184:qpnp_rtc_alarm: 13m 22s 325ms (3182 times) realtime
+  Wakeup reason Abort:Callback failed on 7570000.uart in msm_hs_pm_sys_suspend_noirq+0x0/0x134 returned -16: 26m 28s 17ms (2683 times) realtime
+  Wakeup reason 168:qcom,smd-rpm-summary: 2m 49s 118ms (467 times) realtime
+  ...
+```
+
+上面的日志中，**168:qcom,smd-rpm-summary:280:681b8.qcom,mpm:174:400f000.qcom,spmi:184:qpnp_rtc_alarm**这个原因导致了3182次唤醒。唤醒原因是Native层上报的，有些日志需要有内核和驱动的开发经验才能看懂。
+
+### 2.5.6 Statistics by uid
+
+`batterystats`是按照uid来统计耗电的，每一个uid的耗电详情都会在这一部分日志中体现出来。在[Process.java]({{ site.android_source }}/platform/frameworks/base/+/master/core/java/android/os/Process.java)定义了不同uid的值：
+
+```java
+public static final int ROOT_UID = 0;         // initd、netd、installd等内核进程
+public static final int SYSTEM_UID = 1000;    // system、settings、servicemanager等系统进程
+public static final int PHONE_UID = 1001;     // phone、rild等通信进程
+public static final int BLUETOOTH_UID = 1002; // 蓝牙进程
+public static final int FIRST_APPLICATION_UID = 10000;  // 应用进程的初始UID值
+public static final int LAST_APPLICATION_UID = 19999;   // 应用进程的最大UID值
+```
+
+Android中预设的uid都是小于10000的，应用进程的uid是在[10000,19999]这个区间分配的，为了描述方便，10000就用字符*a*代替了，例如：u0a21就表示uid为10021，前面的*u0*表示这是user 0(默认的Android用户编号就是0)。
+
+> **注意**：Android用户的编号不同于uid，Android是一个多用户系统，会为每一个用户分配一个用户编号，通常我们的手机就我们自己用，对多用户的感受不明显，但如果映射到Window上的用户，就好理解了，管理员和普通用户就是两个不同的用户，不同的用户可以独立管理自己的桌面和文件，互不影响。
+>
+> uid是linux用户的概念，Android为了做进程隔离，借用linux的uid来隔离不同进程的数据，这就是所谓的“沙箱机制”。Android为每一个包都分配了一个uid，简单理解，我们安装一个APK时，就会为这个APK分配一个uid，一旦分配完成，这个uid就不会改变了。运行这个APK时，这个uid就会映射到一个或多个进程。当然，Android还提供另外一种机制，通过sharedUserId和签名可以将不同APK运行在同一个进程中，但此时，不同APK的uid是一样的，都是sharedUserId配置的值。
+
+理解了uid的概念后，先来看uid为0的耗电详情：
+
+```
+  CPU freqs: 307200 384000 460800 537600 614400 691200 748800 768000 825600 844800 902400 979200 1056000 1132800 1209600 1286400 1363200 1440000 1516800 1593600 1670400 1747200 1824000 1900800 1977600 2054400 2150400
+
+  0:
+    Total cpu time: u=31s 337ms s=14m 36s 531ms 
+    Total cpu time per freq: 402470 17540 18100 18030 15310 5760 1230 1740 1650 1320 2230 1650 1170 1140 300 440 390 790 340 1180 150 90 80 60 90 80 770
+    Total screen-off cpu time per freq: 399680 17280 17890 17870 15110 5570 1200 1540 1550 1170 2010 1530 1090 690 270 430 330 590 260 740 110 60 60 40 80 80 510
+    Proc irq/19-408000.q:
+      CPU: 0ms usr + 3s 410ms krn ; 0ms fg
+    Proc android.hardware.wifi@1.0-service:
+      CPU: 10ms usr + 20ms krn ; 0ms fg
+    ...
+```
+
+- CPU freqs：CPU所有的频率值，最小的307200(300M Hz)，最大的2150400(2.05G Hz)
+- Total cpu time：累计的CPU使用时间
+- Total cpu time per freq：在不同CPU频率下的使用时间
+- Total screen-off cpu time per freq：灭屏状态下，不同CPU频率的使用时间
+- Proc：每一个进程的CPU使用时间
+
+再来看另外一个uid为1000的耗电详情，系统相关的进程都被统计到这个uid下：
+
+```
+  1000:
+    User activity: 4 other, 6 button, 27 touch
+    Wake lock ActivityManager-Sleep: 48ms partial (1 times) max=53 actual=53 realtime
+    Wake lock *alarm*: 16s 109ms partial (349 times) max=213 actual=23936 realtime
+    Wake lock PhoneWindowManager.mPowerKeyWakeLock: 17ms partial (1 times) max=17 realtime
+    ...
+    Audio: 1s 480ms realtime (7 times)
+    Sensor 7: 1m 39s 460ms realtime (2 times)
+    Sensor 30: 1m 39s 392ms realtime (3 times)
+    Vibrator: 100ms realtime (5 times)
+    Foreground activities: 18s 747ms realtime (6 times)
+    Fg Service for: 12d 21h 29m 48s 696ms 
+    Total running: 12d 21h 29m 48s 696ms 
+    Total cpu time: u=2m 25s 691ms s=14m 19s 515ms 
+    Total cpu time per freq: 889380 52900 50670 42700 45550 19950 1170 10610 1350 8400 6780 6260 4810 3680 1180 1800 1460 2230 1340 5320 350 220 160 110 90 140 11910
+    Total screen-off cpu time per freq: 885260 52060 49940 41850 44600 18870 1030 9190 1170 7040 5480 4990 4320 2270 1030 1660 1270 1570 770 2420 160 50 90 40 70 80 660
+    Proc android.hardware.memtrack@1.0-service:
+      CPU: 160ms usr + 210ms krn ; 0ms fg
+    Proc imsqmidaemon:
+      CPU: 80ms usr + 1s 560ms krn ; 0ms fg
+    Proc servicemanager:
+      CPU: 400ms usr + 960ms krn ; 0ms fg
+    ...
+    Apk android:
+      Wakeup alarm *walarm*:*job.delay*: 33 times
+      Wakeup alarm *walarm*:ScheduleConditionProvider.EVALUATE: 51 times
+      Wakeup alarm *walarm*:*job.deadline*: 9 times
+      Wakeup alarm *walarm*:com.android.server.ACTION_TRIGGER_IDLE: 2 times
+      Wakeup alarm *walarm*:EventConditionProvider.EVALUATE: 12 times
+      Service com.android.server.backup.KeyValueBackupJob:
+        Created for: 0ms uptime
+        Starts: 0, launches: 9
+      Service com.android.server.camera.CameraStatsJobService:
+        Created for: 0ms uptime
+        Starts: 0, launches: 12
+      Service com.android.server.PruneInstantAppsJobService:
+        Created for: 0ms uptime
+        Starts: 0, launches: 13
+```
+
+- User activity: 用户的触屏、实体键操作
+- Wake lock： 当前uid持有锁的时间和次数统计
+- Sensor：传感器使用时间和次数
+- Foreground activities：前台界面的显示时间
+- Apk android： uid关联到的包名，对于系统进程而言，包名就是android，这个包名来自于framework-res.apk
+
+**至此，整个电量统计的日志就分析完毕了。**
