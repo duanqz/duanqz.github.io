@@ -2,6 +2,14 @@
 
 Personal Blog
 
-## License
+## Setup
 
-[MIT](http://opensource.org/licenses/MIT)
+Ubuntu 18.04
+
+```sh
+$ sudo apt install ruby-dev
+$ sudo gem install bundler -v '2.0.1'
+$ sudo gem install jekyll
+$ bundle install
+$ bundle exec jekyll serve
+```
