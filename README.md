@@ -13,3 +13,5 @@ $ sudo gem install jekyll
 $ bundle install
 $ bundle exec jekyll serve
 ```
+
+If update dependencies in [Gemfile](Gemfile), then use `bundle update` to update [Gemfile.lock](Gemfile.lock).
