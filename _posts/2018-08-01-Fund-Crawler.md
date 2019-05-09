@@ -1,6 +1,6 @@
 ---
 layout: post
-category: 小白文
+category: 技术札记
 title: 基金数据爬虫
 tagline:
 tags : [爬虫 基金]

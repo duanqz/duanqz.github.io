@@ -1,6 +1,6 @@
 ---
 layout: post
-category : 小白文
+category : 技术札记
 title: Java ThreadLocal的演化、实现和场景
 tagline:
 tags : [Java编程]

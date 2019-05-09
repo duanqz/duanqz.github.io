@@ -1,6 +1,6 @@
 ---
 layout: post
-category : 小白文
+category : 技术札记
 title: 微擎环境搭建指南
 tagline:
 tags: 微擎开发

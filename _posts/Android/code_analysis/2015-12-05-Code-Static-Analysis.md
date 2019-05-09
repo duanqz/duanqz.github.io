@@ -1,6 +1,6 @@
 ---
 layout: post
-category: 小白文
+category: 技术札记
 title: 静态代码检查工具--Klocwork
 tagline:
 tags:  [代码检查]
